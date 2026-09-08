@@ -1,0 +1,72 @@
+00:00.391  blend            | Read blend: "/Users/codeinthemode/Crew's Place/characters/cowboy_face_v02/cowboy_face_v02.blend"
+INFO Draco is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_draco_bridge.dylib
+INFO MeshOptimizer is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib
+21:44:03 | INFO: Starting glTF 2.0 export
+21:44:03 | INFO: Extracting primitive: Body torso | mesh.003
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Boot L | shaped outsole | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Boot L | welt edging | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Boot L | sculpted shaft | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | dark blue limbal ring | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Sphere.031
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | blue iris | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Brow L | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | pupil | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Mouth | lower lip | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | inner blue iris | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Mouth | quiet expression | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Sphere.036
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | almond sclera | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Eye L | upper eyelid | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Belt | brass buckle frame | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Cube.034
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Holster | front edge stitch | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Belt | continuous leather strap | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Cube.035
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Cube.030
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Hat | bound brim edge | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: HAT | swept cowboy brim | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Hat | leather band | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Body torso | mesh.002
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Sphere.005
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Shirt torso | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Pocket lower stitch L | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Cuff L | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Trouser hip | mesh.001
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Extracting primitive: Trouser outside seam L | curve
+21:44:03 | INFO: Primitives created: 1
+21:44:03 | INFO: Finished glTF 2.0 export in 0.11874985694885254 s
+
+EXPORT_REPORT {"source": "characters/cowboy_face_v02/cowboy_face_v02.blend", "asset": "assets/models/cowboy.glb", "height": 1.85, "up": "+Y", "forward": "+Z", "ground_origin": true, "meshes": 31, "triangles": 123609, "bytes": 2574964, "animations": 0, "studio_exported": false}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

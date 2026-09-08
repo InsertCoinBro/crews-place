@@ -1,0 +1,181 @@
+/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/build_jolly_robot.py:38: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/build_jolly_robot.py:320: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+Info: Saved as "jolly_robot_v01.blend"
+JOLLY_SAVED /Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_v01.blend
+INFO Draco is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_draco_bridge.dylib
+INFO MeshOptimizer is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib
+21:50:07 | INFO: Starting glTF 2.0 export
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | WARNING: Armature must be the parent of skinned meshArmature is selected by its name, but may be false in case of instances
+21:50:07 | INFO: Extracting primitive: Cube.106
+21:50:09 | INFO: Primitives created: 7
+21:50:10 | INFO: Finished glTF 2.0 export in 3.2755300998687744 s
+
+EXPORT_REPORT {"source": "characters/jolly_robot_v01/jolly_robot_v01.blend", "asset": "assets/models/jolly_robot.glb", "editable_parts": 158, "bones": 15, "triangles": 36428, "bytes": 1428404, "height_m": 1.85, "up": "+Y", "forward": "+Z", "clips": {"Happy_Idle": [0, 0], "Hello_Wave": [0, 0], "Jolly_Walk": [0, 0]}, "studio_exported": false, "walk": "Initial in-place cycle; foot-contact tuning remains for integration"}
+00:31.865  blend            | Read blend: "/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_v01.blend"
+02:07.034  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_preview.png'
+02:14.961  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_front.png'
+02:23.927  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_rear.png'
+JOLLY_PREVIEWS_COMPLETE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

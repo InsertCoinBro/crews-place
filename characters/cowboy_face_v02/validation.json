@@ -1,0 +1,17 @@
+{
+  "source": "cowboy_shell_v01.blend",
+  "original_objects_checked": 83,
+  "all_original_geometry_transforms_and_colors_unchanged": true,
+  "new_face_objects": 31,
+  "features": [
+    "blue eyes",
+    "eyelids",
+    "eyebrows",
+    "nose",
+    "mustache",
+    "goatee",
+    "subtle mouth"
+  ],
+  "ears_added": false,
+  "finite_new_mesh_coordinates": true
+}

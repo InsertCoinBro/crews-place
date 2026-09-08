@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#194e4b" />
+    <meta
+      name="description"
+      content="Explore a little town at your own pace. A playable 3D world at Crew's Place."
+    />
+    <title>Crew's Place · Little Town</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body>
+    <main id="game" aria-label="Little Town 3D game">
+      <canvas
+        id="world"
+        tabindex="0"
+        aria-label="Town, Friendly Farm, and Skybird Airfield. WASD or arrows to walk, Shift to run, drag mouse to look, Space to jump, and E to interact. At the yellow plane, press E to enter, hold W or Up to take off and climb, S or Down to descend, A or D to turn, and E to leave the plane. Near the blue car, press E to enter, W or S to drive around the street, and E to get out."
+      ></canvas>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">c<span>•</span></span>
+        <div>Crew's Place<small>A LITTLE WORLD OF YOUR OWN</small></div>
+      </div>
+      <section id="opening" class="opening" aria-labelledby="welcome-title">
+        <div class="welcome-card">
+          <span class="eyebrow"><i></i> WELCOME TO LITTLE TOWN</span>
+          <h1 id="welcome-title">
+            A little town.<br />So much to <em>explore.</em>
+          </h1>
+          <p>
+            Take a wander, meet the neighborhood,<br class="wide-only" />
+            and find a little joy around every corner.
+          </p>
+          <fieldset class="character-choices">
+            <legend>Choose your character</legend>
+            <label class="character-choice">
+              <input
+                type="radio"
+                name="character"
+                value="cowboy"
+                checked
+                disabled
+              />
+              <span aria-hidden="true" class="character-icon">🤠</span>
+              <span
+                ><strong>Cowboy</strong
+                ><small>Your familiar explorer</small></span
+              >
+            </label>
+            <label class="character-choice">
+              <input
+                type="radio"
+                name="character"
+                value="jolly_robot"
+                disabled
+              />
+              <span aria-hidden="true" class="character-icon">🤖</span>
+              <span
+                ><strong>Jolly Robot</strong
+                ><small>A smile in every step</small></span
+              >
+            </label>
+          </fieldset>
+          <p id="character-status" class="character-status" role="status">
+            Getting everyone ready…
+          </p>
+          <button id="start" class="primary" disabled>
+            Preparing the town…
+          </button>
+          <div class="welcome-foot">
+            <span>YOUR PACE. YOUR PATH.</span><span>NO TIMERS. JUST PLAY.</span>
+          </div>
+        </div>
+        <span class="scene-caption"
+          >LITTLE TOWN <span>01</span> <i>•</i> A place to begin</span
+        >
+      </section>
+      <div id="hud" hidden>
+        <div class="top-actions">
+          <button id="camera-lock" class="pill">Free mouse</button
+          ><button id="pause" class="pill">Pause <kbd>Esc</kbd></button>
+        </div>
+        <div class="location">
+          <span class="location-dot"></span>
+          <div>
+            <small>YOU'RE EXPLORING</small
+            ><strong id="location-name">Town Square</strong>
+          </div>
+        </div>
+        <div id="flight-status" class="flight-status" role="status" hidden>
+          <span>SKYBIRD FLIGHT</span>
+          <strong><span id="flight-altitude">0 m</span> high</strong>
+          <small id="flight-speed">0 km/h</small>
+        </div>
+        <div class="map-card">
+          <span id="map-title">LITTLE TOWN</span
+          ><canvas
+            id="map"
+            width="180"
+            height="180"
+            aria-label="Town map showing your position"
+          ></canvas
+          ><small id="map-caption">Find your own way</small>
+        </div>
+        <div
+          id="prompt"
+          class="prompt"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <div class="controls">
+          <span><kbd>W A S D</kbd> / <kbd>↑ ← ↓ →</kbd> Walk</span
+          ><span><kbd>Drag mouse</kbd> Look</span
+          ><span><kbd>Shift</kbd> Run</span><span><kbd>Space</kbd> Jump</span
+          ><span><kbd>E</kbd> Interact</span>
+          <span id="drive-controls" hidden
+            ><kbd>W</kbd>/<kbd>S</kbd> Drive forward / reverse ·
+            <kbd>E</kbd> Get out</span
+          >
+          <span id="plane-controls" hidden
+            ><kbd>W</kbd>/<kbd>↑</kbd> Take off + climb · <kbd>S</kbd>/<kbd
+              >↓</kbd
+            >
+            Descend · <kbd>A</kbd>/<kbd>D</kbd> Turn · <kbd>E</kbd> Leave
+            plane</span
+          >
+        </div>
+        <div
+          id="robot-gestures"
+          class="robot-gestures"
+          aria-label="Robot gestures"
+          hidden
+        >
+          <span>Say it your way</span>
+          <button data-gesture="Wave">Wave <kbd>F</kbd></button>
+          <button data-gesture="Celebrate">Celebrate <kbd>G</kbd></button>
+          <button data-gesture="LookAround">Look <kbd>H</kbd></button>
+          <button data-gesture="Nod">Nod <kbd>J</kbd></button>
+          <button data-gesture="ShakeHead">Shake head <kbd>K</kbd></button>
+        </div>
+        <div id="cowboy-controls" class="cowboy-controls">
+          <kbd>F</kbd> Dance · <kbd>T</kbd> Grab / return a toy
+        </div>
+        <div id="pickup-hint" class="pickup-hint" role="status" hidden></div>
+        <div id="toast" class="toast" role="status" hidden></div>
+      </div>
+      <dialog id="panel" aria-labelledby="panel-title">
+        <span id="panel-tag" class="eyebrow">TAKE YOUR TIME</span>
+        <h2 id="panel-title">A little pause.</h2>
+        <p id="panel-copy">Your town will be right here.</p>
+        <div id="preferences">
+          <div class="pause-character">
+            <label for="pause-character">Your character</label>
+            <select id="pause-character">
+              <option value="cowboy">Cowboy</option>
+              <option value="jolly_robot">Jolly Robot</option>
+            </select>
+          </div>
+          <label
+            ><input id="calm" type="checkbox" /> Gentler motion
+            <small>Slower camera, fewer leaves</small></label
+          >
+        </div>
+        <button id="resume" class="primary">
+          Return to exploring <span aria-hidden="true">→</span>
+        </button>
+      </dialog>
+      <section id="error" class="error" role="alert" hidden>
+        <h2>The town couldn't start.</h2>
+        <p id="error-copy"></p>
+        <button onclick="location.reload()">Try again</button>
+      </section>
+      <noscript>This town needs JavaScript turned on to play.</noscript>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

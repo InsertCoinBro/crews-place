@@ -1,0 +1,62 @@
+{
+  "rig_system": "Rigify",
+  "components": "basic.super_copy",
+  "control_bones": 15,
+  "metarig_retained": true,
+  "original_unchanged": true,
+  "height_m": 1.85,
+  "clips": {
+    "Idle": {
+      "frames": 97,
+      "duration_s": 4.0
+    },
+    "Walk": {
+      "frames": 33,
+      "duration_s": 1.3333333333333333
+    },
+    "Run": {
+      "frames": 21,
+      "duration_s": 0.8333333333333334
+    },
+    "Jump": {
+      "frames": 11,
+      "duration_s": 0.4166666666666667
+    },
+    "Fall": {
+      "frames": 25,
+      "duration_s": 1.0
+    },
+    "Land": {
+      "frames": 9,
+      "duration_s": 0.3333333333333333
+    },
+    "Wave": {
+      "frames": 81,
+      "duration_s": 3.3333333333333335
+    },
+    "Celebrate": {
+      "frames": 65,
+      "duration_s": 2.6666666666666665
+    },
+    "LookAround": {
+      "frames": 97,
+      "duration_s": 4.0
+    },
+    "Nod": {
+      "frames": 41,
+      "duration_s": 1.6666666666666667
+    },
+    "ShakeHead": {
+      "frames": 49,
+      "duration_s": 2.0
+    }
+  },
+  "expressions": [
+    "Blink",
+    "Focused",
+    "Surprised",
+    "Delighted",
+    "Wink"
+  ],
+  "bytes": 1863256
+}

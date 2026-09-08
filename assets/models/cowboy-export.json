@@ -1,0 +1,13 @@
+{
+  "source": "characters/cowboy_face_v02/cowboy_face_v02.blend",
+  "asset": "assets/models/cowboy.glb",
+  "height": 1.85,
+  "up": "+Y",
+  "forward": "+Z",
+  "ground_origin": true,
+  "meshes": 31,
+  "triangles": 123609,
+  "bytes": 2574964,
+  "animations": 0,
+  "studio_exported": false
+}

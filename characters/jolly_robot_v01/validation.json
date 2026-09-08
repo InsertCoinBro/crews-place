@@ -1,0 +1,27 @@
+{
+  "source": "characters/jolly_robot_v01/jolly_robot_v01.blend",
+  "asset": "assets/models/jolly_robot.glb",
+  "editable_parts": 158,
+  "bones": 15,
+  "triangles": 36428,
+  "bytes": 1428404,
+  "height_m": 1.85,
+  "up": "+Y",
+  "forward": "+Z",
+  "clips": {
+    "Happy_Idle": [
+      0,
+      0
+    ],
+    "Hello_Wave": [
+      0,
+      0
+    ],
+    "Jolly_Walk": [
+      0,
+      0
+    ]
+  },
+  "studio_exported": false,
+  "walk": "Initial in-place cycle; foot-contact tuning remains for integration"
+}

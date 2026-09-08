@@ -1,0 +1,324 @@
+/* Mini-games use the same canvas and the entire viewport, not browser fullscreen. */
+.arcade-active .brand,
+.arcade-active #hud {
+  display: none !important;
+}
+#arcade-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #234e57;
+  font-family: "Avenir Next", Avenir, system-ui, sans-serif;
+}
+.arcade-top {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+}
+.arcade-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 190px;
+}
+#arcade-symbol {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background: #fff8d6c9;
+  font-size: 36px;
+  color: #477e89;
+  border: 1px solid #fff9;
+}
+.arcade-title small {
+  font-size: 9px;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+.arcade-title h1 {
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  margin: 4px 0 0;
+}
+.arcade-stats {
+  background: #fcfff0eb;
+  box-shadow: 0 4px 20px #28415b13;
+  border: 1px solid #fff;
+  padding: 14px 22px;
+  border-radius: 18px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  white-space: pre-wrap;
+}
+.arcade-actions {
+  display: flex;
+  gap: 9px;
+  pointer-events: auto;
+}
+.arcade-button {
+  border: 1px solid #ffffff9c;
+  background: #f8fbeff0;
+  color: #30535a;
+  font:
+    700 13px "Avenir Next",
+    Avenir,
+    system-ui,
+    sans-serif;
+  padding: 13px 17px;
+  border-radius: 14px;
+  cursor: pointer;
+  min-height: 46px;
+}
+.arcade-button:hover {
+  background: #fffdf2;
+  box-shadow: 0 3px 16px #25495f25;
+}
+.arcade-button:focus-visible {
+  outline: 3px solid #d98f27;
+  outline-offset: 3px;
+}
+.arcade-button kbd {
+  margin-left: 5px;
+  font-size: 10px;
+}
+.arcade-message {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  text-align: center;
+  font-size: 14px;
+  background: #f8ffefde;
+  padding: 10px 21px;
+  border-radius: 30px;
+  font-weight: 600;
+}
+.arcade-message:empty {
+  display: none;
+}
+.arcade-bottom {
+  position: absolute;
+  bottom: 23px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 40px);
+  text-align: center;
+  background: #fcfff0e8;
+  border: 1px solid #fff9;
+  border-radius: 18px;
+  padding: 13px 24px;
+  box-shadow: 0 3px 20px #22354a10;
+}
+.arcade-bottom p {
+  font-size: 13px;
+  line-height: 1.55;
+}
+#arcade-progress-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+#arcade-progress {
+  appearance: none;
+  height: 9px;
+  width: 150px;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #d6e3d6;
+}
+#arcade-progress::-webkit-progress-bar {
+  background: #d6e3d6;
+  border-radius: 10px;
+}
+#arcade-progress::-webkit-progress-value {
+  background: #d7a147;
+  border-radius: 10px;
+}
+#arcade-progress::-moz-progress-bar {
+  background: #d7a147;
+}
+.arcade-result {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #21385055;
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+  padding: 26px;
+}
+.arcade-result-card {
+  max-width: 510px;
+  width: 100%;
+  border: 1px solid #fff;
+  background: #fffbed;
+  color: #2d515b;
+  border-radius: 28px;
+  padding: 38px;
+  text-align: center;
+  box-shadow: 0 24px 100px #1d344f44;
+}
+#arcade-result-tag {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 800;
+  color: #668e87;
+}
+.arcade-result-card h2 {
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -1.2px;
+  margin: 20px 0 16px;
+}
+.arcade-result-card p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: #5c787f;
+}
+#arcade-result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 25px;
+}
+.arcade-result-card .arcade-button {
+  font-size: 16px;
+  padding: 16px 22px;
+  border: 1px solid #cedecc;
+}
+.arcade-result-card .arcade-primary {
+  background: #38696d;
+  color: #fff8de;
+  border-color: #38696d;
+}
+.arcade-top {
+  z-index: 2;
+}
+.arcade-result {
+  z-index: 1;
+} /* Exit and mute stay available above every outcome. */
+#arcade-layer[data-game="rocket"] .arcade-title {
+  color: #fff2de;
+}
+#arcade-layer[data-game="rocket"] #arcade-symbol {
+  background: #607b9e66;
+  color: #f7d77d;
+}
+#arcade-layer[data-game="rocket"] .arcade-message {
+  background: #354968e8;
+  color: #e3f2ff;
+  border: 1px solid #7796bb66;
+}
+#arcade-layer[data-game="rocket"] .arcade-stats {
+  font-size: 14px;
+}
+@media (max-width: 1050px) {
+  .arcade-top {
+    gap: 12px;
+    left: 18px;
+    right: 18px;
+    top: 18px;
+    flex-wrap: wrap;
+  }
+  .arcade-title {
+    min-width: 0;
+  }
+  .arcade-title h1 {
+    font-size: 21px;
+  }
+  .arcade-stats {
+    order: 3;
+    flex-basis: 100%;
+    margin: 0 auto;
+    padding: 9px 15px;
+    max-width: 560px;
+  }
+  .arcade-message {
+    top: 142px;
+    font-size: 12px;
+  }
+  .arcade-actions {
+    margin-left: auto;
+  }
+  #arcade-symbol {
+    width: 42px;
+    height: 42px;
+    font-size: 30px;
+  }
+  .arcade-title small {
+    font-size: 8px;
+  }
+}
+@media (max-width: 600px) {
+  .arcade-top {
+    top: 14px;
+    left: 12px;
+    right: 12px;
+    gap: 10px;
+  }
+  .arcade-title {
+    gap: 8px;
+  }
+  .arcade-title h1 {
+    font-size: 18px;
+  }
+  .arcade-title small {
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+  .arcade-button {
+    padding: 10px;
+    font-size: 11px;
+    min-height: 44px;
+  }
+  .arcade-button kbd {
+    display: none;
+  }
+  .arcade-actions {
+    gap: 6px;
+  }
+  .arcade-stats {
+    font-size: 14px;
+  }
+  #arcade-layer[data-game="rocket"] .arcade-stats {
+    font-size: 12px;
+  }
+  .arcade-message {
+    top: 126px;
+    font-size: 11px;
+    width: max-content;
+    max-width: 93%;
+    padding: 9px 13px;
+  }
+  .arcade-bottom {
+    bottom: 16px;
+    max-width: calc(100% - 24px);
+    padding: 10px 14px;
+    width: calc(100% - 24px);
+  }
+  .arcade-bottom p {
+    font-size: 11px;
+  }
+  .arcade-result-card {
+    padding: 30px 24px;
+  }
+  .arcade-result-card h2 {
+    font-size: 30px;
+  }
+}

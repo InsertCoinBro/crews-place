@@ -1,0 +1,41 @@
+00:00.612  blend            | Read blend: "/Users/codeinthemode/Crew's Place/characters/jolly_robot_v01/jolly_robot_v01.blend"
+Reloading external rigs...
+Reloading external metarigs...
+Fetch rig.
+Clear rig animation data.
+Create widgets collection: 0.001
+Duplicate rig: 0.018
+Instantiate rigs: 0.000
+Initialize rigs: 0.000
+Prepare bones: 0.001
+Generate bones: 0.007
+Parent bones: 0.004
+Configure bones: 0.005
+Preapply bones: 0.007
+Apply bones: 0.000
+Rig bones: 0.004
+Generate widgets: 0.003
+Assign layers: 0.007
+Finalize: 0.007
+The rest: 0.004
+Info: Saved as "jolly_robot_rigify_v02.blend"
+RIGIFY_SAVED /Users/codeinthemode/Crew's Place/characters/jolly_robot_v02/jolly_robot_rigify_v02.blend
+INFO Draco is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_draco_bridge.dylib
+INFO MeshOptimizer is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib
+12:59:49 | INFO: Starting glTF 2.0 export
+12:59:49 | INFO: Extracting primitive: Cube.106
+12:59:49 | INFO: Primitives created: 7
+12:59:49 | INFO: Extracting primitive: Cube.208
+12:59:49 | INFO: Primitives created: 1
+12:59:49 | INFO: Extracting primitive: Antenna | bent spring.001
+12:59:49 | INFO: Primitives created: 5
+12:59:53 | INFO: Finished glTF 2.0 export in 3.3287301063537598 s
+
+RIGIFY_EXPORTED /Users/codeinthemode/Crew's Place/assets/models/jolly_robot.glb
+00:39.604  blend            | Read blend: "/Users/codeinthemode/Crew's Place/characters/jolly_robot_v02/jolly_robot_rigify_v02.blend"
+00:55.531  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/jolly_robot_v02/jolly_robot_wave.png'
+RIGIFY_COMPLETE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+scripts disabled for "/Users/codeinthemode/Crew's Place/characters/jolly_robot_v02/jolly_robot_rigify_v02.blend", skipping 'RIG-Jolly_Metarig_ui.py'
+
+Blender quit

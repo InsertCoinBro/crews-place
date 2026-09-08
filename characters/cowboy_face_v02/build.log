@@ -1,0 +1,11 @@
+00:00.369  blend            | Read blend: "/Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/cowboy_shell_v01.blend"
+cowboy_geometry_helpers:38: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+PRESERVATION_CHECK {"source": "cowboy_shell_v01.blend", "original_objects_checked": 83, "all_original_geometry_transforms_and_colors_unchanged": true, "new_face_objects": 31, "features": ["blue eyes", "eyelids", "eyebrows", "nose", "mustache", "goatee", "subtle mouth"], "ears_added": false, "finite_new_mesh_coordinates": true}
+Info: Saved as "cowboy_face_v02.blend"
+FACE_SAVED
+00:33.997  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_face_v02/cowboy_face_full.png'
+01:03.106  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_face_v02/cowboy_face_closeup.png'
+FACE_RENDERS_COMPLETE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

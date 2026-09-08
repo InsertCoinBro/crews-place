@@ -1,0 +1,91 @@
+.farm-fact-card {
+  position: absolute;
+  right: 28px;
+  top: 105px;
+  z-index: 8;
+  width: min(360px, calc(100vw - 40px));
+  padding: 20px;
+  border: 2px solid #fff5d6;
+  border-radius: 20px;
+  background: #fffaf0f2;
+  color: var(--ink);
+  box-shadow: 0 12px 40px #21494632;
+}
+.farm-card-tag {
+  color: #6d7e55;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+.farm-fact-card h2 {
+  margin: 8px 0 6px;
+  font-size: 28px;
+}
+.farm-fact-card p {
+  margin: 0;
+  color: #49685e;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.farm-fact-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+.farm-fact-card dl div {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #edf3df;
+}
+.farm-fact-card dt {
+  font-size: 12px;
+  font-weight: 800;
+}
+.farm-fact-card dd {
+  margin: 0;
+  color: #49685e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.farm-audio-status {
+  min-height: 1.25em;
+  margin: 12px 0 -2px;
+  color: #57756a;
+  font-size: 12px;
+  font-weight: 700;
+}
+.farm-fact-card .farm-card-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 15px;
+}
+.farm-fact-card button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid #9eb6a2;
+  border-radius: 11px;
+  background: #e7efd5;
+  color: var(--ink);
+  font-weight: 750;
+}
+.farm-fact-card button:last-child {
+  background: white;
+}
+.farm-fact-card button:focus-visible {
+  outline: 3px solid #e3b74f;
+  outline-offset: 2px;
+}
+@media (max-width: 700px) {
+  .farm-fact-card {
+    left: 20px;
+    right: 20px;
+    top: 90px;
+    width: auto;
+  }
+  .farm-fact-card dl div {
+    grid-template-columns: 80px 1fr;
+  }
+}

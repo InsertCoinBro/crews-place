@@ -1,0 +1,135 @@
+Reloading external rigs...
+Reloading external metarigs...
+12:47:33 | INFO: Data are loaded, start creating Blender stuff
+12:47:33 | INFO: Blender create Mesh node Body torso | mesh.003
+12:47:33 | INFO: Blender create Mesh node Boot L | shaped outsole | mesh.001
+12:47:33 | INFO: Blender create Mesh node Boot L | welt edging | curve
+12:47:33 | INFO: Blender create Mesh node Boot L | sculpted shaft | mesh.001
+12:47:33 | INFO: Blender create Mesh node Eye L | dark blue limbal ring | mesh.001
+12:47:33 | INFO: Blender create Mesh node Sphere.031
+12:47:33 | INFO: Blender create Mesh node Eye L | blue iris | mesh.001
+12:47:33 | INFO: Blender create Mesh node Brow L | mesh.001
+12:47:33 | INFO: Blender create Mesh node Eye L | pupil | mesh.001
+12:47:33 | INFO: Blender create Mesh node Mouth | lower lip | mesh.001
+12:47:33 | INFO: Blender create Mesh node Eye L | inner blue iris | mesh.001
+12:47:33 | INFO: Blender create Mesh node Mouth | quiet expression | curve
+12:47:33 | INFO: Blender create Mesh node Sphere.036
+12:47:33 | INFO: Blender create Mesh node Eye L | almond sclera | mesh.001
+12:47:33 | INFO: Blender create Mesh node Eye L | upper eyelid | curve
+12:47:33 | INFO: Blender create Mesh node Belt | brass buckle frame | curve
+12:47:33 | INFO: Blender create Mesh node Cube.034
+12:47:33 | INFO: Blender create Mesh node Holster | front edge stitch | curve
+12:47:33 | INFO: Blender create Mesh node Belt | continuous leather strap | mesh.001
+12:47:33 | INFO: Blender create Mesh node Cube.035
+12:47:33 | INFO: Blender create Mesh node Cube.030
+12:47:33 | INFO: Blender create Mesh node Hat | bound brim edge | curve
+12:47:33 | INFO: Blender create Mesh node HAT | swept cowboy brim | mesh.001
+12:47:33 | INFO: Blender create Mesh node Hat | leather band | mesh.001
+12:47:33 | INFO: Blender create Mesh node Body torso | mesh.002
+12:47:33 | INFO: Blender create Mesh node Sphere.005
+12:47:33 | INFO: Blender create Mesh node Shirt torso | mesh.001
+12:47:33 | INFO: Blender create Mesh node Pocket lower stitch L | curve
+12:47:33 | INFO: Blender create Mesh node Cuff L | mesh.001
+12:47:33 | INFO: Blender create Mesh node Trouser hip | mesh.001
+12:47:33 | INFO: Blender create Mesh node Trouser outside seam L | curve
+12:47:33 | INFO: glTF import finished in 0.13s
+Fetch rig.
+Clear rig animation data.
+Create widgets collection: 0.000
+Duplicate rig: 0.003
+Instantiate rigs: 0.000
+Initialize rigs: 0.000
+Prepare bones: 0.000
+Generate bones: 0.005
+Parent bones: 0.004
+Configure bones: 0.005
+Preapply bones: 0.001
+Apply bones: 0.001
+Rig bones: 0.006
+Generate widgets: 0.006
+Assign layers: 0.006
+Finalize: 0.014
+The rest: 0.009
+Info: Successfully generated: "RIG-Cowboy_Metarig"
+RIG_AND_WEIGHTS_READY
+RIGIFY_ACTIONS_CREATED
+INFO Draco is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_draco_bridge.dylib
+INFO MeshOptimizer is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib
+12:47:42 | INFO: Starting glTF 2.0 export
+12:47:42 | INFO: Extracting primitive: Body torso | mesh.003
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Boot L | shaped outsole | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Boot L | welt edging | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Boot L | sculpted shaft | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | dark blue limbal ring | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Sphere.031
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | blue iris | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Brow L | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | pupil | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Mouth | lower lip | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | inner blue iris | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Mouth | quiet expression | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Sphere.036
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | almond sclera | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Eye L | upper eyelid | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Belt | brass buckle frame | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Cube.034
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Holster | front edge stitch | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Belt | continuous leather strap | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Cube.035
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Cube.030
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Hat | bound brim edge | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: HAT | swept cowboy brim | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Hat | leather band | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Body torso | mesh.002
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Sphere.005
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Shirt torso | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Pocket lower stitch L | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Cuff L | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Trouser hip | mesh.001
+12:47:42 | INFO: Primitives created: 1
+12:47:42 | INFO: Extracting primitive: Trouser outside seam L | curve
+12:47:42 | INFO: Primitives created: 1
+12:47:44 | INFO: Finished glTF 2.0 export in 2.603821039199829 s
+
+ANIMATED_GLB_EXPORTED
+/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/build_animations.py:285: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=bpy.data.worlds.new('Preview world');scene.world.use_nodes=True
+00:20.763  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/walk_preview.png'
+00:28.574  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/run_preview.png'
+00:37.826  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/jumpstart_preview.png'
+00:45.628  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/dance_preview.png'
+00:51.088  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_animated_v03/reach_preview.png'
+Info: Saved as "cowboy_animated_v03.blend"
+ANIMATION_BUILD_COMPLETE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

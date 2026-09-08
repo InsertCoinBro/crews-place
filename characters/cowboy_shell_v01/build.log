@@ -1,0 +1,12 @@
+/Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/build_cowboy.py:38: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+/Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/build_cowboy.py:450: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes=True
+Info: Saved as "cowboy_shell_v01.blend"
+COWBOY_SAVED /Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/cowboy_shell_v01.blend
+00:30.038  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/cowboy_shell_preview.png'
+00:43.025  render           | Saved: '/Users/codeinthemode/Crew's Place/characters/cowboy_shell_v01/cowboy_shell_rear.png'
+RENDER_COMPLETE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 01:35:57)
+
+Blender quit

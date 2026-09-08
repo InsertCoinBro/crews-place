@@ -1,0 +1,9 @@
+:focus-visible {
+  outline: 3px solid #bd740c;
+  outline-offset: 5px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+  }
+}

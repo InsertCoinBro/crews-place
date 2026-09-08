@@ -1,0 +1,12 @@
+{
+  "blender": "5.2.1 LTS",
+  "blend_reopened": true,
+  "character_meshes": 56,
+  "character_curves": 17,
+  "base_mesh_vertices": 145896,
+  "finite_mesh_coordinates": true,
+  "character_parenting_valid": true,
+  "external_textures_required": false,
+  "preview_checked": "front three-quarter and rear",
+  "stage": "shell - no rig or final UVs"
+}
