@@ -97,6 +97,10 @@ function makeLibraryShelf(area, interactions, origin) {
 export function buildInterior(scene, interactions, id, origin) {
   const arcade = id === "arcade";
   const library = id === "library";
+  const halfWidth = arcade ? 9 : 7;
+  const roomWidth = halfWidth * 2;
+  const frontWallWidth = halfWidth - 1;
+  const frontWallCenter = (halfWidth + 1) / 2;
   const title = arcade
     ? "Star Arcade"
     : library
@@ -105,7 +109,12 @@ export function buildInterior(scene, interactions, id, origin) {
   const area = createArea(
     id,
     title,
-    { minX: origin - 7, maxX: origin + 7, minZ: -6, maxZ: 6 },
+    {
+      minX: origin - halfWidth,
+      maxX: origin + halfWidth,
+      minZ: -6,
+      maxZ: 6,
+    },
     true,
   );
   const g = area.group;
@@ -116,12 +125,12 @@ export function buildInterior(scene, interactions, id, origin) {
     origin,
     -0.12,
     0,
-    14,
+    roomWidth,
     0.2,
     12,
     arcade ? 0xe7cbb6 : library ? 0xd7c6a2 : 0xdcdcb4,
   );
-  for (let x = -6; x <= 6; x += 2)
+  for (let x = -halfWidth + 1; x <= halfWidth - 1; x += 2)
     for (let z = -5; z <= 5; z += 2)
       box(
         g,
@@ -143,11 +152,11 @@ export function buildInterior(scene, interactions, id, origin) {
       );
   const wallColor = arcade ? 0xddb6ae : library ? 0xd8c597 : 0xb9d6c8;
   for (const [x, z, w, d] of [
-    [origin, -6, 14, 0.35],
-    [origin - 7, 0, 0.35, 12],
-    [origin + 7, 0, 0.35, 12],
-    [origin - 4, 6, 6, 0.35],
-    [origin + 4, 6, 6, 0.35],
+    [origin, -6, roomWidth, 0.35],
+    [origin - halfWidth, 0, 0.35, 12],
+    [origin + halfWidth, 0, 0.35, 12],
+    [origin - frontWallCenter, 6, frontWallWidth, 0.35],
+    [origin + frontWallCenter, 6, frontWallWidth, 0.35],
   ])
     collider(area, box(g, x, 2.25, z, w, 4.5, d, wallColor), x, z, w, d, 5.5);
   // Roofless dollhouse interiors keep the first camera implementation readable.
@@ -175,33 +184,126 @@ export function buildInterior(scene, interactions, id, origin) {
     hint: "Back to the neighborhood",
   });
   if (arcade) {
-    for (let i = -1; i <= 1; i++) {
-      const x = origin + i * 3.6,
-        z = -3.8,
-        color = [0x65becb, 0xd2a457, 0x756497][i + 1];
-      const cabinet = box(g, x, 1.1, z, 1.4, 2.2, 0.95, color);
-      collider(area, cabinet, x, z, 1.4, 0.95, 2.4);
-      box(g, x, 1.65, z + 0.49, 1.1, 0.85, 0.08, 0x294951);
-      const gameId = ["bubble", "memory", "rocket"][i + 1];
-      const gameName = ["Bubble Pop", "Memory Hop", "Rocket Flyer"][i + 1];
+    const cabinets = [
+      {
+        x: origin - 5.6,
+        z: -3.8,
+        id: "gem",
+        name: "Gem Garden",
+        color: 0xb56ca4,
+      },
+      {
+        x: origin - 3.6,
+        z: -3.8,
+        id: "bubble",
+        name: "Bubble Pop",
+        color: 0x65becb,
+      },
+      {
+        x: origin,
+        z: -3.8,
+        id: "memory",
+        name: "Memory Hop",
+        color: 0xd2a457,
+      },
+      {
+        x: origin + 3.6,
+        z: -3.8,
+        id: "rocket",
+        name: "Rocket Flyer",
+        color: 0x756497,
+      },
+      {
+        x: origin + 5.6,
+        z: -3.8,
+        id: "golf",
+        name: "Crew’s Putt-Putt",
+        color: 0x64a56f,
+      },
+      {
+        x: origin - 8.15,
+        z: -0.6,
+        rotation: Math.PI / 2,
+        id: "tower",
+        name: "Tower Builder",
+        color: 0x8f6fc3,
+      },
+      {
+        x: origin - 8.15,
+        z: 2,
+        rotation: Math.PI / 2,
+        id: "brick",
+        name: "Brick Out",
+        color: 0xd06f5e,
+      },
+      {
+        x: origin - 8.15,
+        z: 4.4,
+        rotation: Math.PI / 2,
+        id: "derby",
+        name: "Home Run Derby",
+        color: 0xd58c4c,
+      },
+      {
+        x: origin + 8.15,
+        z: -0.6,
+        rotation: -Math.PI / 2,
+        id: "ski",
+        name: "Downhill Ski",
+        color: 0x659bc1,
+      },
+      {
+        x: origin + 8.15,
+        z: 2,
+        rotation: -Math.PI / 2,
+        id: "throw",
+        name: "Free Throw",
+        color: 0xc87942,
+      },
+    ];
+    for (const {
+      x,
+      z,
+      rotation = 0,
+      id: gameId,
+      name: gameName,
+      color,
+    } of cabinets) {
+      const stand = new THREE.Group();
+      stand.position.set(x, 0, z);
+      stand.rotation.y = rotation;
+      g.add(stand);
+      const cabinet = box(stand, 0, 1.1, 0, 1.4, 2.2, 0.95, color);
+      const sideFacing = Math.abs(Math.sin(rotation)) > 0.5;
+      collider(
+        area,
+        cabinet,
+        x,
+        z,
+        sideFacing ? 0.95 : 1.4,
+        sideFacing ? 1.4 : 0.95,
+        2.4,
+      );
+      box(stand, 0, 1.65, 0.49, 1.1, 0.85, 0.08, 0x294951);
       const artwork = new THREE.Mesh(
         new THREE.PlaneGeometry(1.07, 0.82),
         new THREE.MeshBasicMaterial({ map: cabinetTexture(gameId) }),
       );
-      artwork.position.set(x, 1.65, z + 0.545);
-      g.add(artwork);
-      box(g, x, 1.1, z + 0.6, 1.4, 0.16, 0.5, color);
-      cylinder(g, x - 0.3, 1.26, z + 0.65, 0.065, 0.065, 0.2, 0x355d57);
-      cylinder(g, x + 0.3, 1.2, z + 0.65, 0.1, 0.1, 0.04, 0xf2c46d);
-      label(g, gameName.toUpperCase(), x, 2.45, z + 0.51, 2.7);
+      artwork.position.set(0, 1.65, 0.545);
+      stand.add(artwork);
+      box(stand, 0, 1.1, 0.6, 1.4, 0.16, 0.5, color);
+      cylinder(stand, -0.3, 1.26, 0.65, 0.065, 0.065, 0.2, 0x355d57);
+      cylinder(stand, 0.3, 1.2, 0.65, 0.1, 0.1, 0.04, 0xf2c46d);
+      label(stand, gameName.toUpperCase(), 0, 2.45, 0.51, 2.1);
+      const interactionDistance = 1.65;
       interactions.register({
         id: gameId + "-cabinet",
         area: id,
         kind: "minigame",
         game: gameId,
-        x,
-        z: -2.15,
-        radius: 1.6,
+        x: x + Math.sin(rotation) * interactionDistance,
+        z: z + Math.cos(rotation) * interactionDistance,
+        radius: sideFacing ? 1.25 : 1.6,
         label: "Press E to play " + gameName,
         hint: "Your arcade adventure starts here",
       });

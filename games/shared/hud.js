@@ -21,8 +21,8 @@ export class ArcadeHUD {
     this.root.hidden = false;
     this.root.dataset.game = id;
     this.hideResult();
-    this.lastStats = "";
-    this.lastMessage = "";
+    this.lastStats = null;
+    this.lastMessage = null;
     this.root.querySelector("#arcade-title").textContent = title;
     this.root.querySelector("#arcade-symbol").textContent = symbol;
     this.root.querySelector("#arcade-instructions").textContent = instructions;

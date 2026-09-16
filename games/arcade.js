@@ -2,13 +2,29 @@ import * as THREE from "three";
 import { ArcadeAudio } from "./shared/audio.js";
 import { ArcadeHUD } from "./shared/hud.js";
 import { BubblePop } from "./bubble-pop/game.js";
+import {
+  BrickOut,
+  CrewsPuttPutt,
+  DownhillSki,
+  FreeThrow,
+  GemGarden,
+  HomeRunDerby,
+  TowerBuilder,
+} from "./embedded/game.js";
 import { MemoryHop } from "./memory-hop/game.js";
 import { RocketFlyer } from "./rocket-flyer/game.js";
 
 export const ARCADE_GAMES = {
+  gem: { title: "Gem Garden", Game: GemGarden },
   bubble: { title: "Bubble Pop", Game: BubblePop },
   memory: { title: "Memory Hop", Game: MemoryHop },
   rocket: { title: "Rocket Flyer", Game: RocketFlyer },
+  golf: { title: "Crew’s Putt-Putt", Game: CrewsPuttPutt },
+  tower: { title: "Tower Builder", Game: TowerBuilder },
+  brick: { title: "Brick Out", Game: BrickOut },
+  derby: { title: "Home Run Derby", Game: HomeRunDerby },
+  ski: { title: "Downhill Ski", Game: DownhillSki },
+  throw: { title: "Free Throw", Game: FreeThrow },
 };
 const EMPTY_INPUT = { down: () => false, consume: () => false };
 export class ArcadeManager {
@@ -28,6 +44,7 @@ export class ArcadeManager {
       mute: () => {
         this.audio.unlock();
         this.audio.mute(!this.audio.muted);
+        this.current?.setMuted?.(this.audio.muted);
         this.hud.sound(this.audio.muted);
       },
       resume: () => this.resume(),
@@ -86,7 +103,13 @@ export class ArcadeManager {
       this.audio.unlock();
     });
     window.addEventListener("keyup", (e) => this.keys.delete(e.code));
-    window.addEventListener("blur", () => this.pause());
+    window.addEventListener("blur", () => {
+      // Moving focus into a same-page embedded game blurs the parent window.
+      // It is still active play, not a reason to show the pause screen.
+      queueMicrotask(() => {
+        if (document.activeElement !== this.current?.frame) this.pause();
+      });
+    });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) this.pause();
     });
@@ -98,7 +121,22 @@ export class ArcadeManager {
     this.keys.clear();
     this.pressed.clear();
     this.taps.clear();
-    this.game.canvas.focus({ preventScroll: true });
+    if (this.current?.focusGame) this.current.focusGame();
+    else this.game.canvas.focus({ preventScroll: true });
+  }
+  press(code) {
+    if (!this.current || this.suspended || this.hud.resultVisible) return;
+    this.audio.unlock();
+    this.current.virtualKey?.(code, true);
+    if (!this.keys.has(code)) {
+      this.pressed.add(code);
+      this.taps.set(code, 0.09);
+    }
+    this.keys.add(code);
+  }
+  release(code) {
+    this.current?.virtualKey?.(code, false);
+    this.keys.delete(code);
   }
   launch(item) {
     const spec = ARCADE_GAMES[item.game];
@@ -140,6 +178,7 @@ export class ArcadeManager {
         },
       });
       this.current.id = item.game;
+      this.current.setMuted?.(this.audio.muted);
       this.resize();
       this.hud.sound(this.audio.muted);
       g.canvas.setAttribute(
@@ -209,6 +248,7 @@ export class ArcadeManager {
     this.pressed.clear();
     this.taps.clear();
     this.audio.stop();
+    this.current.pause?.();
     this.previousResult = this.hud.resultVisible ? this.hud.resultState : null;
     this.hud.result({
       tag: "TAKE YOUR TIME",
@@ -225,6 +265,7 @@ export class ArcadeManager {
     this.suspended = false;
     this.audio.unlock();
     this.keys.clear();
+    this.current.resume?.();
     if (this.previousResult) this.hud.result(this.previousResult);
     else {
       this.hud.hideResult();
@@ -244,7 +285,7 @@ export class ArcadeManager {
       }
     }
   }
-  resize() {
-    this.current?.resize(innerWidth, innerHeight);
+  resize(width = innerWidth, height = innerHeight) {
+    this.current?.resize(width, height);
   }
 }

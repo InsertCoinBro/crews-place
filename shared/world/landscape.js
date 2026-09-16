@@ -1,4 +1,6 @@
 import { blob, box, cylinder, makeTree } from "./models.js";
+import { NORTH_EXTENSION, WORLD_BOUNDS } from "./world-layout.js";
+import { buildNorthernTerrain } from "./northern-terrain.js";
 
 // The original town occupied a 60 x 60 square. The new playable countryside is
 // three times as wide and deep, while a non-playable scenery skirt keeps the
@@ -6,13 +8,8 @@ import { blob, box, cylinder, makeTree } from "./models.js";
 export const ORIGINAL_WORLD_SIZE = 60;
 export const WORLD_SIZE = ORIGINAL_WORLD_SIZE * 3;
 export const WORLD_HALF_SIZE = WORLD_SIZE / 2;
-export const SCENERY_SIZE = 300;
-export const TOWN_BOUNDS = Object.freeze({
-  minX: -WORLD_HALF_SIZE,
-  maxX: WORLD_HALF_SIZE,
-  minZ: -WORLD_HALF_SIZE,
-  maxZ: WORLD_HALF_SIZE,
-});
+export const SCENERY_SIZE = 650;
+export const TOWN_BOUNDS = WORLD_BOUNDS;
 
 const ALL_EXPANSION_TREES = [
   [-54, 43, 1.2],
@@ -99,15 +96,40 @@ export function buildLandscape(parent, area) {
     parent,
     0,
     -0.45,
-    0,
+    -NORTH_EXTENSION / 2,
     SCENERY_SIZE,
     0.8,
-    SCENERY_SIZE,
+    SCENERY_SIZE + NORTH_EXTENSION,
     0x92b973,
   );
   grass.name = "expanded-grassland";
-  const soil = box(parent, 0, -1.3, 0, SCENERY_SIZE, 1, SCENERY_SIZE, 0xc3a580);
+  const soil = box(
+    parent,
+    0,
+    -1.3,
+    -NORTH_EXTENSION / 2,
+    SCENERY_SIZE,
+    1,
+    SCENERY_SIZE + NORTH_EXTENSION,
+    0xc3a580,
+  );
   soil.name = "expanded-soil";
+  buildNorthernTerrain(area);
+
+  // Sparse groves leave the northbound approach and destination clear.
+  for (let z = -180; z > TOWN_BOUNDS.minZ + 35; z -= 85) {
+    for (const x of [-74, -53]) {
+      const tree = makeTree(parent, x, z, 1.1, 0x70a86e);
+      tree.name = "north-meadow-tree";
+      area.colliders.push({
+        minX: x - 0.3,
+        maxX: x + 0.3,
+        minZ: z - 0.3,
+        maxZ: z + 0.3,
+        maxY: 3.6,
+      });
+    }
+  }
 
   // Broad, subtle color patches break up the acreage without occupying the
   // open space reserved for future activities.
@@ -160,11 +182,13 @@ export function buildLandscape(parent, area) {
   for (let index = 0; index < 20; index++) {
     const angle = (index / 20) * Math.PI * 2;
     const distance = 122 + (index % 2) * 12;
+    // Move northern backdrop hills beyond the new end of the map.
+    const northOffset = Math.cos(angle) < 0 ? -NORTH_EXTENSION : 0;
     const hill = blob(
       parent,
       Math.sin(angle) * distance,
       -5,
-      Math.cos(angle) * distance,
+      Math.cos(angle) * distance + northOffset,
       15 + (index % 4) * 3,
       index % 3 === 0 ? 0x8fb88b : 0x9dc69a,
       1,

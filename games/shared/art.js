@@ -222,14 +222,20 @@ export function cabinetTexture(id) {
   canvas.height = 460;
   const c = canvas.getContext("2d");
   const bg = c.createLinearGradient(0, 0, 600, 460);
-  bg.addColorStop(
-    0,
-    id === "rocket" ? "#243864" : id === "memory" ? "#80bca6" : "#6bc4d0",
-  );
-  bg.addColorStop(
-    1,
-    id === "rocket" ? "#6b518b" : id === "memory" ? "#eadb91" : "#f0bce2",
-  );
+  const colors = {
+    bubble: ["#6bc4d0", "#f0bce2"],
+    memory: ["#80bca6", "#eadb91"],
+    rocket: ["#243864", "#6b518b"],
+    gem: ["#4d286f", "#c65a9d"],
+    golf: ["#72bf7b", "#d8dd78"],
+    tower: ["#35255f", "#a862bf"],
+    brick: ["#224c70", "#df725b"],
+    derby: ["#397b4b", "#d79a55"],
+    ski: ["#71b8dc", "#e6f5ff"],
+    throw: ["#293b67", "#e18b42"],
+  }[id] ?? ["#243864", "#6b518b"];
+  bg.addColorStop(0, colors[0]);
+  bg.addColorStop(1, colors[1]);
   c.fillStyle = bg;
   c.fillRect(0, 0, 600, 460);
   if (id === "bubble") {
@@ -272,6 +278,161 @@ export function cabinetTexture(id) {
       c.font = "bold 94px sans-serif";
       c.fillText(["A", "2", "★", "A", "2", "★"][i], x + 75, y + 110);
     }
+  } else if (id === "gem") {
+    const gems = ["●", "★", "◆", "▲", "+"];
+    for (let row = 0; row < 4; row++)
+      for (let col = 0; col < 6; col++) {
+        const x = 58 + col * 97,
+          y = 70 + row * 105;
+        circle(c, x, y, 39, "#24183473");
+        c.fillStyle = ["#f7d252", "#ff7f9e", "#78e1cc", "#9aa7ff"][
+          (row + col * 2) % 4
+        ];
+        c.font = "bold 60px sans-serif";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.fillText(gems[(row * 2 + col) % gems.length], x, y + 2);
+      }
+  } else if (id === "golf") {
+    c.fillStyle = "#57a865";
+    c.fillRect(0, 185, 600, 275);
+    for (let x = -120; x < 700; x += 120) {
+      c.fillStyle = "#ffffff14";
+      c.fillRect(x, 185, 60, 275);
+    }
+    c.strokeStyle = "#fff7dd";
+    c.lineWidth = 10;
+    c.beginPath();
+    c.moveTo(410, 105);
+    c.lineTo(410, 345);
+    c.stroke();
+    triangle(
+      c,
+      [
+        [410, 107],
+        [410, 205],
+        [515, 150],
+      ],
+      "#f27b78",
+    );
+    ellipse(c, 410, 352, 52, 19, "#295d42");
+    circle(c, 178, 334, 44, "#fffdf1");
+    for (const [x, y] of [
+      [164, 322],
+      [190, 338],
+      [174, 355],
+    ])
+      circle(c, x, y, 4, "#b7c0b3");
+  } else if (id === "tower") {
+    const jewelColors = ["#f5cf55", "#6ed6be", "#f17c9d", "#8da3f2"];
+    for (let col = 0; col < 5; col++)
+      for (let row = 0; row <= col + 1; row++) {
+        c.fillStyle = jewelColors[(col + row) % jewelColors.length];
+        c.fillRect(75 + col * 94, 375 - row * 68, 70, 58);
+        c.strokeStyle = "#ffffffb8";
+        c.lineWidth = 5;
+        c.strokeRect(75 + col * 94, 375 - row * 68, 70, 58);
+      }
+  } else if (id === "brick") {
+    const brickColors = ["#f5c55a", "#ef7b70", "#7bcab9", "#9a8bdf"];
+    for (let row = 0; row < 5; row++)
+      for (let col = 0; col < 8; col++) {
+        c.fillStyle = brickColors[row % brickColors.length];
+        c.fillRect(34 + col * 67, 38 + row * 47, 58, 36);
+      }
+    c.fillStyle = "#fff4d9";
+    c.fillRect(205, 397, 190, 25);
+    circle(c, 300, 342, 20, "#ffffff");
+  } else if (id === "derby") {
+    c.fillStyle = "#66a858";
+    c.fillRect(0, 0, 600, 460);
+    c.save();
+    c.translate(300, 270);
+    c.rotate(Math.PI / 4);
+    c.fillStyle = "#c99961";
+    c.fillRect(-145, -145, 290, 290);
+    c.fillStyle = "#77b867";
+    c.fillRect(-92, -92, 184, 184);
+    c.restore();
+    circle(c, 444, 108, 58, "#fff9e8");
+    c.strokeStyle = "#d85656";
+    c.lineWidth = 7;
+    c.beginPath();
+    c.arc(444, 108, 38, -1.3, 1.3);
+    c.stroke();
+    c.beginPath();
+    c.arc(444, 108, 38, 1.84, 4.44);
+    c.stroke();
+  } else if (id === "ski") {
+    c.fillStyle = "#e9f7ff";
+    c.fillRect(0, 170, 600, 290);
+    triangle(
+      c,
+      [
+        [20, 315],
+        [170, 55],
+        [330, 315],
+      ],
+      "#94c6dc",
+    );
+    triangle(
+      c,
+      [
+        [195, 315],
+        [375, 70],
+        [590, 315],
+      ],
+      "#77b1cf",
+    );
+    triangle(
+      c,
+      [
+        [105, 165],
+        [170, 55],
+        [240, 168],
+      ],
+      "#ffffff",
+    );
+    triangle(
+      c,
+      [
+        [292, 182],
+        [375, 70],
+        [474, 183],
+      ],
+      "#ffffff",
+    );
+    c.strokeStyle = "#df6a67";
+    c.lineWidth = 18;
+    c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(214, 337);
+    c.lineTo(330, 407);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(259, 322);
+    c.lineTo(374, 392);
+    c.stroke();
+  } else if (id === "throw") {
+    c.fillStyle = "#dce7ed";
+    c.fillRect(330, 65, 210, 155);
+    c.strokeStyle = "#ffffff";
+    c.lineWidth = 9;
+    c.strokeRect(330, 65, 210, 155);
+    c.strokeStyle = "#dc6547";
+    c.lineWidth = 14;
+    c.beginPath();
+    c.ellipse(404, 240, 88, 25, 0, 0, Math.PI * 2);
+    c.stroke();
+    circle(c, 150, 350, 72, "#e58537");
+    c.strokeStyle = "#55351f";
+    c.lineWidth = 7;
+    c.beginPath();
+    c.arc(150, 350, 50, -Math.PI / 2, Math.PI / 2);
+    c.stroke();
+    c.beginPath();
+    c.arc(150, 350, 50, Math.PI / 2, -Math.PI / 2);
+    c.stroke();
   } else {
     for (let i = 0; i < 35; i++)
       circle(c, (i * 137) % 600, (i * 83) % 460, 1 + (i % 3), "#ffeec2");

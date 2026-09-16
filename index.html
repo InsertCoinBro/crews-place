@@ -2,7 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="theme-color" content="#194e4b" />
     <meta
       name="description"
@@ -10,6 +18,7 @@
     />
     <title>Crew's Place · Little Town</title>
     <link rel="icon" href="data:," />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="stylesheet" href="/styles/main.css" />
   </head>
   <body>
@@ -17,7 +26,7 @@
       <canvas
         id="world"
         tabindex="0"
-        aria-label="Town, Friendly Farm, and Skybird Airfield. WASD or arrows to walk, Shift to run, drag mouse to look, Space to jump, and E to interact. At the yellow plane, press E to enter, hold W or Up to take off and climb, S or Down to descend, A or D to turn, and E to leave the plane. Near the blue car, press E to enter, W or S to drive around the street, and E to get out."
+        aria-label="Crew's Place 3D world with a town, airfields, rocket, space environment, and interactive Starlight Playground. WASD or arrows move, Shift runs, dragging looks around, Space jumps or floats up, C floats down, and E interacts or exits an activity."
       ></canvas>
       <div class="brand">
         <span class="brand-mark" aria-hidden="true">c<span>•</span></span>
@@ -93,7 +102,25 @@
           <span>SKYBIRD FLIGHT</span>
           <strong><span id="flight-altitude">0 m</span> high</strong>
           <small id="flight-speed">0 km/h</small>
+          <small id="flight-route">Fly north to North Meadow Airfield</small>
+          <small id="flight-weather">Summer · Clear skies</small>
+          <small id="flight-hoops">Hoops 0 / 10</small>
         </div>
+        <section
+          id="rocket-status"
+          class="rocket-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <span>STARBOUND JOURNEY</span>
+          <strong id="rocket-stage">Boarding the rocket</strong>
+          <small id="rocket-detail">The door is closing safely.</small>
+          <div class="rocket-progress-track" aria-hidden="true">
+            <i id="rocket-progress"></i>
+          </div>
+          <button id="rocket-skip" type="button">Skip to landing</button>
+        </section>
         <div class="map-card">
           <span id="map-title">LITTLE TOWN</span
           ><canvas

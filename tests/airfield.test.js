@@ -6,6 +6,9 @@ import {
   FlyablePlane,
   PLANE_MAX_ALTITUDE,
   PLANE_WORLD_LIMIT,
+  PLANE_BOUNDS,
+  NORTH_AIRFIELD_SITE,
+  runwayAt,
 } from "../shared/world/airfield.js";
 
 function input(keys = []) {
@@ -63,7 +66,10 @@ test("S descends and flight stays inside the high world boundary", () => {
   for (let i = 0; i < 900; i++) plane.update(1 / 60, input(["KeyW", "KeyD"]));
   assert.ok(plane.model.position.y <= PLANE_MAX_ALTITUDE);
   assert.ok(Math.abs(plane.model.position.x) <= PLANE_WORLD_LIMIT);
-  assert.ok(Math.abs(plane.model.position.z) <= PLANE_WORLD_LIMIT);
+  assert.ok(
+    plane.model.position.z >= PLANE_BOUNDS.minZ &&
+      plane.model.position.z <= PLANE_BOUNDS.maxZ,
+  );
   const altitude = plane.model.position.y;
   for (let i = 0; i < 120; i++) plane.update(1 / 60, input(["KeyS"]));
   assert.ok(plane.model.position.y < altitude);
@@ -80,4 +86,67 @@ test("leaving the plane returns it to the runway start", () => {
   assert.equal(plane.model.position.z, AIRFIELD_SITE.runwayStart.z);
   assert.equal(plane.model.position.y, 0);
   assert.equal(player.model.visible, true);
+});
+
+test("fly north, land, explore, reboard and fly home without resetting the destination", () => {
+  const plane = new FlyablePlane(new THREE.Group());
+  const player = playerStub();
+  plane.enter(player);
+  // Fly the actual distance using the same input and update path as the game.
+  const navigate = (x, z) => {
+    for (
+      let i = 0;
+      i < 6000 &&
+      Math.hypot(plane.model.position.x - x, plane.model.position.z - z) > 1;
+      i++
+    ) {
+      plane.heading = Math.atan2(
+        x - plane.model.position.x,
+        z - plane.model.position.z,
+      );
+      plane.update(1 / 60, input(["KeyW"]));
+      assert.equal(
+        plane.terrainContact,
+        false,
+        "route must clear mountain surfaces",
+      );
+    }
+    assert.ok(
+      Math.hypot(plane.model.position.x - x, plane.model.position.z - z) <= 1,
+    );
+  };
+  const route = [
+    [-25, -310],
+    [-25, -640],
+    [25, -740],
+    [25, -960],
+    [-25, -1070],
+    [-25, -1300],
+    [25, -1400],
+    [25, -1620],
+    [-25, -1700],
+    [-25, -1900],
+    [52, -1940],
+  ];
+  for (const p of route) navigate(...p);
+  plane.heading = Math.PI;
+  assert.equal(plane.airborne, true);
+  for (let i = 0; i < 720; i++) plane.update(1 / 60, input(["KeyS"]));
+  assert.equal(plane.airborne, false);
+  assert.equal(runwayAt(plane.model.position), NORTH_AIRFIELD_SITE);
+  const landedZ = plane.model.position.z;
+  plane.exit(player);
+  assert.equal(plane.model.position.z, landedZ);
+  assert.ok(player.position.z < -2100);
+  assert.equal(player.inVehicle, false);
+  plane.enter(player);
+  navigate(52, -1940);
+  for (const p of route.slice(0, -1).reverse()) navigate(...p);
+  navigate(52, -190);
+  plane.heading = 0;
+  for (let i = 0; i < 720; i++) plane.update(1 / 60, input(["KeyS"]));
+  assert.equal(plane.airborne, false);
+  assert.equal(runwayAt(plane.model.position), AIRFIELD_SITE);
+  plane.exit(player);
+  assert.ok(player.position.z > 18 && player.position.z < 82);
 });

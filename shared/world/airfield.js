@@ -1,5 +1,9 @@
 import * as THREE from "three";
 import { box, cylinder, label, material } from "./models.js";
+import { WORLD_BOUNDS, NORTH_AIRFIELD_SITE } from "./world-layout.js";
+import { terrainBlocks, waterAt } from "./northern-terrain.js";
+import { sampleWeather } from "./weather.js";
+export { NORTH_AIRFIELD_SITE } from "./world-layout.js";
 
 // The player chose this open southeast clearing from the live map. The runway
 // points north so a takeoff carries the plane across Little Town.
@@ -22,6 +26,24 @@ export const AIRFIELD_BOUNDS = Object.freeze({
 export const PLANE_MAX_ALTITUDE = 72;
 export const PLANE_MAX_SPEED = 30;
 export const PLANE_WORLD_LIMIT = 86;
+export const PLANE_BOUNDS = Object.freeze({
+  ...WORLD_BOUNDS,
+  minX: -86,
+  maxX: 86,
+  minZ: WORLD_BOUNDS.minZ + 4,
+  maxZ: 86,
+});
+export const AIRFIELDS = [AIRFIELD_SITE, NORTH_AIRFIELD_SITE];
+export function runwayAt(position) {
+  return (
+    AIRFIELDS.find(
+      (site) =>
+        Math.abs(position.x - site.x) <= 5 &&
+        position.z >= site.runwayEnd.z - 2 &&
+        position.z <= site.runwayStart.z + 2,
+    ) ?? null
+  );
+}
 
 function addCollider(area, x, z, width, depth, maxY = 8) {
   area.colliders.push({
@@ -169,6 +191,8 @@ export class FlyablePlane {
     this.airborne = false;
     this.occupied = false;
     this.engine = new PlaneEngineSound();
+    this.weatherTime = 0;
+    this.gentleWeather = false;
     this.reset();
   }
 
@@ -192,6 +216,10 @@ export class FlyablePlane {
   }
 
   update(dt, input) {
+    const before = this.model.position.clone();
+    this.weatherTime += dt;
+    const weather = sampleWeather(before, this.weatherTime, this.gentleWeather);
+    this.terrainContact = false;
     const climb =
       Number(input.down("KeyW", "ArrowUp")) -
       Number(input.down("KeyS", "ArrowDown"));
@@ -230,7 +258,7 @@ export class FlyablePlane {
     this.heading -= turn * steerRate * steerStrength * dt;
 
     if (this.airborne) {
-      const targetVertical = climb * 10.5;
+      const targetVertical = climb * 10.5 + weather.lift;
       this.verticalSpeed +=
         (targetVertical - this.verticalSpeed) * (1 - Math.exp(-2.8 * dt));
       this.model.position.y = THREE.MathUtils.clamp(
@@ -253,6 +281,10 @@ export class FlyablePlane {
     const movement = this.speed * dt;
     this.model.position.x += Math.sin(this.heading) * movement;
     this.model.position.z += Math.cos(this.heading) * movement;
+    if (this.airborne) {
+      this.model.position.x += weather.windX * dt;
+      this.model.position.z += weather.windZ * dt;
+    }
     this.model.position.x = THREE.MathUtils.clamp(
       this.model.position.x,
       -PLANE_WORLD_LIMIT,
@@ -260,11 +292,27 @@ export class FlyablePlane {
     );
     this.model.position.z = THREE.MathUtils.clamp(
       this.model.position.z,
-      -PLANE_WORLD_LIMIT,
-      PLANE_WORLD_LIMIT,
+      PLANE_BOUNDS.minZ,
+      PLANE_BOUNDS.maxZ,
     );
 
-    const bank = -turn * (this.airborne ? 0.34 : 0.08);
+    // Sweep the whole motion, including descent and gust drift, so a slow
+    // frame cannot carry the aircraft through a mountain or into a lake.
+    const proposed = this.model.position.clone();
+    const steps = Math.max(1, Math.ceil(before.distanceTo(proposed) / 1.5));
+    for (let i = 1; i <= steps; i++) {
+      const p = before.clone().lerp(proposed, i / steps);
+      if (terrainBlocks(p.x, p.y, p.z) || (p.y < 2 && waterAt(p.x, p.z))) {
+        this.model.position.copy(before).lerp(proposed, (i - 1) / steps);
+        this.verticalSpeed = 0;
+        this.terrainContact = true;
+        if (this.model.position.y > 0) this.airborne = true;
+        break;
+      }
+    }
+    const bank =
+      -turn * (this.airborne ? 0.34 : 0.08) +
+      (this.airborne ? weather.bank : 0);
     const pitch = this.airborne ? -climb * 0.13 : 0;
     this.model.rotation.y = this.heading;
     this.model.rotation.z +=
@@ -279,6 +327,8 @@ export class FlyablePlane {
       altitude: this.model.position.y,
       speed: this.speed,
       airborne: this.airborne,
+      weather,
+      terrainContact: this.terrainContact,
     };
   }
 
@@ -306,8 +356,24 @@ export class FlyablePlane {
     if (!this.occupied) return false;
     this.occupied = false;
     this.engine.stop();
-    this.reset();
-    player.teleport(this.spawn.x + 4.2, this.spawn.z);
+    // A completed landing stays at the destination so the player can explore
+    // and board the same aircraft for the return flight. Airborne exit retains
+    // the original safe return-home behavior.
+    const landedSite =
+      !this.airborne && this.model.position.y === 0
+        ? runwayAt(this.model.position)
+        : null;
+    if (landedSite) {
+      this.speed = this.throttle = this.verticalSpeed = 0;
+      // Park facing the other airfield, ready for the return journey.
+      this.heading = landedSite === NORTH_AIRFIELD_SITE ? 0 : Math.PI;
+      this.model.rotation.set(0, this.heading, 0);
+      this.syncInteraction();
+      player.teleport(landedSite.x - 8, this.model.position.z);
+    } else {
+      this.reset();
+      player.teleport(this.spawn.x + 4.2, this.spawn.z);
+    }
     player.heading = Math.PI;
     player.inVehicle = false;
     player.model.visible = true;
@@ -316,19 +382,30 @@ export class FlyablePlane {
   }
 }
 
-export function buildAirfield(area) {
+export function buildAirfield(area, site = AIRFIELD_SITE) {
   const g = area.group;
-  const { x, z, hangar } = AIRFIELD_SITE;
+  const { x, z, hangar } = site;
+  const runwayLength = site.runwayStart.z - site.runwayEnd.z + 4;
 
-  const runway = box(g, x, 0.025, z, 12, 0.12, 64, 0x52666c);
-  runway.name = "airfield-runway";
-  for (let dashZ = 25; dashZ <= 75; dashZ += 7)
+  const runway = box(g, x, 0.025, z, 12, 0.12, runwayLength, 0x52666c);
+  runway.name =
+    site === AIRFIELD_SITE ? "airfield-runway" : "north-airfield-runway";
+  for (
+    let dashZ = site.runwayEnd.z + 5;
+    dashZ <= site.runwayStart.z - 5;
+    dashZ += 7
+  )
     box(g, x, 0.095, dashZ, 0.45, 0.035, 3.4, 0xf7f0d7);
   for (const sideX of [x - 5.25, x + 5.25])
-    for (let lightZ = 22; lightZ <= 78; lightZ += 4)
+    for (
+      let lightZ = site.runwayEnd.z + 2;
+      lightZ <= site.runwayStart.z - 2;
+      lightZ += 4
+    )
       cylinder(g, sideX, 0.18, lightZ, 0.1, 0.13, 0.24, 0xf6d77d, 8);
   for (const stripeX of [-3.6, -2.4, -1.2, 1.2, 2.4, 3.6])
-    box(g, x + stripeX, 0.1, 22, 0.65, 0.035, 4, 0xf7f0d7);
+    for (const endZ of [site.runwayEnd.z + 2, site.runwayStart.z - 2])
+      box(g, x + stripeX, 0.1, endZ, 0.65, 0.035, 4, 0xf7f0d7);
 
   // The hangar is open toward the runway, with a deep contrasting interior.
   box(g, hangar.x + 5.4, 3.5, hangar.z, 0.5, 7, 13, 0x47727b);
@@ -339,7 +416,7 @@ export function buildAirfield(area) {
   box(g, hangar.x + 5.1, 3.2, hangar.z, 0.08, 5.6, 11.6, 0x31565e);
   const hangarLabel = label(
     g,
-    "SKYBIRD HANGAR",
+    site === AIRFIELD_SITE ? "SKYBIRD HANGAR" : "NORTH MEADOW HANGAR",
     hangar.x - 5.66,
     6.1,
     hangar.z,
@@ -353,15 +430,27 @@ export function buildAirfield(area) {
   addCollider(area, hangar.x, hangar.z + 6.25, 11, 0.7, 7.5);
 
   // A simple windsock provides an easy visual cue for the airfield entrance.
-  cylinder(g, 39, 2.6, 78, 0.09, 0.13, 5.2, 0x355e64, 8);
+  cylinder(
+    g,
+    x - 13,
+    2.6,
+    site.runwayStart.z - 2,
+    0.09,
+    0.13,
+    5.2,
+    0x355e64,
+    8,
+  );
   const sock = new THREE.Mesh(
     new THREE.CylinderGeometry(0.18, 0.48, 2.8, 10, 1, true),
     material(0xe7835f),
   );
   sock.rotation.z = Math.PI / 2;
-  sock.position.set(40.35, 4.8, 78);
+  sock.position.set(x - 11.65, 4.8, site.runwayStart.z - 2);
   sock.castShadow = true;
   g.add(sock);
 
-  return { runway, site: AIRFIELD_SITE };
+  // A flush apron connects the open hangar to the runway.
+  box(g, x + 10, 0.025, hangar.z, 9, 0.12, 12, 0x7a8e8b);
+  return { runway, site };
 }

@@ -1,9 +1,17 @@
+import { MAZE_SITE, makeMaze } from "../world/corn-maze.js";
+const mapMaze = makeMaze();
 import { COASTER_STATION } from "../world/coaster-track.js";
+import { SPACE_DIVE_STATION } from "../world/space-dive-track.js";
 import { BUILDINGS, TRAMPOLINE, LEAVES } from "../world/town.js";
 import { WORLD_HALF_SIZE } from "../world/landscape.js";
 import { FARM_BOUNDS, FARM_SITE } from "../world/farm.js";
-import { AIRFIELD_BOUNDS, AIRFIELD_SITE } from "../world/airfield.js";
+import {
+  AIRFIELD_BOUNDS,
+  AIRFIELD_SITE,
+  NORTH_AIRFIELD_SITE,
+} from "../world/airfield.js";
 import { SPACE_BOUNDS, SPACE_LANDING_SITE } from "../world/space.js";
+import { ROCKET_BOUNDS, ROCKET_SITE } from "../world/rocket.js";
 export class UI {
   constructor() {
     this.prompt = document.querySelector("#prompt");
@@ -37,43 +45,62 @@ export class UI {
     el.hidden = false;
     this.toastTime = 3;
   }
-  update(dt, player, area, yaw, vehicle = null, plane = null) {
+  update(dt, player, area, yaw, vehicle = null, plane = null, rocket = null) {
     if (this.toastTime > 0) {
       this.toastTime -= dt;
       if (this.toastTime <= 0) document.querySelector("#toast").hidden = true;
     }
     const name =
       area.id === "space"
-        ? area.name
-        : area.interior
-          ? area.name
-          : player.position.x >= AIRFIELD_BOUNDS.minX &&
-              player.position.x <= AIRFIELD_BOUNDS.maxX &&
-              player.position.z >= AIRFIELD_BOUNDS.minZ &&
-              player.position.z <= AIRFIELD_BOUNDS.maxZ
-            ? "Skybird Airfield"
-            : player.position.x >= FARM_BOUNDS.minX &&
-                player.position.x <= FARM_BOUNDS.maxX &&
-                player.position.z >= FARM_BOUNDS.minZ &&
-                player.position.z <= FARM_BOUNDS.maxZ
-              ? "Friendly Farm"
-              : player.position.z < -32 && player.position.x > -42
-                ? "Rainbow Rush Coaster Park"
-                : Math.abs(player.position.x) > 72 ||
-                    Math.abs(player.position.z) > 72
-                  ? "Countryside Edge"
-                  : Math.abs(player.position.x) > 30 ||
-                      Math.abs(player.position.z) > 30
-                    ? "Open Countryside"
-                    : player.position.x > 2 &&
-                        player.position.x < 21 &&
-                        player.position.z > 0 &&
-                        player.position.z < 21
-                      ? "Meadow Park"
-                      : Math.abs(player.position.x) > 21 ||
-                          Math.abs(player.position.z) > 21
-                        ? "Neighborhood Lane"
-                        : "Town Square";
+        ? player.position.x < -32
+          ? "Starlight Playground"
+          : area.name
+        : player.position.x < -90 && player.position.z > -50
+          ? "Harvest Corn Maze"
+          : area.interior
+            ? area.name
+            : player.position.x >= ROCKET_BOUNDS.minX &&
+                player.position.x <= ROCKET_BOUNDS.maxX &&
+                player.position.z >= ROCKET_BOUNDS.minZ &&
+                player.position.z <= ROCKET_BOUNDS.maxZ
+              ? "Starbound Launch Pad"
+              : player.position.z < -2100 &&
+                  player.position.z > -2300 &&
+                  player.position.x > 30
+                ? "North Meadow Airfield"
+                : player.position.x > 35 && player.position.z < -98 && player.position.z > -155
+                  ? "Space Dive Launch Station"
+                  : player.inVehicle && player.position.y > 175
+                    ? "Space Dive · Space Flyby"
+                : player.position.z < -90
+                  ? "Northern Meadows"
+                  : player.position.x >= AIRFIELD_BOUNDS.minX &&
+                      player.position.x <= AIRFIELD_BOUNDS.maxX &&
+                      player.position.z >= AIRFIELD_BOUNDS.minZ &&
+                      player.position.z <= AIRFIELD_BOUNDS.maxZ
+                    ? "Skybird Airfield"
+                    : player.position.x >= FARM_BOUNDS.minX &&
+                        player.position.x <= FARM_BOUNDS.maxX &&
+                        player.position.z >= FARM_BOUNDS.minZ &&
+                        player.position.z <= FARM_BOUNDS.maxZ
+                      ? "Friendly Farm"
+                      : player.position.z < -32 && player.position.x > -42
+                        ? "Rainbow Rush Coaster Park"
+                        : Math.abs(player.position.x) > 72 ||
+                            Math.abs(player.position.z) > 72
+                          ? "Countryside Edge"
+                          : Math.abs(player.position.x) > 30 ||
+                              Math.abs(player.position.z) > 30
+                            ? "Open Countryside"
+                            : player.position.x > 2 &&
+                                player.position.x < 21 &&
+                                player.position.z > 0 &&
+                                player.position.z < 21
+                              ? "Meadow Park"
+                              : Math.abs(player.position.x) > 21 ||
+                                  Math.abs(player.position.z) > 21
+                                ? "Neighborhood Lane"
+                                : "Town Square";
     if (name !== this.lastLocation) {
       document.querySelector("#location-name").textContent = name;
       this.lastLocation = name;
@@ -84,6 +111,12 @@ export class UI {
     const c = this.map;
     c.clearRect(0, 0, 180, 180);
     if (area.id === "space") {
+      const mapX = (x) =>
+        10 +
+        ((x - area.bounds.minX) / (area.bounds.maxX - area.bounds.minX)) * 160;
+      const mapZ = (z) =>
+        10 +
+        ((z - area.bounds.minZ) / (area.bounds.maxZ - area.bounds.minZ)) * 160;
       c.fillStyle = "#080d26";
       c.fillRect(0, 0, 180, 180);
       c.fillStyle = "#737991";
@@ -94,22 +127,33 @@ export class UI {
         [28, 28, 11],
         [-29, 25, 6],
       ]) {
-        const px = 90 + (x / SPACE_BOUNDS.maxX) * 76;
-        const pz = 90 + (z / SPACE_BOUNDS.maxZ) * 76;
+        const px = mapX(x);
+        const pz = mapZ(z);
         c.fillStyle = "#545a73";
         c.beginPath();
         c.ellipse(px, pz, radius, radius * 0.68, 0, 0, Math.PI * 2);
         c.fill();
       }
-      const landingX = 90 + (SPACE_LANDING_SITE.x / SPACE_BOUNDS.maxX) * 76;
-      const landingZ = 90 + (SPACE_LANDING_SITE.z / SPACE_BOUNDS.maxZ) * 76;
+      for (const [x, z, color] of [
+        [-45, 24, "#c4a8d8"],
+        [-46, 44, "#86bfc3"],
+        [-67, 9, "#f0cd85"],
+        [-65, -15, "#9fe3dc"],
+      ]) {
+        c.fillStyle = color;
+        c.beginPath();
+        c.arc(mapX(x), mapZ(z), 4, 0, Math.PI * 2);
+        c.fill();
+      }
+      const landingX = mapX(SPACE_LANDING_SITE.x);
+      const landingZ = mapZ(SPACE_LANDING_SITE.z);
       c.strokeStyle = "#9ce7df";
       c.lineWidth = 3;
       c.beginPath();
       c.arc(landingX, landingZ, 12, 0, Math.PI * 2);
       c.stroke();
-      const playerX = 90 + (player.position.x / SPACE_BOUNDS.maxX) * 76;
-      const playerZ = 90 + (player.position.z / SPACE_BOUNDS.maxZ) * 76;
+      const playerX = mapX(player.position.x);
+      const playerZ = mapZ(player.position.z);
       c.save();
       c.translate(playerX, playerZ);
       c.rotate(-yaw);
@@ -126,7 +170,8 @@ export class UI {
       c.stroke();
       c.restore();
       document.querySelector("#map-title").textContent = "SPACE ZONE";
-      document.querySelector("#map-caption").textContent = "Landing area map";
+      document.querySelector("#map-caption").textContent =
+        "Rocket & playground";
       document
         .querySelector("#map")
         .setAttribute(
@@ -142,12 +187,32 @@ export class UI {
     c.fillStyle = "#abc992";
     c.fillRect(0, 0, 180, 180);
     const mapScale = 80 / WORLD_HALF_SIZE;
-    const point = (x, z) => [90 + x * mapScale, 90 + z * mapScale];
+    const mapCenterZ =
+      !area.interior && player.position.z < -90 ? player.position.z : 0;
+    const point = (x, z) => [
+      90 + (x - (player.position.x < -90 ? -164 : 0)) * mapScale,
+      90 + (z - (player.position.x < -90 ? 24 : mapCenterZ)) * mapScale,
+    ];
+    if (mapCenterZ)
+      document.querySelector("#map-title").textContent = "NORTHERN MEADOWS";
     const rect = (x, z, w, d, color) => {
       c.fillStyle = color;
       const p = point(x - w / 2, z - d / 2);
       c.fillRect(p[0], p[1], w * mapScale, d * mapScale);
     };
+    rect(-164, 24, 136, 136, "#739342");
+    for (let row = 0; row < 17; row++)
+      for (let col = 0; col < 17; col++)
+        if (!mapMaze[row][col])
+          rect(
+            MAZE_SITE.minX + (col + 0.5) * 8,
+            MAZE_SITE.minZ + (row + 0.5) * 8,
+            8,
+            8,
+            "#dec58d",
+          );
+    if (player.position.x < -90)
+      document.querySelector("#map-title").textContent = "CORN MAZE";
     for (const z of [-24, 24]) rect(0, z, 54, 6, "#819b98");
     for (const x of [-24, 24]) rect(x, 0, 6, 54, "#819b98");
     rect(0, 0, 4, 38, "#f4e6c6");
@@ -168,10 +233,22 @@ export class UI {
     rect(FARM_SITE.x, FARM_SITE.z, FARM_SITE.width, FARM_SITE.depth, "#d6c38b");
     rect(AIRFIELD_SITE.x, AIRFIELD_SITE.z, 12, 64, "#52666c");
     rect(AIRFIELD_SITE.hangar.x, AIRFIELD_SITE.hangar.z, 11, 13, "#f0cf6b");
+    rect(NORTH_AIRFIELD_SITE.x, NORTH_AIRFIELD_SITE.z, 12, 164, "#52666c");
+    rect(
+      NORTH_AIRFIELD_SITE.hangar.x,
+      NORTH_AIRFIELD_SITE.hangar.z,
+      11,
+      13,
+      "#f0cf6b",
+    );
     const station = point(COASTER_STATION.x, COASTER_STATION.z);
     c.fillStyle = "#c13b79";
     c.beginPath();
     c.arc(...station, 4, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#3766d6";
+    c.beginPath();
+    c.arc(...point(SPACE_DIVE_STATION.x, SPACE_DIVE_STATION.z), 4, 0, Math.PI * 2);
     c.fill();
     const px = area.interior
         ? BUILDINGS.find((b) => b.id === area.id).x
@@ -216,11 +293,28 @@ export class UI {
       c.fill();
       c.restore();
     }
+    if (rocket && !rocket.arrived && area.id === "town") {
+      const launch = point(ROCKET_SITE.x, ROCKET_SITE.z);
+      c.fillStyle = "#e66f58";
+      c.beginPath();
+      c.arc(launch[0], launch[1], 4.5, 0, Math.PI * 2);
+      c.fill();
+      c.strokeStyle = "#fff0ad";
+      c.lineWidth = 1.5;
+      c.stroke();
+    }
     c.fillStyle = "#315d4f";
     c.font = "bold 10px sans-serif";
     c.fillText("N", 86, 12);
     document.querySelector("#map-caption").textContent = area.interior
       ? "Inside " + area.name
-      : "Find your own way";
+      : player.position.x < -90 ? "Golden finish at the west exit" : "North airfield: " +
+        Math.round(
+          Math.hypot(
+            player.position.x - NORTH_AIRFIELD_SITE.x,
+            player.position.z - NORTH_AIRFIELD_SITE.z,
+          ),
+        ) +
+        " m";
   }
 }

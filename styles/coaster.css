@@ -7,3 +7,7 @@
 .coaster-actions #coaster-launch { background:#bd3e74; color:white; border-color:#bd3e74; }
 .coaster-actions button:focus-visible { outline:3px solid #ec9d34; outline-offset:3px; }
 body:has(.coaster-hud:not([hidden])) .controls { visibility:hidden; }
+.space-dive-hud { background:#101e39f2; color:#e9f5ff; border-color:#6bd8ed; }
+.space-dive-hud .coaster-eyebrow { color:#83ecff; }
+.space-dive-hud .coaster-actions button { background:#203556; color:#e9f5ff; border-color:#6a92b2; }
+.space-dive-hud #space-dive-launch { background:#8fe9ff; color:#152743; border-color:#8fe9ff; }

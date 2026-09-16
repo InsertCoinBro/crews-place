@@ -12,6 +12,13 @@ body,
   height: 100%;
   overflow: hidden;
 }
+@supports (height: 100dvh) {
+  html,
+  body,
+  #game {
+    height: 100dvh;
+  }
+}
 body {
   font-family: ui-rounded, "Avenir Next", Avenir, system-ui, sans-serif;
   color: var(--ink);
@@ -381,6 +388,71 @@ h1 em {
   margin: 3px 0 1px;
   font-size: 15px;
 }
+.rocket-status {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  z-index: 6;
+  width: min(350px, calc(100vw - 40px));
+  padding: 14px 18px;
+  border: 2px solid #f5d477;
+  border-radius: 18px;
+  background: #14243bea;
+  color: #fff8dc;
+  text-align: center;
+  box-shadow: 0 8px 30px #07101f66;
+}
+.rocket-status > span,
+.rocket-status small {
+  display: block;
+}
+.rocket-status > span {
+  color: #9ce7df;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.rocket-status strong {
+  display: block;
+  margin: 3px 0;
+  font-size: 16px;
+}
+.rocket-status small {
+  color: #d9e3ee;
+  font-size: 11px;
+}
+.rocket-progress-track {
+  height: 6px;
+  margin: 10px 0 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #ffffff2b;
+}
+.rocket-progress-track i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f28b55, #f6dc7f, #9ce7df);
+}
+.rocket-status button {
+  border: 1px solid #ffffff55;
+  border-radius: 999px;
+  background: #f8f3dd;
+  color: #23384b;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.rocket-journey-active .location,
+.rocket-journey-active .map-card,
+.rocket-journey-active .controls,
+.rocket-journey-active .cowboy-controls,
+.rocket-journey-active .robot-gestures,
+.rocket-journey-active .top-actions {
+  opacity: 0.18;
+  pointer-events: none;
+}
 .controls {
   position: absolute;
   bottom: 24px;
@@ -644,4 +716,244 @@ dialog .primary {
   dialog {
     padding: 28px;
   }
+}
+
+#mobile-controls {
+  display: none;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  #mobile-controls {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    display: none;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  #mobile-controls.mobile-controls-active {
+    display: block;
+  }
+  .controls,
+  #camera-lock,
+  .cowboy-controls,
+  .robot-gestures,
+  .map-card {
+    display: none !important;
+  }
+  .mobile-stick {
+    position: absolute;
+    left: max(18px, env(safe-area-inset-left));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    width: 132px;
+    height: 132px;
+    border: 2px solid #fff9;
+    border-radius: 50%;
+    background: #163f4970;
+    box-shadow: 0 8px 28px #102f3840;
+    pointer-events: auto;
+  }
+  .mobile-stick::before {
+    content: "MOVE";
+    position: absolute;
+    inset: 17px 0 auto;
+    text-align: center;
+    color: #fffbd9b8;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+  }
+  .mobile-stick-knob {
+    position: absolute;
+    left: 39px;
+    top: 39px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #fff8dcdf;
+    border: 2px solid #fff;
+    box-shadow: 0 5px 14px #163f4955;
+  }
+  .mobile-look {
+    position: absolute;
+    inset: 25% 0 25% 46%;
+    pointer-events: auto;
+  }
+  .mobile-look span {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right));
+    bottom: 0;
+    color: #fff;
+    background: #173f477d;
+    border: 1px solid #ffffff55;
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .mobile-actions {
+    position: absolute;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: repeat(2, minmax(58px, auto));
+    gap: 10px;
+    pointer-events: auto;
+  }
+  .mobile-action {
+    min-width: 64px;
+    min-height: 58px;
+    border: 2px solid #fff;
+    border-radius: 18px;
+    background: #fff8dce8;
+    color: #194e4b;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 900;
+    box-shadow: 0 7px 22px #163f4948;
+    touch-action: none;
+  }
+  .mobile-action.pressed {
+    transform: scale(0.94);
+    background: #f4d477;
+  }
+  .mobile-use {
+    background: #194e4bec;
+    color: #fff8dc;
+  }
+  .mobile-controls-arcade {
+    z-index: 16 !important;
+  }
+  .mobile-controls-arcade .mobile-stick {
+    width: 112px;
+    height: 112px;
+  }
+  .mobile-controls-arcade .mobile-stick-knob {
+    left: 33px;
+    top: 33px;
+    width: 46px;
+    height: 46px;
+  }
+  .mobile-controls-arcade .mobile-action {
+    min-height: 52px;
+  }
+  .prompt {
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 142px);
+  }
+  .top-actions {
+    right: max(14px, env(safe-area-inset-right));
+    top: max(18px, env(safe-area-inset-top));
+  }
+  .brand {
+    top: max(18px, env(safe-area-inset-top));
+    left: max(18px, env(safe-area-inset-left));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 1000px) {
+  .mobile-stick {
+    width: 108px;
+    height: 108px;
+  }
+  .mobile-stick-knob {
+    left: 32px;
+    top: 32px;
+    width: 44px;
+    height: 44px;
+  }
+  .mobile-actions {
+    grid-template-columns: repeat(2, 56px);
+  }
+  .mobile-action {
+    min-width: 56px;
+    min-height: 48px;
+    padding: 6px;
+    font-size: 12px;
+  }
+  .location {
+    top: max(78px, calc(env(safe-area-inset-top) + 58px));
+  }
+  .mobile-look span {
+    right: max(154px, calc(env(safe-area-inset-right) + 136px));
+  }
+  .prompt {
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 112px);
+  }
+}
+.playground-controls {
+  position: fixed;
+  z-index: 25;
+  right: 18px;
+  top: 120px;
+  width: min(340px, calc(100vw - 36px));
+  padding: 18px;
+  border: 2px solid #b9e5d9;
+  border-radius: 20px;
+  background: #20344bf2;
+  color: #fff5db;
+  font: 15px/1.5 system-ui;
+}
+.playground-controls[hidden] {
+  display: none;
+}
+.playground-controls div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.playground-controls button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  border: 0;
+  background: #e3eedc;
+  color: #20344b;
+  cursor: pointer;
+}
+.playground-controls button[hidden] {
+  display: none;
+}
+.playground-controls button:focus-visible {
+  outline: 3px solid #f4d982;
+  outline-offset: 3px;
+}
+@media (max-width: 700px) {
+  .playground-controls {
+    top: 92px;
+    right: 12px;
+    width: min(300px, calc(100vw - 24px));
+    padding: 14px;
+  }
+}
+
+.maze-controls {
+  position: absolute;
+  left: 20px;
+  top: 180px;
+  max-width: 310px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff8e8ed;
+  color: #284c32;
+  box-shadow: 0 5px 25px #19382322;
+  pointer-events: auto;
+  font-size: 14px;
+}
+.maze-controls[hidden] {
+  display: none;
+}
+.maze-controls p {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.maze-controls button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #a6b38d;
+  border-radius: 10px;
+  background: #f3e7bc;
+  color: #284c32;
+  cursor: pointer;
 }

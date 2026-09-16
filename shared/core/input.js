@@ -8,6 +8,7 @@ export class Input {
     this.lookY = 0;
     this.enabled = false;
     this.dragging = false;
+    this.pointerId = null;
     const gameKeys = [
       "KeyW",
       "KeyA",
@@ -58,11 +59,25 @@ export class Input {
     canvas.addEventListener("pointerdown", (e) => {
       if (!this.enabled) return;
       this.dragging = true;
+      this.pointerId = e.pointerId;
       canvas.focus({ preventScroll: true });
       if (!document.pointerLockElement) canvas.setPointerCapture(e.pointerId);
     });
-    canvas.addEventListener("pointerup", () => {
+    canvas.addEventListener("pointermove", (e) => {
+      if (
+        this.enabled &&
+        this.dragging &&
+        this.pointerId === e.pointerId &&
+        e.pointerType !== "mouse"
+      ) {
+        this.lookX += e.movementX;
+        this.lookY += e.movementY;
+      }
+    });
+    canvas.addEventListener("pointerup", (e) => {
+      if (e.pointerId !== this.pointerId) return;
       this.dragging = false;
+      this.pointerId = null;
     });
     canvas.addEventListener("pointercancel", () => this.clear());
     window.addEventListener("mousemove", (e) => {
@@ -84,11 +99,25 @@ export class Input {
     this.pressed.delete(code);
     return has;
   }
+  press(code) {
+    if (!this.enabled || this.keys.has(code)) return;
+    this.keys.add(code);
+    this.pressed.add(code);
+  }
+  release(code) {
+    this.keys.delete(code);
+  }
+  addLook(x, y) {
+    if (!this.enabled) return;
+    this.lookX += x;
+    this.lookY += y;
+  }
   clear() {
     this.keys.clear();
     this.pressed.clear();
     this.lookX = this.lookY = 0;
     this.dragging = false;
+    this.pointerId = null;
   }
   setEnabled(enabled) {
     this.enabled = enabled;

@@ -28,12 +28,23 @@ export function runArcadeChecks(game) {
     const m = game.arcade.current;
     game.renderer.render(m?.scene ?? game.scene, m?.camera ?? game.camera);
   };
-  const cabinetX = { bubble: 96.4, memory: 100, rocket: 103.6 };
+  const cabinetPosition = {
+    gem: [94.4, -2.15],
+    bubble: [96.4, -2.15],
+    memory: [100, -2.15],
+    rocket: [103.6, -2.15],
+    golf: [105.6, -2.15],
+    tower: [93.5, -0.6],
+    brick: [93.5, 2],
+    derby: [93.5, 4.4],
+    ski: [106.5, -0.6],
+    throw: [106.5, 2],
+  };
   const launch = (id) => {
     if (game.arcade.current) game.arcade.exit();
     if (game.ui.panel.open) game.resume();
     game.enter("arcade");
-    game.player.teleport(cabinetX[id], -2.15);
+    game.player.teleport(...cabinetPosition[id]);
     game.interactionCooldown = 0;
     game.input.clear();
     frames(1);
@@ -76,6 +87,51 @@ export function runArcadeChecks(game) {
           "invisible cowboy " + part + " in " + id,
         );
       game.arcade.exit();
+    }
+  });
+  check("All downloaded cabinets launch locally and cleanly return", () => {
+    const files = {
+      gem: "matchThree.html",
+      golf: "miniGolf.html",
+      tower: "pillars.html",
+      brick: "brickout.html",
+      derby: "homerDerby.html",
+      ski: "skiing.html",
+      throw: "freeThrow.html",
+    };
+    for (const id of Object.keys(files)) {
+      const m = launch(id);
+      assert(
+        game.mode === "arcade" && !game.input.enabled,
+        "town controls not isolated",
+      );
+      assert(m.frame instanceof HTMLIFrameElement, "local game frame missing");
+      const source = new URL(m.frame.src);
+      assert(source.origin === location.origin, "game is not same-origin");
+      assert(
+        source.pathname.endsWith("/vendor/littlejs/games/" + files[id]),
+        "wrong local game source",
+      );
+      assert(m.host.isConnected, "game host is not mounted");
+      assert(
+        document.body.classList.contains("arcade-embedded-active") &&
+          getComputedStyle(game.canvas).visibility === "hidden",
+        "3D room remained behind embedded play",
+      );
+      assert(
+        document.querySelector("#arcade-message").textContent === "",
+        "previous game message remained",
+      );
+      game.arcade.pause();
+      assert(game.arcade.suspended, "embedded game did not pause");
+      click("Continue Game");
+      assert(!game.arcade.suspended, "embedded game did not resume");
+      game.arcade.exit();
+      assert(
+        !document.querySelector(".arcade-embed-host") &&
+          !document.body.classList.contains("arcade-embedded-active"),
+        "embedded game remained after exit",
+      );
     }
   });
   check(
@@ -470,7 +526,18 @@ export function runArcadeChecks(game) {
     p.textContent = result;
     report.append(p);
   }
-  for (const id of ["bubble", "memory", "rocket"]) {
+  for (const id of [
+    "gem",
+    "bubble",
+    "memory",
+    "rocket",
+    "golf",
+    "tower",
+    "brick",
+    "derby",
+    "ski",
+    "throw",
+  ]) {
     const button = document.createElement("button");
     button.textContent = "Inspect " + id;
     button.style.cssText = "margin:8px;padding:9px";

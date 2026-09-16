@@ -12,6 +12,8 @@ The development-only `/?coaster-test` harness exercises the complete Rainbow Rus
 
 ## Manual visual checks
 
+Space Dive: the focused unit checks cover station placement north of Rainbow Rush, boarding clearance, track separation, lunar-surface clearance, continuous orientation, a full ground/space/ground ride, and exact stopping at 30/60/120 fps. The `/?space-dive-test` button runs seven browser checks covering boarding, explicit launch, pause/resume, the existing space scene, camera controls, fast return, early exit, both characters, and independent Rainbow Rush operation. The space flyby was also visually inspected with the moon, ringed planet, stars, playground, and rider visible.
+
 Cowboy and vehicle integration: all 33 Node tests and 28 town browser checks passed in the local Chromium browser. The cowboy replaces the main player and the mini-game avatar; Rocket Flyer shows its head, face and hat. The production build includes the local GLB. Character animation clips remain intentionally absent.
 
 Opening screen, visible third-person character, actual mouse-drag camera rotation, arcade interior, recreation room, contextual door prompt, and activity panel are checked in the Codex Chromium browser during implementation.

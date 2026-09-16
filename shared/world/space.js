@@ -277,6 +277,8 @@ export function buildSpace(scene) {
         1.25 + (Math.abs(offset + 1) % 3) * 0.18,
         0x686d83,
       );
+      eastRock.name = "space-boundary-ridge";
+      northRock.name = "space-boundary-ridge";
       eastRock.scale.y = 0.52;
     }
   }

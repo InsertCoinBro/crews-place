@@ -12,15 +12,15 @@ function mat(color,metalness=0.15) {
 function mesh(parent,geo,color,pos) {
   const m=new THREE.Mesh(geo,mat(color)); m.position.copy(pos); m.castShadow=true; m.receiveShadow=true; parent.add(m); return m;
 }
-function rounded(parent,pos,size,color,r=0.15) { return mesh(parent,new RoundedBoxGeometry(...size,3,r),color,v(...pos)); }
-function bar(parent,a,b,r,color) {
+export function rounded(parent,pos,size,color,r=0.15) { return mesh(parent,new RoundedBoxGeometry(...size,3,r),color,v(...pos)); }
+export function bar(parent,a,b,r,color) {
   const delta=b.clone().sub(a);
   const m=mesh(parent,new THREE.CylinderGeometry(r,r,delta.length(),10),color,a.clone().add(b).multiplyScalar(.5));
   m.quaternion.setFromUnitVectors(v(0,1,0),delta.normalize()); return m;
 }
-function tube(track,offsetY,offsetX,radius) {
+export function tube(track,offsetY,offsetX,radius,paletteColors=COASTER_COLORS) {
   const vertices=[], normals=[], colors=[], indices=[], sides=8;
-  const palette=COASTER_COLORS.map(c=>new THREE.Color(c));
+  const palette=paletteColors.map(c=>new THREE.Color(c));
   for(let i=0;i<=track.count;i++) {
     const colorT=i/track.count*palette.length, ci=Math.floor(colorT)%palette.length;
     const color=palette[ci].clone().lerp(palette[(ci+1)%palette.length],colorT%1);
@@ -34,12 +34,14 @@ function tube(track,offsetY,offsetX,radius) {
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.setIndex(indices);geo.computeBoundingSphere();return geo;
 }
 export class RollerCoaster {
-  constructor(game) {
-    this.game=game; this.track=createCoasterTrack(); this.ride=new CoasterRide(this.track);
-    this.group=new THREE.Group();this.group.name='Rainbow Rush coaster park';game.areas.town.group.add(this.group);
+  constructor(game, options = {}) {
+    this.game=game; this.track=options.track ?? createCoasterTrack(); this.ride=options.ride ?? new CoasterRide(this.track);
+    this.title=options.title ?? 'Rainbow Rush'; this.id=options.id ?? 'coaster';
+    this.exitPoint=options.exitPoint ?? COASTER_EXIT; this.colors=options.colors ?? COASTER_COLORS;
+    this.group=new THREE.Group();this.group.name=this.title+' coaster park';game.areas.town.group.add(this.group);
     this.buildTrack(); this.buildStation(); this.buildTrain(); this.buildHUD();
-    game.interactions.register({id:'rainbow-coaster',area:'town',kind:'coaster',x:COASTER_EXIT.x,z:COASTER_EXIT.z,radius:5,label:'Board Rainbow Rush',hint:'E · Get into the coaster cart'});
-    game.interactions.on('coaster',()=>this.board());
+    game.interactions.register({id:options.id ?? 'rainbow-coaster',area:'town',kind:this.id,x:this.exitPoint.x,z:this.exitPoint.z,radius:5,label:'Board '+this.title,hint:'E · Get into the coaster cart'});
+    game.interactions.on(this.id,()=>this.board());
     this.placeTrain();
   }
   get occupied() { return this.ride.state!=='waiting'; }
@@ -119,9 +121,9 @@ export class RollerCoaster {
     this.cars=[];
     for(let i=0;i<3;i++) {
       const car=new THREE.Group();this.group.add(car);this.cars.push(car);
-      rounded(car,[0,.31,0],[1.7,.5,2.35],COASTER_COLORS[i*2],.2);
-      rounded(car,[0,.57,1.05],[1.7,.8,.36],COASTER_COLORS[i*2],.15);
-      for(const x of [-.76,.76]) rounded(car,[x,.72,0],[.2,.72,1.9],COASTER_COLORS[i*2],.09);
+      rounded(car,[0,.31,0],[1.7,.5,2.35],this.colors[i*2],.2);
+      rounded(car,[0,.57,1.05],[1.7,.8,.36],this.colors[i*2],.15);
+      for(const x of [-.76,.76]) rounded(car,[x,.72,0],[.2,.72,1.9],this.colors[i*2],.09);
       rounded(car,[0,.65,-.48],[1.24,.25,.72],0x243b67,.1);
       rounded(car,[0,1.1,-.85],[1.3,.9,.22],0x243b67,.1);
       for(const x of [-.45,.45]) bar(car,v(x,.6,.28),v(x,1.14,.28),.055,0xffd769);
@@ -131,11 +133,13 @@ export class RollerCoaster {
     }
   }
   buildHUD() {
-    this.hud=document.createElement('section');this.hud.className='coaster-hud';this.hud.hidden=true;this.hud.setAttribute('aria-label','Rainbow Rush ride controls');
+    this.hud=document.createElement('section');this.hud.className='coaster-hud';this.hud.hidden=true;this.hud.setAttribute('aria-label',this.title+' ride controls');
     this.hud.innerHTML='<div><span class="coaster-eyebrow">RAINBOW RUSH</span><strong id="coaster-phase" aria-live="polite">Ready when you are</strong></div><div class="coaster-stats"><span id="coaster-speed">0 km/h</span><span id="coaster-progress">At the station</span></div><div class="coaster-actions"><button id="coaster-launch">Launch ride · E</button><button id="coaster-view">View: follow cart · C</button><button id="coaster-exit">Get out</button></div>';
     document.querySelector('#hud').append(this.hud);
     this.phase=this.hud.querySelector('#coaster-phase');this.speedLabel=this.hud.querySelector('#coaster-speed');this.progress=this.hud.querySelector('#coaster-progress');
     this.launchButton=this.hud.querySelector('#coaster-launch');this.viewButton=this.hud.querySelector('#coaster-view');this.exitButton=this.hud.querySelector('#coaster-exit');
+    this.hud.querySelector('.coaster-eyebrow').textContent=this.title.toUpperCase();
+    if(this.id !== 'coaster') this.hud.querySelectorAll('[id]').forEach(el=>el.id=el.id.replace('coaster',this.id));
     this.launchButton.onclick=()=>{if(this.game.mode==='playing') this.launch();};
     this.viewButton.onclick=()=>{if(this.game.mode==='playing')this.toggleView();};
     this.exitButton.onclick=()=>{if(this.game.mode==='playing')this.exit();};
@@ -143,7 +147,7 @@ export class RollerCoaster {
   }
   board() {
     const g=this.game;
-    if(g.driving || g.area.id!=='town' || g.mode!=='playing' || !this.ride.board()) return;
+    if(g.player.inVehicle || g.driving || g.flying || g.cornMaze?.occupied || g.area.id!=='town' || g.mode!=='playing' || !this.ride.board()) return;
     g.pickups.reset();g.player.velocity.set(0,0);g.player.velocityY=0;g.player.inVehicle=true;g.player.model.animator?.reset();
     this.savedParent=g.player.model.parent;
     this.cars[0].add(g.player.model);
@@ -171,7 +175,7 @@ export class RollerCoaster {
     const g=this.game;
     this.savedParent.add(g.player.model);g.player.model.rotation.set(0,0,0);g.player.inVehicle=false;g.player.model.visible=true;
     this.ride.reset();this.hud.hidden=true;g.camera.up.set(0,1,0);g.camera.fov=55;g.camera.updateProjectionMatrix();
-    g.player.teleport(COASTER_EXIT.x,COASTER_EXIT.z);g.player.heading=Math.PI;g.follow.reset(0);g.input.clear();g.interactionCooldown=.6;g.refreshCharacterUI();g.canvas.focus();this.placeTrain();g.ui.toast('Back at the station. Ride again whenever you like!');
+    g.player.teleport(this.exitPoint.x,this.exitPoint.z);g.player.heading=Math.PI;g.follow.reset(0);g.input.clear();g.interactionCooldown=.6;g.refreshCharacterUI();g.canvas.focus();this.placeTrain();g.ui.toast('Back at the station. Ride again whenever you like!');
   }
   placeTrain() {
     this.cars.forEach((car,i)=>{ const s=this.track.sample(this.ride.distance-i*2.8);car.position.copy(s.position);car.quaternion.copy(s.rotation); });

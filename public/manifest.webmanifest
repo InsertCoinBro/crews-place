@@ -1,0 +1,10 @@
+{
+  "name": "Crew's Place",
+  "short_name": "Crew's Place",
+  "description": "A calm little 3D world to explore and play.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#b7dce1",
+  "theme_color": "#194e4b"
+}

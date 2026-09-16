@@ -21,6 +21,10 @@ The project includes a `pnpm-lock.yaml`; `pnpm install --frozen-lockfile` and `p
 
 ## Controls
 
+The northern journey includes five mountain passes (150–185 metres high), bushy forests, a winding river, three lakes, clouds, and ten colorful flight hoops. Mountain peaks exceed Skybird's 72-metre ceiling: steer through the alternating open passes. Rings are optional, work in either direction, and turn green when completed; progress lasts until reload.
+
+Weather changes by region as you travel: spring rain, autumn gusts, winter snow, then clear skies near North Meadow's runway. Crosswinds move the aircraft sideways and change ground speed; updrafts and downdrafts affect altitude, with gentle bank motion. Calm mode reduces gust strength and precipitation density. Mountain or low-water contact stops motion safely and shows a steering hint. Land at either airfield to explore and reboard.
+
 | Control                        | Action                                                 |
 | ------------------------------ | ------------------------------------------------------ |
 | WASD or arrow keys             | Walk relative to the camera                            |
@@ -32,6 +36,7 @@ The project includes a `pnpm-lock.yaml`; `pnpm install --frozen-lockfile` and `p
 | Near the blue car: E, W/S      | Enter/exit; drive forward or reverse around the street |
 | At Rainbow Rush: E             | Board the coaster, then launch the ride                |
 | During Rainbow Rush: C         | Switch between follow-cart and front-seat views        |
+| At Space Dive: E / C            | Board and launch / change the ride camera              |
 | Escape / Pause                 | Pause; Escape also closes an activity panel            |
 
 The controls guide and contextual prompts remain on screen. The game pauses when the window loses focus. The Pause menu includes gentler camera motion and fewer leaf particles; this starts enabled if the system requests reduced motion. The prototype is silent.
@@ -40,7 +45,8 @@ The controls guide and contextual prompts remain on screen. The game pauses when
 
 - Custom Blender cowboy as the main character, with blue eyes, mustache, goatee, Western outfit and holster. Smooth movement, jumping and camera follow work; the character keeps its current pose until skeletal animations are added.
 - Ground, wall, furniture, tree-trunk, and map-edge collision; camera obstruction checks for buildings and room walls/doors.
-- A 180×180 walkable countryside—three times the original width and depth—with open grassland, scattered tree clusters, wildflowers, distant hills, and scenery beyond the boundary so there is no visible world drop-off.
+- The original 180×180 countryside now extends another 2,400 metres north. East, west and south boundaries are unchanged. The northern meadows remain mostly open for future activities.
+- North Meadow Airfield is at x=52, z=-2200, roughly a 75-second flight from Skybird at cruising speed. It reuses the original open hangar, windsock and runway design, with a 164-metre landing strip and connecting apron. Fly north, hold S to descend and brake, then press E on the runway to explore. Skybird stays there and faces south for your return. Exiting in the air still returns safely home.
 - The animated horse from the Character Creations project wanders a quiet outer meadow and rests when the player approaches.
 - Streets, sidewalks, shops, a library exterior, park, benches, trees, flowers, fountain, and a position map on wider screens.
 - Four cars on two road loops and seven pedestrians on walking routes. They stop when the player is close ahead. There is no traffic damage.
@@ -50,6 +56,14 @@ The controls guide and contextual prompts remain on screen. The game pauses when
 - Arcade cabinets, the recreation room's creative table, and the park activity sign open a **Mini-game coming soon** panel; player input is disabled until it closes.
 - Jump into the leaf pile in Meadow Park to scatter leaves. They settle and can be triggered again.
 - Jump onto the round trampoline in Meadow Park. Each descending landing automatically bounces the player; move off the mat to stop.
+
+## Space Dive
+
+Space Dive's station is north of Rainbow Rush at `(59, -118)`. Follow the path along the east side of Rainbow Rush, then turn toward the Space Dive sign. Press **E** to board, press **E** again or use **Launch ride**, and use **C** to switch between following the carts and a front-seat view.
+
+The continuous track climbs to about 222 meters, passes above the existing moon and Starlight Playground for roughly 13 seconds, then dives back to its starting station. The full ride takes about 43 seconds. The sky, stars, planet, and lighting change as the character climbs and descends. Pause works throughout, and **Return to station** provides an early exit. Gentler motion keeps the camera upright.
+
+For local development, `/?space-dive-preview` starts beside its boarding area. `/?space-dive-test` provides a button to run the browser integration checks.
 
 ## Code map
 
@@ -68,6 +82,8 @@ shared/world/
   landscape.js              Expanded grassland, outer scenery, trees, flowers
   wildlife.js               Imported horse asset, animation, and meadow route
   coaster-track.js          Closed track, transported frame, and ride physics
+  space-dive-track.js       Ground-to-space circuit and ascent/flyby/dive timing
+  space-dive.js             Space Dive station, train, camera, and sky transition
   coaster.js                Park scenery, train, interactions, HUD, and ride camera
   interiors.js              The two rooms and their exits
   routes.js                 Reusable closed-route sampling

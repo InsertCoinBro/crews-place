@@ -139,7 +139,13 @@ export class Player {
         this.grounded = false;
       }
     }
-    const event = stepVertical(this, dt, area.trampoline, area.groundY ?? 0);
+    const groundY = area.groundHeightAt?.(this.position.x, this.position.z);
+    const event = stepVertical(
+      this,
+      dt,
+      area.trampoline,
+      groundY ?? area.groundY ?? 0,
+    );
     this.actualSpeed =
       dt > 0
         ? Math.hypot(this.position.x - beforeX, this.position.z - beforeZ) / dt
