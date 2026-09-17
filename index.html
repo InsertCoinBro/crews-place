@@ -71,6 +71,19 @@
                 ><small>A smile in every step</small></span
               >
             </label>
+            <label class="character-choice">
+              <input
+                type="radio"
+                name="character"
+                value="moon_mischief"
+                disabled
+              />
+              <span aria-hidden="true" class="character-icon">👽</span>
+              <span
+                ><strong>Moon Mischief</strong
+                ><small>A little spooky, a little silly</small></span
+              >
+            </label>
           </fieldset>
           <p id="character-status" class="character-status" role="status">
             Getting everyone ready…
@@ -184,6 +197,7 @@
             <select id="pause-character">
               <option value="cowboy">Cowboy</option>
               <option value="jolly_robot">Jolly Robot</option>
+              <option value="moon_mischief">Moon Mischief</option>
             </select>
           </div>
           <label
@@ -200,6 +214,44 @@
         <p id="error-copy"></p>
         <button onclick="location.reload()">Try again</button>
       </section>
+      <aside
+        id="alien-hud"
+        hidden
+        aria-label="Alien tag"
+        style="
+          position: fixed;
+          left: 50%;
+          bottom: 110px;
+          transform: translateX(-50%);
+          z-index: 12;
+          width: min(92vw, 480px);
+          padding: 12px 16px;
+          border-radius: 18px;
+          background: #152936ee;
+          color: #fff;
+          text-align: center;
+          font-size: 16px;
+          pointer-events: auto;
+        "
+      >
+        <p id="alien-status" role="status" style="margin: 0 0 8px"></p>
+        <button
+          id="alien-toggle"
+          type="button"
+          style="
+            min-height: 44px;
+            padding: 8px 20px;
+            border-radius: 12px;
+            background: #c5f4d9;
+            color: #122a31;
+            border: 0;
+            font: inherit;
+            cursor: pointer;
+          "
+        >
+          Stop alien chase
+        </button>
+      </aside>
       <noscript>This town needs JavaScript turned on to play.</noscript>
     </main>
     <script type="module" src="./app.js"></script>

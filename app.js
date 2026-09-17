@@ -1,3 +1,4 @@
+import { SpaceAlien } from "./shared/world/space-alien.js";
 import * as THREE from "three";
 import { Input } from "./shared/core/input.js";
 import { Player } from "./shared/core/player.js";
@@ -210,6 +211,7 @@ class Game {
     this.library = new LibraryReader(this);
     this.coaster = new RollerCoaster(this);
     this.spaceDive = new SpaceDive(this);
+    this.spaceAlien = new SpaceAlien(this, characters.get("moon_mischief"));
     this.farm = new Farm(this);
     this.cornMaze = new CornMaze(this);
     this.interactions.on("minigame", (item) => {
@@ -363,7 +365,7 @@ class Game {
       radio.checked = radio.value === id;
     });
     document.querySelector("#pause-character").value = id;
-    document.querySelector("#robot-gestures").hidden = id !== "jolly_robot";
+    document.querySelector("#robot-gestures").hidden = id === "cowboy";
     document.querySelector("#cowboy-controls").hidden = id !== "cowboy";
     document.querySelector("#character-status").textContent =
       `${CHARACTERS[id].label} selected`;
@@ -580,6 +582,7 @@ class Game {
     this.area.group.visible = false;
     this.area = next;
     next.group.visible = true;
+    this.spaceAlien?.reset();
     const point = spawn ?? next.spawn ?? [0, 15];
     this.player.heading = id === "town" ? 0 : Math.PI;
     this.player.teleport(point[0], point[1], next.groundY ?? 0);
@@ -606,6 +609,7 @@ class Game {
     );
   }
   tick(dt) {
+    this.spaceAlien.update(dt);
     if (this.mode === "arcade") {
       this.arcade.update(dt);
       return;

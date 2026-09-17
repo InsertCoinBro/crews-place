@@ -7,14 +7,24 @@ const cowboyUrl = new URL("../../assets/models/cowboy.glb", import.meta.url)
   .href;
 const robotUrl = new URL("../../assets/models/jolly_robot.glb", import.meta.url)
   .href;
+const alienUrl = new URL(
+  "../../assets/models/moon_mischief.glb",
+  import.meta.url,
+).href;
 export const CHARACTERS = {
+  moon_mischief: { label: "Moon Mischief", url: alienUrl },
   cowboy: { label: "Cowboy", url: cowboyUrl },
   jolly_robot: { label: "Jolly Robot", url: robotUrl },
 };
 
 export function preparePlayerCharacter(gltf, avatarId = "cowboy") {
   const model = new THREE.Group();
-  model.name = avatarId === "jolly_robot" ? "PlayerJollyRobot" : "PlayerCowboy";
+  model.name =
+    avatarId === "moon_mischief"
+      ? "PlayerMoonMischief"
+      : avatarId === "jolly_robot"
+        ? "PlayerJollyRobot"
+        : "PlayerCowboy";
   model.userData.avatarId = avatarId;
   model.animations = gltf.animations;
   model.add(gltf.scene);
