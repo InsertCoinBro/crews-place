@@ -217,11 +217,11 @@
       <aside
         id="alien-hud"
         hidden
-        aria-label="Alien tag"
+        aria-label="Space blaster and alien chase"
         style="
           position: fixed;
           left: 50%;
-          bottom: 110px;
+          bottom: var(--alien-hud-bottom, 110px);
           transform: translateX(-50%);
           z-index: 12;
           width: min(92vw, 480px);
@@ -235,6 +235,7 @@
         "
       >
         <p id="alien-status" role="status" style="margin: 0 0 8px"></p>
+        <button id="alien-fire" type="button">Fire blaster · B</button>
         <button
           id="alien-toggle"
           type="button"

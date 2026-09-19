@@ -78,8 +78,9 @@ export function alienPath(from, to, area) {
   return path;
 }
 export class SpaceAlien {
-  constructor(game, template) {
+  constructor(game, template, { hud = true, notifyTag = true } = {}) {
     this.game = game;
+    this.notifyTag = notifyTag;
     this.enabled = true;
     this.state = "waiting";
     this.delay = 4;
@@ -94,9 +95,13 @@ export class SpaceAlien {
       this.model.visible = false;
       game.scene.add(this.model);
     }
-    this.hud = globalThis.document?.querySelector("#alien-hud");
-    this.status = globalThis.document?.querySelector("#alien-status");
-    this.button = globalThis.document?.querySelector("#alien-toggle");
+    this.hud = hud ? globalThis.document?.querySelector("#alien-hud") : null;
+    this.status = hud
+      ? globalThis.document?.querySelector("#alien-status")
+      : null;
+    this.button = hud
+      ? globalThis.document?.querySelector("#alien-toggle")
+      : null;
     this.button?.addEventListener("click", () => this.toggle());
     this.reset();
   }
@@ -190,9 +195,10 @@ export class SpaceAlien {
     if (dist < 1.65 && !blocked && Math.abs(p.y - g.area.groundY) < 0.8) {
       this.state = "tagged";
       a.play("Wave");
-      g.ui.toast(
-        "Tag! Moon Mischief says hello. Play again whenever you like.",
-      );
+      if (this.notifyTag)
+        g.ui.toast(
+          "Tag! Moon Mischief says hello. Play again whenever you like.",
+        );
       this.refresh();
       return;
     }

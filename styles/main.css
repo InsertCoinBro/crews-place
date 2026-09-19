@@ -723,6 +723,9 @@ dialog .primary {
 }
 
 @media (pointer: coarse), (max-width: 900px) {
+  #alien-hud {
+    --alien-hud-bottom: max(220px, calc(env(safe-area-inset-bottom) + 200px));
+  }
   #mobile-controls {
     position: absolute;
     inset: 0;
@@ -956,4 +959,23 @@ dialog .primary {
   background: #f3e7bc;
   color: #284c32;
   cursor: pointer;
+}
+#alien-fire {
+  min-height: 44px;
+  padding: 8px 20px;
+  margin: 4px;
+  border: 2px solid #8de2dc;
+  border-radius: 12px;
+  background: #e7f9f5;
+  color: #122a31;
+  font: inherit;
+  cursor: pointer;
+}
+#alien-fire:focus-visible,
+#alien-toggle:focus-visible {
+  outline: 3px solid #f4d982;
+  outline-offset: 3px;
+}
+#alien-fire:disabled {
+  opacity: 0.5;
 }

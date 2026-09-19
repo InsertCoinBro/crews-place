@@ -1,6 +1,6 @@
 # Moon Mischief
 
-Original 3D alien for Crew’s Place: mildly spooky eyes and brows, rounded horns and three soft fingers. No teeth, weapons or attack animation.
+Original 3D alien for Crew’s Place: mildly spooky eyes and brows, rounded horns and three soft fingers. The exported character has no built-in weapon; the game equips a separate sci-fi blaster in space.
 
 Open `moon_mischief_animated.blend` in Blender. The `MoonMischiefRig` armature has 15 bones; choose any action in the Action Editor. `build_alien.py` recreates the source, export and two previews using Blender 5.2. The studio is excluded from the exported model.
 
@@ -12,8 +12,10 @@ Game-ready model: `../../assets/models/moon_mischief.glb` (about 1 MB). Self-con
 
 Choose Moon Mischief at the opening screen or from the pause menu. Use the existing movement, run, jump and gesture controls.
 
-A separate alien waits near the space landing pad. After leaving the safe landing area, it starts a gentle chase following a short grace period. Walking is faster than the alien; Gentler motion slows it further. It follows routes around obstacles. It rests while the player is using playground activities, and freezes while paused. Stop alien chase is always available during space exploration. After a tag, it waves and waits for Play tag again. Leaving space resets the encounter. Turning the chase off lasts for the current game session.
+Five independent Moon Mischief NPCs spawn around the space boundary and chase after a short grace period. Walking is faster than the aliens; Gentler motion slows them further. They follow routes around obstacles and respect the safe landing area. They rest during playground and Space Dive activities, and freeze while paused. Pause alien chase is available during space exploration. After reaching the player, an alien waves briefly before resuming its chase. Leaving space resets the encounter. Turning the chase off lasts for the current game session.
+
+Cowboy, Jolly Robot and Moon Mischief all equip a visible sci-fi blaster in space. Face an alien and press **B**, or use the **Fire blaster** button. A small forward aim-assist cone selects a visible target; scenery blocks shots. A hit defeats an alien with a non-graphic fall/shrink effect, then it respawns in a clear spot along the space boundary after 2.5 seconds. Aiming and recoil are procedural in-game animations layered over each character's movement; the Blender source and its 14 exported clips are unchanged. Gentler motion suppresses the muzzle flash. Pausing the encounter also unequips the blaster.
 
 ## Verification
 
-The model was rendered and visually inspected, then cleanly re-imported into Blender with all 14 clips and its 15-bone rig. Automated Three.js tests cover finite clips, forward-reaching hands, independent NPC skeleton, player movement/jumping, safe-zone behavior, pause, tag/restart/stop, gentle speed, obstacle paths and actual space-world collider placement. The game production build is checked separately. No manual browser playthrough was performed for this delivery.
+The model was rendered and visually inspected, then cleanly re-imported into Blender with all 14 clips and its 15-bone rig. The game GLB matches the export in Character creations. Automated Three.js tests cover animation validity, independent NPC skeletons, chase behavior, cover, directional targeting, boundary respawn and aiming/recoil on all three playable rigs. The development-only `?space-combat-test` browser harness checks five visible NPCs, firing and respawning with each playable character, and activity/pause safety. All 90 Node tests, all five browser integration checks and the production build passed for this update.

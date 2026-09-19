@@ -31,6 +31,7 @@ export class Input {
       "KeyJ",
       "KeyK",
       "KeyT",
+      "KeyB",
     ];
     window.addEventListener("keydown", (e) => {
       this.heldKeys.add(e.code);

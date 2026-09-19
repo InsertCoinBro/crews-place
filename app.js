@@ -1,4 +1,4 @@
-import { SpaceAlien } from "./shared/world/space-alien.js";
+import { SpaceCombat } from "./shared/world/space-combat.js";
 import * as THREE from "three";
 import { Input } from "./shared/core/input.js";
 import { Player } from "./shared/core/player.js";
@@ -211,7 +211,7 @@ class Game {
     this.library = new LibraryReader(this);
     this.coaster = new RollerCoaster(this);
     this.spaceDive = new SpaceDive(this);
-    this.spaceAlien = new SpaceAlien(this, characters.get("moon_mischief"));
+    this.spaceAlien = new SpaceCombat(this, characters.get("moon_mischief"));
     this.farm = new Farm(this);
     this.cornMaze = new CornMaze(this);
     this.interactions.on("minigame", (item) => {
@@ -735,6 +735,7 @@ class Game {
           this.interactions.activate();
       }
       if (this.mode !== "playing") return;
+      this.spaceAlien.afterPlayer(dt);
       this.scene.updateMatrixWorld(true);
       if (this.spaceDive.occupied) this.spaceDive.updateCamera(dt);
       else if (this.coaster.occupied) this.coaster.updateCamera(dt);
@@ -959,6 +960,24 @@ async function boot() {
       game.plane.model.position.z,
     );
     game.follow.reset(Math.PI / 2);
+  }
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("space-combat-test")
+  ) {
+    import("./tests/space-combat-browser-checks.js").then((m) =>
+      m.runSpaceCombatChecks(game),
+    );
+  }
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("space-combat-preview")
+  ) {
+    game.start();
+    game.enter("space");
+    game.player.teleport(-20, -20, game.area.groundY);
+    game.player.heading = 0;
+    game.follow.reset(0);
   }
   if (
     import.meta.env.DEV &&
