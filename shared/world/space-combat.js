@@ -129,6 +129,7 @@ export class SpaceCombat {
     );
     this.beam.visible = false;
     this.beamTime = 0;
+    this.bubbles = new Map();
     game.scene.add(this.beam);
     this.hud = globalThis.document?.querySelector("#alien-hud");
     this.status = globalThis.document?.querySelector("#alien-status");
@@ -193,6 +194,7 @@ export class SpaceCombat {
       alien.delay = 1.2;
       alien.respawn = 0;
       alien.tagTime = 0;
+      alien.model.visible = true;
       this.spawnSerial++;
       return;
     }
@@ -204,6 +206,8 @@ export class SpaceCombat {
     this.beamTime = 0;
     this.shotRequested = false;
     this.beam.visible = false;
+    for (const bubble of this.bubbles.values()) this.game.scene.remove(bubble);
+    this.bubbles.clear();
     this.gun.visible = false;
     this.aliens.forEach((a, i) => {
       if (a.model) this.spawn(a, i);
@@ -248,12 +252,27 @@ export class SpaceCombat {
     this.aliens.forEach((a, i) => {
       if (!a.model) return;
       if (a.respawn > 0) {
-        if (active && this.enabled) a.respawn = Math.max(0, a.respawn - dt);
-        const progress = RESPAWN_SECONDS - a.respawn;
-        a.model.visible = progress < 0.45;
-        a.model.scale.setScalar(Math.max(0.02, 1 - progress / 0.45));
-        a.model.rotation.x = (-Math.min(1, progress / 0.45) * Math.PI) / 2;
-        if (a.respawn === 0) this.spawn(a, i);
+        const bubble = this.bubbles.get(a);
+        if (bubble && active && this.enabled) {
+          bubble.position.addScaledVector(a.bubbleVelocity, dt);
+          bubble.rotation.y += dt * 1.4;
+          bubble.rotation.x += dt * 0.6;
+          a.model.position.copy(bubble.position);
+          const b = g.area.bounds;
+          if (
+            bubble.position.y > g.area.groundY + 58 ||
+            bubble.position.x < b.minX - 4 ||
+            bubble.position.x > b.maxX + 4 ||
+            bubble.position.z < b.minZ - 4 ||
+            bubble.position.z > b.maxZ + 4
+          ) {
+            g.scene.remove(bubble);
+            this.bubbles.delete(a);
+            a.model.visible = false;
+            a.respawn = 0;
+            this.spawn(a, i);
+          }
+        }
         return;
       }
       a.enabled = this.enabled && active;
@@ -272,7 +291,7 @@ export class SpaceCombat {
   refresh() {
     const text = !this.enabled
       ? "Alien chase paused. Explore at your own pace."
-      : `Space blaster · ${ALIEN_COUNT} aliens · ${this.defeated} defeated. B to fire; face an alien to aim. Defeated aliens return at the edge.`;
+      : `Bubble launcher · ${ALIEN_COUNT} aliens · ${this.defeated} bubbled. B to fire; float aliens out of space. They return at the edge.`;
     if (this.status && this.status.textContent !== text)
       this.status.textContent = text;
     if (this.toggleButton)
@@ -316,6 +335,7 @@ export class SpaceCombat {
   }
   fire(origin, forward) {
     const area = this.game.areas.space;
+    this.game.audio?.oneShot("bubble", this.game.calm ? 0.12 : 0.22);
     let chosen = null,
       best = Infinity,
       aim = forward.clone();
@@ -348,8 +368,30 @@ export class SpaceCombat {
     this.beam.visible = true;
     this.beamTime = 0.14;
     if (chosen) {
-      chosen.respawn = RESPAWN_SECONDS;
-      chosen.state = "defeated";
+      const bubble = new THREE.Mesh(
+        new THREE.SphereGeometry(1.55, 24, 16),
+        new THREE.MeshPhysicalMaterial({
+          color: 0x9fe9ff,
+          transparent: true,
+          opacity: 0.28,
+          roughness: 0.05,
+          metalness: 0,
+          transmission: 0.35,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+      );
+      bubble.name = "alien-bubble";
+      bubble.position
+        .copy(chosen.model.position)
+        .add(new THREE.Vector3(0, 1.45, 0));
+      this.game.scene.add(bubble);
+      this.bubbles.set(chosen, bubble);
+      chosen.respawn = 1;
+      chosen.state = "bubbled";
+      chosen.bubbleVelocity = aim.clone().multiplyScalar(4.4);
+      chosen.bubbleVelocity.y = 4.8;
+      chosen.model.position.copy(bubble.position);
       chosen.model.animator?.mixer.stopAllAction();
       this.defeated++;
     }

@@ -8,7 +8,6 @@ import {
   SpaceCombat,
   aimBlasterArm,
   rayBoxDistance,
-  RESPAWN_SECONDS,
 } from "../shared/world/space-combat.js";
 
 async function model(id) {
@@ -65,7 +64,7 @@ test("five independent aliens spawn at the boundary, chase, and freeze on pause"
   for (let i = 0; i < 60; i++) c.update(1 / 60);
   assert.ok(c.aliens.every((a, i) => a.model.position.equals(frozen[i])));
 });
-test("blaster hits once, defeats visibly, and respawns a live alien at an edge", async () => {
+test("bubble launcher captures an alien and respawns it after it floats beyond the edge", async () => {
   const c = await setup(),
     a = c.aliens[0];
   a.model.position.set(-20, 180, 9);
@@ -73,17 +72,17 @@ test("blaster hits once, defeats visibly, and respawns a live alien at an edge",
     direction = new THREE.Vector3(0, 0, 1);
   assert.equal(c.fire(origin, direction), a);
   assert.equal(c.defeated, 1);
-  assert.equal(a.respawn, RESPAWN_SECONDS);
+  assert.equal(a.respawn, 1);
+  assert.ok(c.bubbles.has(a));
   c.fire(origin, direction);
   assert.equal(c.defeated, 1);
-  for (let i = 0; i < 160; i++) c.update(1 / 60);
+  for (let i = 0; i < 1000; i++) c.update(1 / 60);
   assert.equal(a.respawn, 0);
   assert.equal(a.model.scale.x, 1);
+  assert.equal(c.bubbles.has(a), false);
   const b = c.game.area.bounds,
     p = a.model.position;
-  assert.ok(
-    Math.min(p.x - b.minX, b.maxX - p.x, p.z - b.minZ, b.maxZ - p.z) < 3,
-  );
+  assert.ok(p.x >= b.minX && p.x <= b.maxX && p.z >= b.minZ && p.z <= b.maxZ);
 });
 test("cover blocks shots and targets behind the player are not hit", async () => {
   const c = await setup(),

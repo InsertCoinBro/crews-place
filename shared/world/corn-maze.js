@@ -259,10 +259,12 @@ export class CornMaze {
     this.occupied = true;
     g.player.inVehicle = true;
     this.panel.hidden = false;
+    g.audio?.oneShot("tractorEngine", 0.12);
     this.sync();
     g.input.clear();
     g.follow.reset(this.model.rotation.y + Math.PI);
     g.canvas.focus();
+    g.audio?.oneShot("doorClose", 0.12);
   }
   sync() {
     const p = this.game.player;
@@ -281,6 +283,7 @@ export class CornMaze {
     g.input.clear();
     g.interactionCooldown = 0.4;
     g.canvas.focus();
+    g.audio?.oneShot("doorClose", 0.12);
   }
   update(dt) {
     const g = this.game;
@@ -311,6 +314,7 @@ export class CornMaze {
       this.complete = true;
       this.panel.querySelector("[data-maze-status]").textContent =
         "You found the finish! 🌻 Explore more or return to start to play again.";
+      g.audio?.oneShot("confirm", 0.28);
       g.ui.toast("You found your way through the corn maze!");
     }
   }

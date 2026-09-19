@@ -153,6 +153,7 @@ export class RollerCoaster {
     this.cars[0].add(g.player.model);
     g.player.model.position.set(0,.29,-.24);g.player.model.rotation.set(0,0,0);g.player.model.visible=true;
     this.poseRider();g.input.clear();g.ui.showPrompt(null);this.hud.hidden=false;
+    g.audio?.oneShot('click', 0.16);
     document.querySelector('#cowboy-controls').hidden=true;document.querySelector('#robot-gestures').hidden=true;
     g.ui.toast('You are in! Press E or Launch ride when ready.');this.placeTrain();this.updateHUD();
   }
@@ -167,7 +168,7 @@ export class RollerCoaster {
   }
   launch() {
     if(this.ride.state==='arrived') { this.ride.reset();this.ride.board(); }
-    if(this.ride.launch()) { this.game.input.clear();this.game.canvas.focus();this.updateHUD(); }
+    if(this.ride.launch()) { this.game.audio?.oneShot('confirm', 0.24); this.game.input.clear();this.game.canvas.focus();this.updateHUD(); }
   }
   toggleView() { this.view=this.view==='follow'?'front':'follow';this.viewButton.textContent=`View: ${this.view==='follow'?'follow cart':'front seat'} · C`;this.game.canvas.focus(); }
   exit() {
@@ -175,7 +176,7 @@ export class RollerCoaster {
     const g=this.game;
     this.savedParent.add(g.player.model);g.player.model.rotation.set(0,0,0);g.player.inVehicle=false;g.player.model.visible=true;
     this.ride.reset();this.hud.hidden=true;g.camera.up.set(0,1,0);g.camera.fov=55;g.camera.updateProjectionMatrix();
-    g.player.teleport(this.exitPoint.x,this.exitPoint.z);g.player.heading=Math.PI;g.follow.reset(0);g.input.clear();g.interactionCooldown=.6;g.refreshCharacterUI();g.canvas.focus();this.placeTrain();g.ui.toast('Back at the station. Ride again whenever you like!');
+    g.player.teleport(this.exitPoint.x,this.exitPoint.z);g.player.heading=Math.PI;g.follow.reset(0);g.input.clear();g.interactionCooldown=.6;g.refreshCharacterUI();g.canvas.focus();this.placeTrain();g.audio?.oneShot('land', 0.22);g.ui.toast('Back at the station. Ride again whenever you like!');
   }
   placeTrain() {
     this.cars.forEach((car,i)=>{ const s=this.track.sample(this.ride.distance-i*2.8);car.position.copy(s.position);car.quaternion.copy(s.rotation); });

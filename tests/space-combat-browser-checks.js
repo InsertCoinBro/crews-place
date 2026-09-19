@@ -27,7 +27,7 @@ export function runSpaceCombatChecks(game) {
     );
   });
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
-    check(`${id} equips, fires, defeats and respawns an alien`, () => {
+    check(`${id} equips, bubbles and floats an alien to the boundary`, () => {
       game.pause();
       game.setCharacter(id);
       game.resume();
@@ -45,10 +45,13 @@ export function runSpaceCombatChecks(game) {
       game.input.release("KeyB");
       assert(c.gun.visible, "blaster missing");
       assert(c.beam.visible, "shot missing");
-      assert(c.defeated === before + 1, "shot did not defeat target");
-      assert(a.respawn > 0, "respawn not started");
-      frames(170);
-      assert(a.respawn === 0 && a.model.visible, "did not respawn");
+      assert(c.defeated === before + 1, "bubble shot did not capture target");
+      assert(a.respawn > 0 && c.bubbles.has(a), "bubble did not start");
+      frames(1000);
+      assert(
+        a.respawn === 0 && a.model.visible && !c.bubbles.has(a),
+        "bubble did not leave the area and respawn",
+      );
     });
   check("Paused chase and playground prevent firing", () => {
     const c = game.spaceAlien;

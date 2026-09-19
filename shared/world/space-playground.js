@@ -300,6 +300,7 @@ export class SpacePlayground {
     this.game.input.clear();
     this.game.player.velocity.set(0, 0);
     this.panel.hidden = false;
+    this.game.audio?.oneShot("click", 0.14);
     this.panel.querySelector("#playground-title").textContent = {
       swing: "Moon swing",
       spinner: "Orbit spinner",
@@ -339,6 +340,7 @@ export class SpacePlayground {
     this.game.interactionCooldown = 0.5;
     this.game.follow.ready = false;
     this.game.canvas.focus();
+    this.game.audio?.oneShot("doorClose", 0.12);
   }
   bendJoint(node, angle) {
     // Bones have different bind orientations in the two avatars. Bend in the
@@ -391,7 +393,8 @@ export class SpacePlayground {
         p.position.copy(slidePoint(t));
         p.position.y -= 0.5;
         p.heading = Math.atan2(Math.PI * 5 * Math.cos(t * Math.PI), 42);
-        if (t === 1) {
+      if (t === 1) {
+          game.audio?.oneShot("land", 0.2);
           this.exit();
           return;
         }

@@ -1,0 +1,88 @@
+{
+  "purpose": "Downloaded audio candidates for Crew's Place implementation",
+  "created": "2026-09-19",
+  "license_policy": "Use only files whose source license is recorded here; verify the source page again before public release.",
+  "sources": [
+    {
+      "id": "kenney-interface",
+      "publisher": "Kenney",
+      "source_page": "https://kenney.nl/assets/interface-sounds",
+      "download": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip",
+      "license": "CC0 / public domain",
+      "downloaded_archive": "library/kenney/kenney_interface-sounds.zip"
+    },
+    {
+      "id": "kenney-impact",
+      "publisher": "Kenney",
+      "source_page": "https://kenney.nl/assets/impact-sounds",
+      "download": "https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip",
+      "license": "CC0 / public domain",
+      "downloaded_archive": "library/kenney/kenney_impact-sounds.zip"
+    },
+    {
+      "id": "kenney-digital",
+      "publisher": "Kenney",
+      "source_page": "https://kenney.nl/assets/digital-audio",
+      "download": "https://kenney.nl/media/pages/assets/digital-audio/216eac4753-1677590265/kenney_digital-audio.zip",
+      "license": "CC0 / public domain",
+      "downloaded_archive": "library/kenney/kenney_digital-audio.zip"
+    },
+    {
+      "id": "kenney-scifi",
+      "publisher": "Kenney",
+      "source_page": "https://kenney.nl/assets/sci-fi-sounds",
+      "download": "https://kenney.nl/media/pages/assets/sci-fi-sounds/6b296f9ecf-1677589334/kenney_sci-fi-sounds.zip",
+      "license": "CC0 / public domain",
+      "downloaded_archive": "library/kenney/kenney_sci-fi-sounds.zip"
+    },
+    {
+      "id": "freesound-leaves",
+      "publisher": "BranndyBottle",
+      "source_page": "https://freesound.org/people/BranndyBottle/sounds/464698/",
+      "download": "https://cdn.freesound.org/previews/464/464698_7358035-hq.mp3",
+      "license": "CC0",
+      "file": "sfx/nature/leaves-rustling-cc0.mp3"
+    },
+    {
+      "id": "freesound-fountain",
+      "publisher": "Legnalegna55",
+      "source_page": "https://freesound.org/people/Legnalegna55/sounds/554789/",
+      "download": "https://cdn.freesound.org/previews/554/554789_10485775-hq.mp3",
+      "license": "CC0",
+      "file": "sfx/nature/fountain-cc0.mp3"
+    },
+    {
+      "id": "freesound-rocket-launch",
+      "publisher": "Sanderboah",
+      "source_page": "https://freesound.org/people/Sanderboah/sounds/803852/",
+      "download": "https://cdn.freesound.org/previews/803/803852_13017680-lq.mp3",
+      "license": "CC0",
+      "file": "sfx/space/rocket-launch-cc0.mp3"
+    },
+    {
+      "id": "freesound-rocket-short",
+      "publisher": "Jarusca",
+      "source_page": "https://freesound.org/people/Jarusca/sounds/521377/",
+      "download": "https://cdn.freesound.org/previews/521/521377_10847299-hq.mp3",
+      "license": "CC0",
+      "file": "sfx/space/rocket-launch-short-cc0.mp3"
+    },
+    {
+      "id": "freesound-coaster-ratchet",
+      "publisher": "esperar",
+      "source_page": "https://freesound.org/people/esperar/sounds/171510/",
+      "download": "https://cdn.freesound.org/previews/171/171510_377731-hq.mp3",
+      "license": "CC0",
+      "file": "sfx/rides/rollercoaster-ratchet-cc0.mp3",
+      "note": "This is the downloadable HQ preview, retained as an implementation candidate; the original source page identifies the full WAV as CC0."
+    }
+  ],
+  "event_map": {
+    "ui": ["interaction prompt", "panel open/close", "button activation", "pause/resume", "library page turn", "safe exit"],
+    "movement": ["grass footsteps", "concrete footsteps", "wood footsteps", "snow footsteps", "jump/land placeholder", "toy placement", "soft collision", "trampoline landing placeholder"],
+    "nature": ["leaf pile burst", "leaves settling", "fountain ambience", "park ambience placeholder"],
+    "space": ["rocket launch", "rocket ascent", "spaceship engine", "thrusters", "spaceship doors", "bubble launcher", "alien bubble/force field", "space ambience"],
+    "rides": ["Rainbow Rush chain lift", "coaster boarding placeholder", "coaster arrival placeholder", "Space Dive launch placeholder", "ride wind placeholder"],
+    "still_needs_dedicated_source": ["trampoline spring", "coaster wheels/rail", "Space Dive wind", "tractor engine", "car engine", "traffic ambience", "horse/animal ambience", "rain", "snow", "wind", "playground swing", "playground spinner", "playground slide", "flight hoop pass"]
+  }
+}

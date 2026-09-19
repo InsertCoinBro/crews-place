@@ -47,6 +47,7 @@ import {
   ROCKET_SITE,
 } from "./shared/world/rocket.js";
 import { SPACE_ALTITUDE, SPACE_LANDING_SITE } from "./shared/world/space.js";
+import { WorldAudio, SOURCES } from "./shared/world/audio.js";
 
 function showError(error) {
   console.error(error);
@@ -68,6 +69,7 @@ class Game {
       );
     this.mode = "opening";
     this.calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    this.audio = new WorldAudio();
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: !this.mobile,
@@ -383,6 +385,7 @@ class Game {
     document.querySelector("#opening").hidden = true;
     document.querySelector("#hud").hidden = false;
     this.setMode("playing");
+    this.audio.setCalm(this.calm);
     this.follow.reset();
     this.canvas.focus();
     this.ui.toast("Welcome! Wander wherever you like.");
@@ -411,6 +414,7 @@ class Game {
     if (this.area.id !== "town" || this.driving) return;
     this.driving = this.vehicle.enter(this.player);
     if (this.driving) {
+      this.audio.oneShot("doorOpen", 0.22);
       document.querySelector("#drive-controls").hidden = false;
       this.input.clear();
       this.ui.toast("You are in! W or S follows the street.");
@@ -419,6 +423,7 @@ class Game {
   exitVehicle() {
     if (!this.driving) return;
     this.vehicle.exit(this.player);
+    this.audio.oneShot("doorClose", 0.18);
     this.driving = false;
     document.querySelector("#drive-controls").hidden = true;
     this.input.clear();
@@ -456,6 +461,7 @@ class Game {
     this.rocketInteraction.area = "rocket-in-transit";
     this.rocketReturnInteraction.area = "rocket-in-transit";
     this.player.inVehicle = true;
+    this.audio.oneShot("doorClose", 0.2);
     this.player.model.visible = false;
     this.setMode("rocket");
     this.ui.showPrompt(null);
@@ -525,6 +531,7 @@ class Game {
     if (returning) this.rocket.dockInTown();
     else this.rocket.dockInSpace();
     this.player.inVehicle = false;
+    this.audio.oneShot("land", 0.3);
     this.enter(
       returning ? "town" : "space",
       returning
@@ -608,6 +615,7 @@ class Game {
     this.skyLight.intensity = id === "space" ? 0.35 : 2.2;
     this.sun.intensity = id === "space" ? 1.1 : 3.2;
     this.ui.showPrompt(null);
+    if (id !== "town") this.audio.oneShot("doorOpen", 0.18);
     this.ui.toast(
       id === "town" ? "Back in the neighborhood" : "Welcome to " + next.name,
     );
@@ -616,11 +624,14 @@ class Game {
     this.spaceship.update(this.mode === "playing" ? dt : 0);
     this.spaceAlien.update(dt);
     if (this.mode === "arcade") {
+      this.audio.stopAll();
       this.arcade.update(dt);
       return;
     }
     if (this.mode === "rocket") {
       this.updateRocketJourney(dt);
+      this.audio.setLoop("spaceEngineLarge", true, this.calm ? 0.16 : 0.28);
+      this.audio.update(dt);
       return;
     }
     this.interactionCooldown = Math.max(0, this.interactionCooldown - dt);
@@ -643,12 +654,18 @@ class Game {
           this.plane.gentleWeather = this.calm;
           this.plane.weatherTime = this.weather.time;
           const flight = this.plane.update(dt, this.input);
-          if (this.flightHoops.update(this.plane.model.position, true))
+          const crossedHoop = this.flightHoops.update(
+            this.plane.model.position,
+            true,
+          );
+          if (crossedHoop) {
+            this.audio.oneShot("hoop", this.calm ? 0.18 : 0.35);
             this.ui.toast(
               this.flightHoops.passed.size === FLIGHT_HOOPS.length
                 ? "All hoops explored! Beautiful flying."
                 : "Through the hoop! Nicely flown.",
             );
+          }
           document.querySelector("#flight-hoops").textContent =
             "Hoops " +
             this.flightHoops.passed.size +
@@ -738,8 +755,10 @@ class Game {
           this.area.id,
         );
         this.ui.showPrompt(nearby);
-        if (this.input.consume("KeyE") && this.interactionCooldown === 0)
+        if (this.input.consume("KeyE") && this.interactionCooldown === 0) {
+          this.audio.oneShot("click", 0.12);
           this.interactions.activate();
+        }
       }
       if (this.mode !== "playing") return;
       this.spaceAlien.afterPlayer(dt);
@@ -786,7 +805,10 @@ class Game {
         );
       if (event === "bounce") {
         this.bouncePulse = 1;
+        this.audio.oneShot("trampolineBounce", this.calm ? 0.22 : 0.42);
         this.ui.toast("Up you go!");
+      } else if (event === "land") {
+        this.audio.oneShot("land", this.calm ? 0.12 : 0.22);
       }
     }
     if (this.mode === "opening" || this.mode === "playing") {
@@ -803,6 +825,7 @@ class Game {
           this.calm,
         )
       )
+        this.audio.oneShot("leavesRustle", this.calm ? 0.16 : 0.3),
         this.ui.toast("A little rustle of autumn.");
       this.bouncePulse = Math.max(0, this.bouncePulse - dt * 3);
       this.areas.town.trampolineMesh.position.y =
@@ -843,6 +866,7 @@ class Game {
       outdoors,
       this.calm,
     );
+    this.syncWorldAudio(weather, dt);
     if (outdoors) {
       const amount = weather.cloud;
       this.scene.background.lerp(
@@ -866,6 +890,58 @@ class Game {
       this.plane,
       this.rocket,
     );
+    this.audio.update(dt);
+  }
+
+  syncWorldAudio(weather, dt) {
+    const audio = this.audio;
+    if (this.mode !== "playing") {
+      if (this.mode !== "rocket") audio.stopAll();
+      return;
+    }
+    const listener = this.player.position;
+    const town = this.area.id === "town";
+    const outdoors = town && !this.area.interior;
+    const calm = this.calm ? 0.5 : 1;
+    const fountain = { x: -8, z: 2.5 };
+    audio.proximity("fountain", town ? fountain : null, listener, 18, 0.24 * calm);
+
+    const horse = this.wildlife.horse?.model;
+    audio.proximity("meadowHorse", town ? horse?.position : null, listener, 12, 0.32 * calm, SOURCES.horse);
+    for (const [index, animal] of (this.farm.animals ?? []).entries())
+      audio.proximity(`farmAnimal${index}`, town ? animal.position : null, listener, 9, 0.22 * calm, SOURCES.animals);
+
+    const nearestTraffic = town
+      ? this.traffic.cars.reduce((nearest, car) => {
+          if (!nearest) return car.model.position;
+          return Math.hypot(car.model.position.x - listener.x, car.model.position.z - listener.z) <
+            Math.hypot(nearest.x - listener.x, nearest.z - listener.z)
+            ? car.model.position
+            : nearest;
+        }, null)
+      : null;
+    audio.proximity("traffic", nearestTraffic, listener, 15, 0.18 * calm);
+    audio.setLoop("carEngine", this.driving, this.driving ? 0.2 + Math.min(Math.abs(this.vehicle.speed) / 30, 0.35) : 0);
+    audio.setLoop("tractorEngine", this.cornMaze.occupied, this.cornMaze.occupied ? 0.3 : 0);
+
+    const rain = outdoors ? weather.rain * 0.25 * calm : 0;
+    const snow = outdoors ? weather.snow * 0.16 * calm : 0;
+    const wind = outdoors ? Math.max(weather.windX / 5, weather.windZ / 5, 0) * 0.2 * calm : 0;
+    audio.setLoop("rain", rain > 0.01, rain);
+    audio.setLoop("snow", snow > 0.01, snow);
+    audio.setLoop("wind", wind > 0.01, wind);
+
+    const ride = this.playground.active;
+    audio.setLoop("swing", ride === "swing", 0.2 * calm);
+    audio.setLoop("spinner", ride === "spinner", 0.18 * calm);
+    audio.setLoop("slide", ride === "slide", 0.22 * calm);
+    audio.setLoop("coasterWheels", this.coaster.ride.state === "riding", 0.2 * calm);
+    audio.setLoop("coasterRail", this.coaster.ride.state === "riding", 0.14 * calm);
+    audio.setLoop("coasterRatchet", this.coaster.ride.state === "riding" && this.coaster.ride.distance < 105, 0.25 * calm);
+    audio.setLoop("spaceDiveWind", this.spaceDive.ride.state === "riding", 0.22 * calm);
+    audio.setLoop("spaceDiveBrake", this.spaceDive.ride.state === "riding" && this.spaceDive.ride.phase.includes("brakes"), 0.25 * calm);
+    audio.setLoop("spaceEngine", this.spaceship.occupied, 0.22 * calm);
+    audio.setLoop("spaceEngineLarge", this.flying, this.flying ? 0.2 : 0);
   }
   frame(time) {
     if (!this.running) return;

@@ -205,6 +205,7 @@ export class SpaceDive extends RollerCoaster {
     };
     g.camera.far = 500;
     g.camera.updateProjectionMatrix();
+    g.audio?.oneShot("click", 0.16);
     g.ui.toast("Space Dive! Boarded and ready. E launches your trip.");
   }
   updateHUD() {
@@ -285,5 +286,6 @@ export class SpaceDive extends RollerCoaster {
     }
     this.spaceMix = 0;
     this.environmentSaved = null;
+    g.audio?.oneShot("land", 0.22);
   }
 }
