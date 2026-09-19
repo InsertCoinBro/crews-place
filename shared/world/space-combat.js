@@ -227,6 +227,7 @@ export class SpaceCombat {
     if (this.hud)
       this.hud.hidden =
         !space ||
+        !!g.spaceship?.occupied ||
         g.mode !== "playing" ||
         !!g.playground?.active ||
         !!g.spaceDive?.occupied;

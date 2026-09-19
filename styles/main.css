@@ -979,3 +979,26 @@ dialog .primary {
 #alien-fire:disabled {
   opacity: 0.5;
 }
+
+.spaceship-hud {
+  position: fixed;
+  top: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  width: min(90vw, 430px);
+  padding: 12px 16px;
+  border: 1px solid #82e9e8;
+  border-radius: 18px;
+  background: #152936ee;
+  color: white;
+  text-align: center;
+  font-size: 16px;
+}
+.spaceship-hud p {
+  margin: 7px 0;
+}
+.spaceship-hud button {
+  min-height: 44px;
+  padding: 8px 16px;
+}
