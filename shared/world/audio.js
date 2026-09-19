@@ -4,7 +4,7 @@ const AUDIO_FILES = import.meta.glob("../../assets/audio/sfx/**/*.{ogg,mp3}", {
   query: "?url",
 });
 
-const asset = (path) => AUDIO_FILES[`../../assets/audio/sfx/${path}`];
+const asset = (path) => AUDIO_FILES[path];
 
 const SOURCES = Object.freeze({
   trampolineSpring: asset("../../assets/audio/sfx/mechanical/trampoline-spring.ogg"),
