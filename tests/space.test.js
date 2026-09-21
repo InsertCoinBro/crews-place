@@ -5,6 +5,7 @@ import {
   SPACE_ALTITUDE,
   SPACE_BOUNDS,
   SPACE_LANDING_SITE,
+  SPACE_WORLD_RADIUS,
   SPACE_WORLD_SIZE,
 } from "../shared/world/space.js";
 import { stepVertical } from "../shared/core/physics.js";
@@ -13,7 +14,8 @@ test("space is a full-size world layer above the countryside", () => {
   assert.ok(SPACE_ALTITUDE > 100);
   assert.equal(SPACE_BOUNDS.maxX - SPACE_BOUNDS.minX, SPACE_WORLD_SIZE);
   assert.equal(SPACE_BOUNDS.maxZ - SPACE_BOUNDS.minZ, SPACE_WORLD_SIZE);
-  assert.ok(SPACE_WORLD_SIZE >= 80);
+  assert.ok(SPACE_WORLD_RADIUS >= 804.672);
+  assert.equal(SPACE_WORLD_SIZE, SPACE_WORLD_RADIUS * 2);
 });
 
 test("the future rocket landing site is safely inside the space bounds", () => {

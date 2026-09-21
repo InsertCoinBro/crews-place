@@ -7,7 +7,7 @@ import {
   SPACE_DIVE_EXIT,
 } from "../shared/world/space-dive-track.js";
 import { createCoasterTrack } from "../shared/world/coaster-track.js";
-import { SPACE_ALTITUDE, SPACE_BOUNDS } from "../shared/world/space.js";
+import { SPACE_ALTITUDE } from "../shared/world/space.js";
 const track = createSpaceDiveTrack();
 
 test("Space Dive is north of Rainbow Rush and clears the existing track and moon surface", () => {
@@ -26,10 +26,9 @@ test("Space Dive is north of Rainbow Rush and clears the existing track and moon
         Math.hypot(p.x - SPACE_DIVE_EXIT.x, p.z - SPACE_DIVE_EXIT.z) > 2,
         "boarding point lies on the track",
       );
-    if (
-      Math.abs(p.x) < SPACE_BOUNDS.maxX + 4 &&
-      Math.abs(p.z) < SPACE_BOUNDS.maxZ + 4
-    )
+    // The original central moon surface remains clear of the ride's low
+    // approach. The playable space field now extends beyond that central zone.
+    if (Math.abs(p.x) < 46 && Math.abs(p.z) < 46)
       assert.ok(p.y > SPACE_ALTITUDE + 10, "track intersects lunar ground");
     for (let j = 0; j < rainbow.count; j += 12)
       assert.ok(

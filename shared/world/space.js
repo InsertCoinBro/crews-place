@@ -5,7 +5,10 @@ import { blob, box, cylinder, label, material } from "./models.js";
 // Space is a separate layer above the countryside. Keeping it in its own area
 // means a future rocket can switch worlds cleanly without disturbing the town.
 export const SPACE_ALTITUDE = 180;
-export const SPACE_WORLD_SIZE = 84;
+// Half a mile of playable space in every compass direction from the center.
+// One world unit is approximately one meter, so the full field is one mile wide.
+export const SPACE_WORLD_RADIUS = 805;
+export const SPACE_WORLD_SIZE = SPACE_WORLD_RADIUS * 2;
 export const SPACE_LANDING_SITE = Object.freeze({ x: 0, z: 12 });
 export const SPACE_BOUNDS = Object.freeze({
   minX: -SPACE_WORLD_SIZE / 2,
@@ -258,20 +261,25 @@ export function buildSpace(scene) {
 
   // Low boundary ridges keep the platform edge visually clear while the
   // rectangular physics bounds provide a dependable safety barrier.
-  for (let offset = -36; offset <= 36; offset += 8) {
+  const boundary = SPACE_WORLD_RADIUS + 1.5;
+  for (
+    let offset = -SPACE_WORLD_RADIUS;
+    offset <= SPACE_WORLD_RADIUS;
+    offset += 40
+  ) {
     for (const side of [-1, 1]) {
       const northRock = blob(
         g,
         offset,
         0.55,
-        side * 43.5,
+        side * boundary,
         1.25 + (Math.abs(offset) % 3) * 0.18,
         0x686d83,
       );
       northRock.scale.y = 0.52;
       const eastRock = blob(
         g,
-        side * 43.5,
+        side * boundary,
         0.55,
         offset,
         1.25 + (Math.abs(offset + 1) % 3) * 0.18,
