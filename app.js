@@ -48,6 +48,7 @@ import {
 } from "./shared/world/rocket.js";
 import { SPACE_ALTITUDE, SPACE_LANDING_SITE } from "./shared/world/space.js";
 import { WorldAudio, SOURCES } from "./shared/world/audio.js";
+import { mixWorldAudio, mixRocketAudio } from "./shared/world/audio-mix.js";
 
 function showError(error) {
   console.error(error);
@@ -279,6 +280,58 @@ class Game {
     document
       .querySelector("#resume")
       .addEventListener("click", () => this.resume());
+    const soundVolume = document.querySelector("#sound-volume");
+    const ambienceVolume = document.querySelector("#ambience-volume");
+    const gentleSounds = document.querySelector("#gentle-sounds");
+    const soundToggle = document.querySelector("#sound-toggle");
+    const rocketSoundToggle = document.querySelector("#rocket-sound-toggle");
+    const muteSounds = document.querySelector("#mute-sounds");
+    const refreshSoundUI = () => {
+      soundVolume.value = String(Math.round(this.audio.settings.volume * 100));
+      ambienceVolume.value = String(
+        Math.round(this.audio.settings.ambience * 100),
+      );
+      gentleSounds.checked = this.audio.settings.gentle;
+      document.querySelector("#sound-volume-value").textContent =
+        soundVolume.value + "%";
+      document.querySelector("#ambience-volume-value").textContent =
+        ambienceVolume.value + "%";
+      muteSounds.checked = this.audio.settings.muted;
+      for (const button of [soundToggle, rocketSoundToggle]) {
+        button.textContent = this.audio.settings.muted
+          ? "World sound off"
+          : "World sound on";
+        button.setAttribute("aria-pressed", String(!this.audio.settings.muted));
+      }
+    };
+    const applySoundSliders = () => {
+      this.audio.configure({
+        volume: Number(soundVolume.value) / 100,
+        ambience: Number(ambienceVolume.value) / 100,
+      });
+      refreshSoundUI();
+    };
+    soundVolume.addEventListener("input", applySoundSliders);
+    ambienceVolume.addEventListener("input", applySoundSliders);
+    gentleSounds.addEventListener("change", (e) => {
+      this.audio.configure({ gentle: e.target.checked });
+      refreshSoundUI();
+    });
+    const toggleSound = () => {
+      this.audio.unlock();
+      this.audio.configure({ muted: !this.audio.settings.muted });
+      refreshSoundUI();
+    };
+    soundToggle.addEventListener("click", toggleSound);
+    rocketSoundToggle.addEventListener("click", toggleSound);
+    muteSounds.addEventListener("change", () => {
+      this.audio.configure({ muted: muteSounds.checked });
+      refreshSoundUI();
+    });
+    refreshSoundUI();
+    const unlockAudio = () => this.audio.unlock();
+    document.addEventListener("pointerdown", unlockAudio, { passive: true });
+    document.addEventListener("keydown", unlockAudio, { passive: true });
     this.ui.panel.addEventListener("cancel", (e) => {
       e.preventDefault();
       this.resume();
@@ -382,10 +435,19 @@ class Game {
       document.exitPointerLock();
   }
   start() {
+    this.audio.unlock();
+    for (const key of [
+      "land",
+      "trampolineBounce",
+      "bubble",
+      "click",
+      "confirm",
+      "hoop",
+    ])
+      void this.audio.load(SOURCES[key]);
     document.querySelector("#opening").hidden = true;
     document.querySelector("#hud").hidden = false;
     this.setMode("playing");
-    this.audio.setCalm(this.calm);
     this.follow.reset();
     this.canvas.focus();
     this.ui.toast("Welcome! Wander wherever you like.");
@@ -393,6 +455,7 @@ class Game {
   pause() {
     if (this.mode !== "playing") return;
     this.setMode("paused");
+    this.audio.stopAll();
     if (this.flying) this.plane.setAudioActive(false);
     this.farm?.closeSign();
     this.ui.showPrompt(null);
@@ -405,6 +468,7 @@ class Game {
     document.querySelector("#resume").focus();
   }
   resume() {
+    this.audio.unlock();
     this.ui.panel.close();
     this.setMode("playing");
     if (this.flying) this.plane.setAudioActive(true);
@@ -461,6 +525,7 @@ class Game {
     this.rocketInteraction.area = "rocket-in-transit";
     this.rocketReturnInteraction.area = "rocket-in-transit";
     this.player.inVehicle = true;
+    this.audio.stopAll();
     this.audio.oneShot("doorClose", 0.2);
     this.player.model.visible = false;
     this.setMode("rocket");
@@ -621,6 +686,10 @@ class Game {
     );
   }
   tick(dt) {
+    if (document.hidden) {
+      this.audio.stopAll();
+      return;
+    }
     this.spaceship.update(this.mode === "playing" ? dt : 0);
     this.spaceAlien.update(dt);
     if (this.mode === "arcade") {
@@ -630,7 +699,7 @@ class Game {
     }
     if (this.mode === "rocket") {
       this.updateRocketJourney(dt);
-      this.audio.setLoop("spaceEngineLarge", true, this.calm ? 0.16 : 0.28);
+      mixRocketAudio(this);
       this.audio.update(dt);
       return;
     }
@@ -825,8 +894,8 @@ class Game {
           this.calm,
         )
       )
-        this.audio.oneShot("leavesRustle", this.calm ? 0.16 : 0.3),
-        this.ui.toast("A little rustle of autumn.");
+        (this.audio.oneShot("leavesRustle", this.calm ? 0.16 : 0.3),
+          this.ui.toast("A little rustle of autumn."));
       this.bouncePulse = Math.max(0, this.bouncePulse - dt * 3);
       this.areas.town.trampolineMesh.position.y =
         0.44 - Math.sin(this.bouncePulse * Math.PI) * 0.12;
@@ -893,55 +962,8 @@ class Game {
     this.audio.update(dt);
   }
 
-  syncWorldAudio(weather, dt) {
-    const audio = this.audio;
-    if (this.mode !== "playing") {
-      if (this.mode !== "rocket") audio.stopAll();
-      return;
-    }
-    const listener = this.player.position;
-    const town = this.area.id === "town";
-    const outdoors = town && !this.area.interior;
-    const calm = this.calm ? 0.5 : 1;
-    const fountain = { x: -8, z: 2.5 };
-    audio.proximity("fountain", town ? fountain : null, listener, 18, 0.24 * calm);
-
-    const horse = this.wildlife.horse?.model;
-    audio.proximity("meadowHorse", town ? horse?.position : null, listener, 12, 0.32 * calm, SOURCES.horse);
-    for (const [index, animal] of (this.farm.animals ?? []).entries())
-      audio.proximity(`farmAnimal${index}`, town ? animal.position : null, listener, 9, 0.22 * calm, SOURCES.animals);
-
-    const nearestTraffic = town
-      ? this.traffic.cars.reduce((nearest, car) => {
-          if (!nearest) return car.model.position;
-          return Math.hypot(car.model.position.x - listener.x, car.model.position.z - listener.z) <
-            Math.hypot(nearest.x - listener.x, nearest.z - listener.z)
-            ? car.model.position
-            : nearest;
-        }, null)
-      : null;
-    audio.proximity("traffic", nearestTraffic, listener, 15, 0.18 * calm);
-    audio.setLoop("carEngine", this.driving, this.driving ? 0.2 + Math.min(Math.abs(this.vehicle.speed) / 30, 0.35) : 0);
-    audio.setLoop("tractorEngine", this.cornMaze.occupied, this.cornMaze.occupied ? 0.3 : 0);
-
-    const rain = outdoors ? weather.rain * 0.25 * calm : 0;
-    const snow = outdoors ? weather.snow * 0.16 * calm : 0;
-    const wind = outdoors ? Math.max(weather.windX / 5, weather.windZ / 5, 0) * 0.2 * calm : 0;
-    audio.setLoop("rain", rain > 0.01, rain);
-    audio.setLoop("snow", snow > 0.01, snow);
-    audio.setLoop("wind", wind > 0.01, wind);
-
-    const ride = this.playground.active;
-    audio.setLoop("swing", ride === "swing", 0.2 * calm);
-    audio.setLoop("spinner", ride === "spinner", 0.18 * calm);
-    audio.setLoop("slide", ride === "slide", 0.22 * calm);
-    audio.setLoop("coasterWheels", this.coaster.ride.state === "riding", 0.2 * calm);
-    audio.setLoop("coasterRail", this.coaster.ride.state === "riding", 0.14 * calm);
-    audio.setLoop("coasterRatchet", this.coaster.ride.state === "riding" && this.coaster.ride.distance < 105, 0.25 * calm);
-    audio.setLoop("spaceDiveWind", this.spaceDive.ride.state === "riding", 0.22 * calm);
-    audio.setLoop("spaceDiveBrake", this.spaceDive.ride.state === "riding" && this.spaceDive.ride.phase.includes("brakes"), 0.25 * calm);
-    audio.setLoop("spaceEngine", this.spaceship.occupied, 0.22 * calm);
-    audio.setLoop("spaceEngineLarge", this.flying, this.flying ? 0.2 : 0);
+  syncWorldAudio(weather) {
+    mixWorldAudio(this, weather);
   }
   frame(time) {
     if (!this.running) return;
@@ -991,6 +1013,14 @@ async function boot() {
     selected,
     horseResult.status === "fulfilled" ? horseResult.value : null,
   );
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("audio-test")
+  ) {
+    import("./tests/audio-browser-checks.js").then((m) =>
+      m.addAudioChecks(game),
+    );
+  }
   if (
     import.meta.env.DEV &&
     new URLSearchParams(location.search).has("space-dive-preview")

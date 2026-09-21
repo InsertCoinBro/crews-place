@@ -259,7 +259,6 @@ export class CornMaze {
     this.occupied = true;
     g.player.inVehicle = true;
     this.panel.hidden = false;
-    g.audio?.oneShot("tractorEngine", 0.12);
     this.sync();
     g.input.clear();
     g.follow.reset(this.model.rotation.y + Math.PI);
@@ -298,6 +297,7 @@ export class CornMaze {
       g.area.colliders,
       g.area.bounds,
     );
+    this.audioSpeed = speed;
     for (const wheel of this.wheels) wheel.rotation.x += speed * dt;
     Object.assign(this.item, {
       x: this.model.position.x,

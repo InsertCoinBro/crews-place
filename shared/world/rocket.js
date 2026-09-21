@@ -445,6 +445,7 @@ export class RocketJourney {
   }
 
   updateExhaust(intensity, calm) {
+    this.audioThrust = intensity;
     const exhaust = this.model.userData.exhaust;
     exhaust.visible = intensity > 0.02;
     if (!exhaust.visible) return;

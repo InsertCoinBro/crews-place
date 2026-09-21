@@ -115,64 +115,14 @@ export function makeFlyablePlane() {
   return plane;
 }
 
+// Plane audio is mixed by WorldAudio so it shares the game's volume, mute,
+// gentle-sound, and lifecycle controls. These no-op methods preserve the
+// existing vehicle API while preventing a second synthetic audio graph.
 class PlaneEngineSound {
-  constructor() {
-    this.context = null;
-    this.oscillator = null;
-    this.gain = null;
-    this.filter = null;
-  }
-
-  start() {
-    const AudioContextClass =
-      globalThis.AudioContext ?? globalThis.webkitAudioContext;
-    if (!AudioContextClass || this.oscillator) return;
-    try {
-      this.context = new AudioContextClass();
-      this.oscillator = this.context.createOscillator();
-      this.filter = this.context.createBiquadFilter();
-      this.gain = this.context.createGain();
-      this.oscillator.type = "sawtooth";
-      this.filter.type = "lowpass";
-      this.filter.frequency.value = 320;
-      this.gain.gain.value = 0.0001;
-      this.oscillator.connect(this.filter);
-      this.filter.connect(this.gain);
-      this.gain.connect(this.context.destination);
-      this.oscillator.start();
-      this.setActive(true, 0);
-    } catch {
-      this.stop();
-    }
-  }
-
-  update(speed, active = true) {
-    if (!this.oscillator || !this.context) return;
-    const now = this.context.currentTime;
-    const amount = THREE.MathUtils.clamp(speed / PLANE_MAX_SPEED, 0, 1);
-    this.oscillator.frequency.setTargetAtTime(52 + amount * 38, now, 0.08);
-    this.filter.frequency.setTargetAtTime(230 + amount * 240, now, 0.1);
-    this.gain.gain.setTargetAtTime(
-      active ? 0.028 + amount * 0.022 : 0.0001,
-      now,
-      0.08,
-    );
-  }
-
-  setActive(active, speed = 0) {
-    if (active && this.context?.state === "suspended") this.context.resume();
-    this.update(speed, active);
-  }
-
-  stop() {
-    try {
-      this.oscillator?.stop();
-      this.context?.close();
-    } catch {
-      // Audio cleanup should never interrupt the game.
-    }
-    this.context = this.oscillator = this.filter = this.gain = null;
-  }
+  start() {}
+  update() {}
+  setActive() {}
+  stop() {}
 }
 
 export class FlyablePlane {

@@ -102,6 +102,8 @@
       <div id="hud" hidden>
         <div class="top-actions">
           <button id="camera-lock" class="pill">Free mouse</button
+          ><button id="sound-toggle" class="pill" aria-pressed="true">
+            World sound on</button
           ><button id="pause" class="pill">Pause <kbd>Esc</kbd></button>
         </div>
         <div class="location">
@@ -133,6 +135,9 @@
             <i id="rocket-progress"></i>
           </div>
           <button id="rocket-skip" type="button">Skip to landing</button>
+          <button id="rocket-sound-toggle" type="button" aria-pressed="true">
+            World sound on
+          </button>
         </section>
         <div class="map-card">
           <span id="map-title">LITTLE TOWN</span
@@ -204,6 +209,43 @@
             ><input id="calm" type="checkbox" /> Gentler motion
             <small>Slower camera, fewer leaves</small></label
           >
+          <fieldset class="sound-preferences">
+            <legend>World sounds</legend>
+            <label
+              ><input id="mute-sounds" type="checkbox" /> Mute world
+              sounds</label
+            >
+            <label for="sound-volume"
+              >Sound volume <output id="sound-volume-value">80%</output></label
+            >
+            <input
+              id="sound-volume"
+              type="range"
+              min="0"
+              max="100"
+              value="80"
+            />
+            <label for="ambience-volume"
+              >Background sounds
+              <output id="ambience-volume-value">65%</output></label
+            >
+            <input
+              id="ambience-volume"
+              type="range"
+              min="0"
+              max="100"
+              value="65"
+            />
+            <label
+              ><input id="gentle-sounds" type="checkbox" /> Gentler sounds
+              <small
+                >Softer volume, softer highs, one animal at a time</small
+              ></label
+            >
+            <small class="sound-note"
+              >Animal lessons have their own Read aloud control.</small
+            >
+          </fieldset>
         </div>
         <button id="resume" class="primary">
           Return to exploring <span aria-hidden="true">→</span>
