@@ -5,6 +5,7 @@ import { blob, box, cylinder, label, material } from "./models.js";
 // Space is a separate layer above the countryside. Keeping it in its own area
 // means a future rocket can switch worlds cleanly without disturbing the town.
 export const SPACE_ALTITUDE = 180;
+export const SPACE_PLANET_HEIGHT = 48;
 // Half a mile of playable space in every compass direction from the center.
 // One world unit is approximately one meter, so the full field is one mile wide.
 export const SPACE_WORLD_RADIUS = 805;
@@ -82,7 +83,7 @@ function makePlanet(parent) {
     new THREE.SphereGeometry(17, 28, 18),
     planetMaterial,
   );
-  planet.position.set(-38, 11, 112);
+  planet.position.set(-38, SPACE_PLANET_HEIGHT, 112);
   planet.name = "distant-blue-planet";
   parent.add(planet);
 

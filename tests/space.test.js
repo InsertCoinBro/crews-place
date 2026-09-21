@@ -5,6 +5,7 @@ import {
   SPACE_ALTITUDE,
   SPACE_BOUNDS,
   SPACE_LANDING_SITE,
+  SPACE_PLANET_HEIGHT,
   SPACE_WORLD_RADIUS,
   SPACE_WORLD_SIZE,
 } from "../shared/world/space.js";
@@ -16,6 +17,10 @@ test("space is a full-size world layer above the countryside", () => {
   assert.equal(SPACE_BOUNDS.maxZ - SPACE_BOUNDS.minZ, SPACE_WORLD_SIZE);
   assert.ok(SPACE_WORLD_RADIUS >= 804.672);
   assert.equal(SPACE_WORLD_SIZE, SPACE_WORLD_RADIUS * 2);
+});
+
+test("the ringed planet floats fully above the lunar surface", () => {
+  assert.ok(SPACE_PLANET_HEIGHT > 30);
 });
 
 test("the future rocket landing site is safely inside the space bounds", () => {
