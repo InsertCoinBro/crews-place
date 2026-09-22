@@ -19,12 +19,18 @@ export function runSpaceCombatChecks(game) {
   game.start();
   game.enter("space", [-20, 0]);
   frames(2);
-  check("Five visible independent Moon Mischief NPCs", () => {
+  check("Five independent Moon Mischief NPCs use distance visibility", () => {
     assert(game.spaceAlien.aliens.length === 5, "wrong count");
     assert(
-      game.spaceAlien.aliens.every((a) => a.model.visible),
-      "hidden alien",
+      game.spaceAlien.aliens.every((a) => !a.model.visible),
+      "distant aliens rendered through the fog",
     );
+    const nearby = game.spaceAlien.aliens[0];
+    nearby.model.position.copy(game.player.position);
+    nearby.model.position.z += 8;
+    nearby.delay = 10;
+    frames(1);
+    assert(nearby.model.visible, "nearby alien stayed hidden");
   });
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     check(`${id} equips, bubbles and floats an alien to the boundary`, () => {
@@ -49,7 +55,7 @@ export function runSpaceCombatChecks(game) {
       assert(a.respawn > 0 && c.bubbles.has(a), "bubble did not start");
       frames(1000);
       assert(
-        a.respawn === 0 && a.model.visible && !c.bubbles.has(a),
+        a.respawn === 0 && !a.model.visible && !c.bubbles.has(a),
         "bubble did not leave the area and respawn",
       );
     });

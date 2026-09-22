@@ -141,7 +141,7 @@ test("navigation detours around obstacles without entering the rocket safe zone"
     { minX: -14, maxX: -12, minZ: 7, maxZ: 17, minY: 180, maxY: 185 },
   ];
   const path = alienPath({ x: -9, z: 12 }, { x: -18, z: 12 }, a);
-  assert.ok(path.length > 10);
+  assert.ok(path.length > 1);
   assert.ok(
     path.every(
       (p) =>
@@ -149,6 +149,13 @@ test("navigation detours around obstacles without entering the rocket safe zone"
     ),
   );
   assert.ok(Math.abs(path.at(-1).x + 18) < 1.5);
+});
+test("long open-space routes stay compact after the one-mile expansion", () => {
+  const a = area();
+  a.bounds = { minX: -805, maxX: 805, minZ: -805, maxZ: 805 };
+  a.colliders = [];
+  const path = alienPath({ x: -803, z: -420 }, { x: -20, z: 0 }, a);
+  assert.deepEqual(path, [{ x: -20, z: 0 }]);
 });
 test("playground participation suspends chasing and gentle mode slows movement", async () => {
   const g = game(await alien()),

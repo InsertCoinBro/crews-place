@@ -31,6 +31,11 @@ export function runSpaceTubeChecks(game) {
     const version = tube.air.instanceMatrix.version;
     frames(60);
     assert(!tube.occupied, "tube unexpectedly occupied");
+    assert(!tube.air.visible, "idle airflow rings remained visible");
+    assert(
+      tube.ribs.length > 1 && tube.ribs.every((chunk) => chunk.count <= 16),
+      "tube hoops were not split into cullable sections",
+    );
     assert(
       tube.air.instanceMatrix.version === version,
       "idle airflow transforms kept uploading",
@@ -47,6 +52,7 @@ export function runSpaceTubeChecks(game) {
         frames(15);
         key("KeyE");
         assert(tube.occupied, "boarding failed");
+        assert(tube.air.visible, "ride airflow rings stayed hidden");
         assert(game.player.model.parent === tube.carrier, "not attached");
         assert(
           Math.abs(game.player.model.rotation.x - Math.PI / 2) < 0.01,

@@ -5,23 +5,15 @@ import { moveHorizontal, overlapsCircle } from "../core/physics.js";
 import { SPACE_LANDING_SITE } from "./space.js";
 
 const RADIUS = 0.48;
+export const ALIEN_RENDER_DISTANCE = 190;
 export function inAlienSafeZone(p) {
   return Math.hypot(p.x - SPACE_LANDING_SITE.x, p.z - SPACE_LANDING_SITE.z) < 6;
 }
-// A small breadth-first navigation grid routes around moon rocks and playground walls.
+// Route around the few solid moon obstacles without searching the entire
+// one-mile world. The old full-area breadth-first grid became over a million
+// cells after Space expanded and stalled the main thread during every replan.
 export function alienPath(from, to, area) {
-  const step = 1.5,
-    b = area.bounds;
-  const nx = Math.floor((b.maxX - b.minX) / step),
-    nz = Math.floor((b.maxZ - b.minZ) / step);
-  const cell = (p) => [
-    Math.max(0, Math.min(nx - 1, Math.floor((p.x - b.minX) / step))),
-    Math.max(0, Math.min(nz - 1, Math.floor((p.z - b.minZ) / step))),
-  ];
-  const point = (x, z) => ({
-    x: b.minX + (x + 0.5) * step,
-    z: b.minZ + (z + 0.5) * step,
-  });
+  const clearance = RADIUS + 0.72;
   const clear = (p) =>
     !inAlienSafeZone(p) &&
     !area.colliders.some(
@@ -30,51 +22,75 @@ export function alienPath(from, to, area) {
         c.maxY > area.groundY &&
         overlapsCircle(p.x, p.z, RADIUS + 0.65, c),
     );
-  const [sx, sz] = cell(from),
-    [tx, tz] = cell(to),
-    start = sz * nx + sx,
-    target = tz * nx + tx;
-  const queue = [start],
-    parents = new Map([[start, null]]);
-  let end = start,
-    best = Infinity;
-  for (let i = 0; i < queue.length; i++) {
-    const key = queue[i],
-      x = key % nx,
-      z = Math.floor(key / nx),
-      d = (x - tx) ** 2 + (z - tz) ** 2;
-    if (d < best) {
-      best = d;
-      end = key;
-    }
-    if (key === target) break;
-    for (const [dx, dz] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
+  const hitTime = (a, b, box) => {
+    if ((box.minY ?? 0) >= area.groundY + 1.9 || box.maxY <= area.groundY)
+      return Infinity;
+    const dx = b.x - a.x,
+      dz = b.z - a.z;
+    let near = 0,
+      far = 1;
+    for (const [origin, delta, lo, hi] of [
+      [a.x, dx, box.minX - clearance, box.maxX + clearance],
+      [a.z, dz, box.minZ - clearance, box.maxZ + clearance],
     ]) {
-      const xx = x + dx,
-        zz = z + dz,
-        k = zz * nx + xx;
-      if (
-        xx < 0 ||
-        zz < 0 ||
-        xx >= nx ||
-        zz >= nz ||
-        parents.has(k) ||
-        !clear(point(xx, zz))
-      )
-        continue;
-      parents.set(k, key);
-      queue.push(k);
+      if (Math.abs(delta) < 1e-8) {
+        if (origin < lo || origin > hi) return Infinity;
+      } else {
+        const first = (lo - origin) / delta,
+          second = (hi - origin) / delta;
+        near = Math.max(near, Math.min(first, second));
+        far = Math.min(far, Math.max(first, second));
+        if (near > far) return Infinity;
+      }
     }
+    return far >= 0 && near <= 1 ? Math.max(0, near) : Infinity;
+  };
+  const firstBlocker = (a, b) => {
+    let blocker = null,
+      time = Infinity;
+    for (const box of area.colliders) {
+      const hit = hitTime(a, b, box);
+      if (hit < time) {
+        time = hit;
+        blocker = box;
+      }
+    }
+    return blocker;
+  };
+  const path = [],
+    cursor = { x: from.x, z: from.z };
+  for (let turn = 0; turn < 12; turn++) {
+    const blocker = firstBlocker(cursor, to);
+    if (!blocker) {
+      path.push({ x: to.x, z: to.z });
+      break;
+    }
+    const margin = clearance + 0.12,
+      corners = [
+        { x: blocker.minX - margin, z: blocker.minZ - margin },
+        { x: blocker.minX - margin, z: blocker.maxZ + margin },
+        { x: blocker.maxX + margin, z: blocker.minZ - margin },
+        { x: blocker.maxX + margin, z: blocker.maxZ + margin },
+      ]
+        .filter(
+          (corner) =>
+            Math.hypot(corner.x - cursor.x, corner.z - cursor.z) > 0.1 &&
+            clear(corner) &&
+            !firstBlocker(cursor, corner),
+        )
+        .sort(
+          (a, b) =>
+            Math.hypot(a.x - cursor.x, a.z - cursor.z) +
+            Math.hypot(a.x - to.x, a.z - to.z) -
+            Math.hypot(b.x - cursor.x, b.z - cursor.z) -
+            Math.hypot(b.x - to.x, b.z - to.z),
+        );
+    if (!corners.length) break;
+    cursor.x = corners[0].x;
+    cursor.z = corners[0].z;
+    path.push({ ...cursor });
   }
-  const path = [];
-  while (end !== start) {
-    path.unshift(point(end % nx, Math.floor(end / nx)));
-    end = parents.get(end);
-  }
+  if (!path.length && clear(to)) path.push({ x: to.x, z: to.z });
   return path;
 }
 export class SpaceAlien {
@@ -144,14 +160,22 @@ export class SpaceAlien {
   }
   update(dt) {
     const g = this.game,
-      visible = g.area.id === "space";
-    if (this.model) this.model.visible = visible;
+      inSpace = g.area.id === "space";
+    if (this.model && !inSpace) this.model.visible = false;
     if (this.hud)
-      this.hud.hidden = !visible || g.mode !== "playing" || !this.model;
-    if (!this.model || !visible || g.mode !== "playing") return;
+      this.hud.hidden = !inSpace || g.mode !== "playing" || !this.model;
+    if (!this.model || !inSpace || g.mode !== "playing") return;
     dt = Math.min(Math.max(dt, 0), 0.05);
     const a = this.model.animator,
       p = g.player.position;
+    const syncVisibility = () => {
+      this.model.visible =
+        this.model.position.distanceToSquared(p) <= ALIEN_RENDER_DISTANCE ** 2;
+      return this.model.visible;
+    };
+    const animate = () => {
+      if (syncVisibility()) a.mixer.update(dt);
+    };
     const safe =
       inAlienSafeZone(p) ||
       g.playground?.active ||
@@ -159,7 +183,7 @@ export class SpaceAlien {
     if (!this.enabled || safe || this.state === "tagged") {
       if (this.state !== "tagged") this.state = "waiting";
       a.play(this.state === "tagged" ? "Wave" : "Idle");
-      a.mixer.update(dt);
+      animate();
       this.pathTime = 0;
       this.refresh();
       return;
@@ -167,7 +191,7 @@ export class SpaceAlien {
     this.delay = Math.max(0, this.delay - dt);
     if (this.delay > 0) {
       a.play("LookAround");
-      a.mixer.update(dt);
+      animate();
       this.refresh();
       return;
     }
@@ -241,7 +265,7 @@ export class SpaceAlien {
       }
     }
     a.play(moved > 0.0001 ? "ChaseRun" : "Idle");
-    a.mixer.update(dt);
+    animate();
     this.refresh();
   }
 }

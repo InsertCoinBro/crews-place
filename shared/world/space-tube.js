@@ -75,22 +75,31 @@ export class SpaceTube {
       this.group.add(shell);
     }
     const count = Math.floor(this.track.length / 11) + 1;
-    this.ribs = new THREE.InstancedMesh(
-      new THREE.TorusGeometry(TUBE_RADIUS, 0.065, 6, 24),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false }),
-      count,
-    );
+    this.ribs = [];
+    const ribGeometry = new THREE.TorusGeometry(TUBE_RADIUS, 0.065, 6, 24),
+      ribMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        fog: false,
+      }),
+      ribChunkSize = 16;
     const dummy = new THREE.Object3D();
-    for (let i = 0; i < count; i++) {
-      const s = this.track.sample((i / (count - 1)) * this.track.length);
-      dummy.position.copy(s.position);
-      dummy.quaternion.copy(s.rotation);
-      dummy.updateMatrix();
-      this.ribs.setMatrixAt(i, dummy.matrix);
-      this.ribs.setColorAt(i, new THREE.Color(colors[Math.floor(i / 8) % 4]));
+    for (let start = 0; start < count; start += ribChunkSize) {
+      const size = Math.min(ribChunkSize, count - start),
+        ribs = new THREE.InstancedMesh(ribGeometry, ribMaterial, size);
+      for (let local = 0; local < size; local++) {
+        const i = start + local,
+          s = this.track.sample((i / (count - 1)) * this.track.length);
+        dummy.position.copy(s.position);
+        dummy.quaternion.copy(s.rotation);
+        dummy.updateMatrix();
+        ribs.setMatrixAt(local, dummy.matrix);
+        ribs.setColorAt(local, new THREE.Color(colors[Math.floor(i / 8) % 4]));
+      }
+      ribs.name = "colored-tube-hoops";
+      ribs.computeBoundingSphere();
+      this.ribs.push(ribs);
+      this.group.add(ribs);
     }
-    this.ribs.name = "colored-tube-hoops";
-    this.group.add(this.ribs);
     this.air = new THREE.InstancedMesh(
       new THREE.TorusGeometry(TUBE_RADIUS - 0.18, 0.025, 4, 20),
       new THREE.MeshBasicMaterial({
@@ -103,6 +112,7 @@ export class SpaceTube {
       32,
     );
     this.air.name = "airflow-rings";
+    this.air.visible = false;
     this.group.add(this.air);
     this.air.frustumCulled = false;
     const pad = box(this.group, 156, 0.06, 43, 27, 0.12, 34, 0x1d3552);
@@ -260,6 +270,7 @@ export class SpaceTube {
     this.cameraReady = false;
     this.view = "follow";
     this.ride.launch();
+    this.air.visible = true;
     this.placeRider();
     this.poseRider();
     g.input.clear();
@@ -419,6 +430,7 @@ export class SpaceTube {
     for (const [bone, q] of this.savedBones) bone.quaternion.copy(q);
     g.player.model.quaternion.copy(this.savedQuaternion);
     this.ride.reset();
+    this.air.visible = false;
     g.player.inVehicle = false;
     g.player.model.visible = true;
     g.player.heading = 0;

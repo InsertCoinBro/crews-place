@@ -54,6 +54,20 @@ export function runSpaceRaceChecks(game) {
   };
   game.start();
   game.calm = false;
+  check("distant opponent detail is culled until the player approaches", () => {
+    game.enter("space", [0, 12]);
+    frames(1);
+    assert(
+      race.aliens.every((alien) => !alien.visible),
+      "distant racers rendered",
+    );
+    game.player.teleport(RACE_ENTRY.x, RACE_ENTRY.z, game.area.groundY);
+    frames(1);
+    assert(
+      race.aliens.every((alien) => alien.visible),
+      "nearby racers hidden",
+    );
+  });
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     check(
       `${id}: full race, four jumps, first place, trophy, repeat and safe exit`,

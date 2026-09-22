@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { SpaceAlien } from "./space-alien.js";
+import { ALIEN_RENDER_DISTANCE, SpaceAlien } from "./space-alien.js";
 import { overlapsCircle } from "../core/physics.js";
 
 export const ALIEN_COUNT = 5;
@@ -258,6 +258,9 @@ export class SpaceCombat {
           bubble.rotation.y += dt * 1.4;
           bubble.rotation.x += dt * 0.6;
           a.model.position.copy(bubble.position);
+          a.model.visible =
+            a.model.position.distanceToSquared(g.player.position) <=
+            ALIEN_RENDER_DISTANCE ** 2;
           const b = g.area.bounds;
           if (
             bubble.position.y > g.area.groundY + 58 ||

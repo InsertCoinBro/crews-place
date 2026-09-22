@@ -10,6 +10,7 @@ import {
 } from "./space-race-track.js";
 
 const v = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const RACER_DETAIL_DISTANCE = 85;
 const material = (color) =>
   new THREE.MeshStandardMaterial({
     color,
@@ -133,6 +134,7 @@ export class SpaceRace {
       return model;
     });
     this.placeKarts();
+    this.updateRacerVisibility();
     game.interactions.register({
       id: "space-race",
       kind: "space-race",
@@ -503,9 +505,21 @@ export class SpaceRace {
       this.game.player.model.visible = true;
     }
   }
+  updateRacerVisibility() {
+    const g = this.game;
+    const show =
+      this.occupied ||
+      (g.area.id === "space" &&
+        Math.hypot(
+          g.player.position.x - RACE_ENTRY.x,
+          g.player.position.z - RACE_ENTRY.z,
+        ) <= RACER_DETAIL_DISTANCE);
+    for (const alien of this.aliens) alien.visible = show;
+  }
   update(dt) {
     const g = this.game;
     if (this.hud) this.hud.hidden = !this.occupied || g.mode !== "playing";
+    this.updateRacerVisibility();
     if (!this.occupied || g.mode !== "playing") return;
     if (g.input.consume("KeyE")) {
       if (this.run.state === "ready" || this.run.state === "finished")
