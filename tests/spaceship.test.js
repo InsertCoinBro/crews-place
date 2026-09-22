@@ -5,7 +5,14 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { preparePlayerCharacter } from "../shared/world/player-character.js";
 import { Player } from "../shared/core/player.js";
-import { Spaceship, SHIP_DOCK, SHIP_EXIT } from "../shared/world/spaceship.js";
+import {
+  Spaceship,
+  SHIP_DOCK,
+  SHIP_EXIT,
+  SHIP_EDGE_MARGIN,
+  SHIP_FLIGHT_CEILING,
+} from "../shared/world/spaceship.js";
+import { SPACE_BOUNDS } from "../shared/world/space.js";
 
 async function setup(id = "cowboy") {
   const bytes = await readFile(
@@ -25,7 +32,7 @@ async function setup(id = "cowboy") {
     id: "space",
     groundY: 180,
     group,
-    bounds: { minX: -83, maxX: 42, minZ: -42, maxZ: 64 },
+    bounds: { ...SPACE_BOUNDS },
     colliders: [],
   };
   const keys = new Set(),
@@ -131,7 +138,7 @@ for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     assert.equal(game.player.model.parent, game.scene);
   });
 
-test("flight respects obstacles, horizontal limits, floor and ceiling", async () => {
+test("flight reaches every edge of the full space map and respects safe limits", async () => {
   const { ship, game, keys } = await setup();
   ship.board();
   game.area.colliders.push({
@@ -142,16 +149,37 @@ test("flight respects obstacles, horizontal limits, floor and ceiling", async ()
     minY: 180,
     maxY: 184,
   });
+  // At floor height, the nearest obstacle still blocks the spacecraft.
   keys.add("KeyW");
   for (let i = 0; i < 200; i++) ship.update(0.05);
   assert.ok(ship.model.position.z <= -25.6);
   keys.add("Space");
-  for (let i = 0; i < 250; i++) ship.update(0.05);
-  assert.equal(ship.model.position.y, 235);
-  assert.ok(ship.model.position.z <= 60);
+  for (let i = 0; i < 800; i++) ship.update(0.05);
+  assert.equal(game.player.position.y, 180 + SHIP_FLIGHT_CEILING);
+  keys.delete("Space");
+  for (const [heading, axis, edge] of [
+    [0, "z", game.area.bounds.maxZ - SHIP_EDGE_MARGIN],
+    [Math.PI, "z", game.area.bounds.minZ + SHIP_EDGE_MARGIN],
+  ]) {
+    keys.clear();
+    ship.heading = heading;
+    keys.add("KeyW");
+    for (let i = 0; i < 1300; i++) ship.update(0.05);
+    assert.ok(Math.abs(ship.model.position[axis] - edge) < 0.02);
+  }
+  for (const [heading, edge] of [
+    [Math.PI / 2, game.area.bounds.maxX - SHIP_EDGE_MARGIN],
+    [-Math.PI / 2, game.area.bounds.minX + SHIP_EDGE_MARGIN],
+  ]) {
+    keys.clear();
+    ship.heading = heading;
+    keys.add("KeyW");
+    for (let i = 0; i < 1300; i++) ship.update(0.05);
+    assert.ok(Math.abs(ship.model.position.x - edge) < 0.02);
+  }
   keys.clear();
   keys.add("KeyC");
-  for (let i = 0; i < 250; i++) ship.update(0.05);
+  for (let i = 0; i < 800; i++) ship.update(0.05);
   assert.ok(ship.model.position.y >= 180.3);
   ship.exit();
   game.area = { id: "town" };

@@ -3,6 +3,11 @@ import { label } from "./models.js";
 
 export const SHIP_DOCK = Object.freeze({ x: 31, z: -31 });
 export const SHIP_EXIT = Object.freeze({ x: 25, z: -27 });
+// The Starlight Explorer is a full-space vehicle, not a local dock hovercraft.
+// This clears the tallest current attraction (the 315 m Slipstream) while
+// keeping the player inside the intentionally walkable moon world.
+export const SHIP_FLIGHT_CEILING = 650;
+export const SHIP_EDGE_MARGIN = 1.5;
 
 export function createSpaceship() {
   const ship = new THREE.Group();
@@ -346,7 +351,7 @@ export class Spaceship {
         1.3;
       this.speed = THREE.MathUtils.damp(
         this.speed,
-        forward * (g.calm ? 7 : 12),
+        forward * (g.calm ? 18 : 34),
         5,
         dt,
       );
@@ -354,14 +359,24 @@ export class Spaceship {
       candidate.x += Math.sin(this.heading) * this.speed * dt;
       candidate.z += Math.cos(this.heading) * this.speed * dt;
       candidate.y +=
-        (Number(input.down("Space")) - Number(input.down("KeyC"))) * dt * 7;
+        (Number(input.down("Space")) - Number(input.down("KeyC"))) *
+        dt *
+        (g.calm ? 12 : 22);
       const b = g.area.bounds;
-      candidate.x = THREE.MathUtils.clamp(candidate.x, b.minX + 4, b.maxX - 4);
-      candidate.z = THREE.MathUtils.clamp(candidate.z, b.minZ + 4, b.maxZ - 4);
+      candidate.x = THREE.MathUtils.clamp(
+        candidate.x,
+        b.minX + SHIP_EDGE_MARGIN,
+        b.maxX - SHIP_EDGE_MARGIN,
+      );
+      candidate.z = THREE.MathUtils.clamp(
+        candidate.z,
+        b.minZ + SHIP_EDGE_MARGIN,
+        b.maxZ - SHIP_EDGE_MARGIN,
+      );
       candidate.y = THREE.MathUtils.clamp(
         candidate.y,
         this.home.y,
-        g.area.groundY + 55,
+        g.area.groundY + SHIP_FLIGHT_CEILING,
       );
       if (!this.blocked(candidate)) p.copy(candidate);
       else {
@@ -383,7 +398,9 @@ export class Spaceship {
       const text =
         this.phase === "returning"
           ? "Returning to the northeast dock…"
-          : `${Math.round(p.y - this.home.y)} m above the surface · E to return and land`;
+          : `${Math.round(p.y - this.home.y)} m high · ${Math.round(
+              Math.hypot(p.x, p.z),
+            )} m from space center · Full-space flight · E to land`;
       const status = this.hud.querySelector(".ship-status");
       if (status.textContent !== text) status.textContent = text;
       this.hud.querySelector("button").disabled = this.phase === "returning";
