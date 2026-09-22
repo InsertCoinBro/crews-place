@@ -25,6 +25,7 @@ export class SpaceTube {
     this.group.add(this.carrier);
     this.view = "follow";
     this.time = 0;
+    this.airDummy = new THREE.Object3D();
     this.build();
     this.buildHUD();
     game.interactions.register({
@@ -324,7 +325,7 @@ export class SpaceTube {
   }
   updateAir(dt) {
     this.time += dt;
-    const dummy = new THREE.Object3D();
+    const dummy = this.airDummy;
     for (let i = 0; i < 32; i++) {
       const d =
           ((i / 32) * this.track.length +
@@ -342,9 +343,9 @@ export class SpaceTube {
     const g = this.game;
     if (this.hud) this.hud.hidden = !this.occupied || g.mode !== "playing";
     if (g.mode !== "playing" || g.area.id !== "space") return;
+    if (!this.occupied) return;
     const calm = this.gentle || g.calm;
     this.updateAir(calm ? 0 : dt);
-    if (!this.occupied) return;
     if (g.input.consume("KeyE")) {
       this.exit();
       return;

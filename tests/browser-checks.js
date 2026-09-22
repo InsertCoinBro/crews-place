@@ -1,4 +1,4 @@
-import { overlapsCircle } from "../shared/core/physics.js";
+import { overlapsCircle, PLAYER_RADIUS } from "../shared/core/physics.js";
 import { NPC_ROUTES } from "../shared/world/npcs.js";
 // Browser integration harness: visit /?test during local development.
 // Sets up scenarios, then drives the real Input -> Game.tick -> renderer path.
@@ -128,9 +128,12 @@ export function runBrowserChecks(game) {
     place(0, 28.5);
     hold("KeyS", 120);
     assert(game.player.position.z > 32, "old town edge still blocks movement");
-    place(0, 89.5);
+    place(0, game.area.bounds.maxZ - 0.5);
     hold("KeyS", 180);
-    assert(game.player.position.z <= 89.64 + 0.001, "escaped expanded map");
+    assert(
+      game.player.position.z <= game.area.bounds.maxZ - PLAYER_RADIUS + 0.001,
+      "escaped expanded map",
+    );
     assert(game.player.position.y === 0, "fell through ground");
   });
   check("Animated horse explores the outer meadow", () => {

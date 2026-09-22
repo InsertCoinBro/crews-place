@@ -26,6 +26,16 @@ export function runSpaceTubeChecks(game) {
   };
   game.start();
   game.calm = false;
+  check("idle tube effects do not consume the walking frame loop", () => {
+    game.enter("space", [TUBE_ENTRY.x - 12, TUBE_ENTRY.z]);
+    const version = tube.air.instanceMatrix.version;
+    frames(60);
+    assert(!tube.occupied, "tube unexpectedly occupied");
+    assert(
+      tube.air.instanceMatrix.version === version,
+      "idle airflow transforms kept uploading",
+    );
+  });
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     check(
       id + " boards with E, rides all 60 seconds visibly and lands safely",
