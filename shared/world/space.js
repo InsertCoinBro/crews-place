@@ -5,7 +5,9 @@ import { blob, box, cylinder, label, material } from "./models.js";
 // Space is a separate layer above the countryside. Keeping it in its own area
 // means a future rocket can switch worlds cleanly without disturbing the town.
 export const SPACE_ALTITUDE = 180;
-export const SPACE_PLANET_HEIGHT = 48;
+export const SPACE_PLANET_POSITION = Object.freeze({ x: -170, y: 60, z: 1050 });
+export const SPACE_PLANET_RADIUS = 55;
+export const SPACE_PLANET_OUTER_RADIUS = 95;
 // Half a mile of playable space in every compass direction from the center.
 // One world unit is approximately one meter, so the full field is one mile wide.
 export const SPACE_WORLD_RADIUS = 805;
@@ -80,15 +82,19 @@ function makePlanet(parent) {
     fog: false,
   });
   const planet = new THREE.Mesh(
-    new THREE.SphereGeometry(17, 28, 18),
+    new THREE.SphereGeometry(SPACE_PLANET_RADIUS, 36, 24),
     planetMaterial,
   );
-  planet.position.set(-38, SPACE_PLANET_HEIGHT, 112);
+  planet.position.set(
+    SPACE_PLANET_POSITION.x,
+    SPACE_PLANET_POSITION.y,
+    SPACE_PLANET_POSITION.z,
+  );
   planet.name = "distant-blue-planet";
   parent.add(planet);
 
   const glow = new THREE.Mesh(
-    new THREE.SphereGeometry(18.2, 28, 18),
+    new THREE.SphereGeometry(SPACE_PLANET_RADIUS + 5, 36, 24),
     new THREE.MeshBasicMaterial({
       color: 0x8ca8ff,
       transparent: true,
@@ -102,7 +108,7 @@ function makePlanet(parent) {
   parent.add(glow);
 
   const ring = new THREE.Mesh(
-    new THREE.RingGeometry(22, 29, 64),
+    new THREE.RingGeometry(70, SPACE_PLANET_OUTER_RADIUS, 80),
     new THREE.MeshBasicMaterial({
       color: 0xe4c98e,
       transparent: true,
@@ -195,6 +201,7 @@ export function buildSpace(scene) {
     fog: 0x070b20,
     fogNear: 72,
     fogFar: 210,
+    cameraFar: 2200,
     exposure: 0.78,
   };
   area.futureRocketReady = true;

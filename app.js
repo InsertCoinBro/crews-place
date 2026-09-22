@@ -612,7 +612,7 @@ class Game {
     this.setMode("playing");
     this.follow.reset(Math.PI / 2);
     this.follow.ready = false;
-    this.camera.far = 320;
+    this.camera.far = this.area.environment?.cameraFar ?? 320;
     this.camera.updateProjectionMatrix();
     document.body.classList.remove("rocket-journey-active");
     document.querySelector("#pause").disabled = false;
@@ -671,6 +671,8 @@ class Game {
     this.sun.target.position.set(center, next.groundY ?? 0, 0);
     this.sun.target.updateMatrixWorld();
     const environment = next.environment;
+    this.camera.far = environment?.cameraFar ?? 320;
+    this.camera.updateProjectionMatrix();
     this.scene.background.set(environment?.background ?? 0xc5e2e0);
     this.scene.fog.color.set(environment?.fog ?? 0xc5e2e0);
     this.scene.fog.near = environment?.fogNear ?? 105;
