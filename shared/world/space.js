@@ -19,6 +19,11 @@ export const SPACE_BOUNDS = Object.freeze({
   minZ: -SPACE_WORLD_SIZE / 2,
   maxZ: SPACE_WORLD_SIZE / 2,
 });
+export const LUNAR_CRATER_COUNT = 180;
+const LUNAR_REGOLITH_URL = new URL(
+  "../../assets/textures/lunar-regolith-v1.png",
+  import.meta.url,
+).href;
 
 function seededRandom(seed) {
   let value = seed >>> 0;
@@ -26,6 +31,35 @@ function seededRandom(seed) {
     value = (value * 1664525 + 1013904223) >>> 0;
     return value / 4294967296;
   };
+}
+
+export function createLunarCraterLayout(
+  count = LUNAR_CRATER_COUNT,
+  seed = 19690720,
+) {
+  const random = seededRandom(seed);
+  return Array.from({ length: count }, (_, index) => {
+    // Squaring the random value creates many little pockmarks and a few
+    // dramatic landmarks, like a naturally weathered lunar surface.
+    const radius = 0.55 + random() ** 2 * 8.5;
+    return {
+      x: THREE.MathUtils.lerp(
+        SPACE_BOUNDS.minX + 12,
+        SPACE_BOUNDS.maxX - 12,
+        random(),
+      ),
+      z: THREE.MathUtils.lerp(
+        SPACE_BOUNDS.minZ + 12,
+        SPACE_BOUNDS.maxZ - 12,
+        random(),
+      ),
+      radius,
+      stretch: 0.78 + random() * 0.44,
+      rotation: random() * Math.PI,
+      shade: 0.7 + random() * 0.3,
+      index,
+    };
+  });
 }
 
 export function createStarPositions(count = 420, seed = 7241) {
@@ -151,6 +185,88 @@ function makeCrater(parent, x, z, radius, stretch = 1) {
   parent.add(rim);
 }
 
+function makeCraterField(parent) {
+  const layout = createLunarCraterLayout();
+  const floors = new THREE.InstancedMesh(
+    new THREE.CircleGeometry(1, 28),
+    new THREE.MeshStandardMaterial({
+      color: 0x3e4148,
+      roughness: 1,
+      metalness: 0,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+    }),
+    layout.length,
+  );
+  const rims = new THREE.InstancedMesh(
+    new THREE.TorusGeometry(1, 0.065, 7, 28),
+    new THREE.MeshStandardMaterial({
+      color: 0xaaa9a4,
+      roughness: 0.96,
+      metalness: 0,
+    }),
+    layout.length,
+  );
+  const ejecta = new THREE.InstancedMesh(
+    new THREE.RingGeometry(1.08, 1.7, 36),
+    new THREE.MeshStandardMaterial({
+      color: 0xc5c2b8,
+      transparent: true,
+      opacity: 0.1,
+      roughness: 1,
+      metalness: 0,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+    layout.length,
+  );
+  const dummy = new THREE.Object3D();
+  layout.forEach((crater, index) => {
+    dummy.position.set(crater.x, 0.016, crater.z);
+    dummy.rotation.set(-Math.PI / 2, 0, crater.rotation);
+    dummy.scale.set(
+      crater.radius * 0.82,
+      crater.radius * crater.stretch * 0.82,
+      1,
+    );
+    dummy.updateMatrix();
+    floors.setMatrixAt(index, dummy.matrix);
+    floors.setColorAt(
+      index,
+      new THREE.Color(0x45484f).multiplyScalar(crater.shade),
+    );
+    dummy.position.y = 0.012;
+    dummy.scale.set(
+      crater.radius,
+      crater.radius * crater.stretch,
+      Math.max(0.7, crater.radius * 0.22),
+    );
+    dummy.updateMatrix();
+    ejecta.setMatrixAt(index, dummy.matrix);
+    ejecta.setColorAt(
+      index,
+      new THREE.Color(0xbdbab0).multiplyScalar(0.82 + crater.shade * 0.18),
+    );
+    dummy.position.y = 0.045;
+    dummy.scale.set(
+      crater.radius,
+      crater.radius * crater.stretch,
+      Math.max(0.7, crater.radius * 0.22),
+    );
+    dummy.updateMatrix();
+    rims.setMatrixAt(index, dummy.matrix);
+    rims.setColorAt(
+      index,
+      new THREE.Color(0xb4b2aa).multiplyScalar(0.78 + crater.shade * 0.22),
+    );
+  });
+  floors.name = "lunar-crater-field-floors";
+  rims.name = "lunar-crater-field-rims";
+  ejecta.name = "lunar-crater-ejecta-halos";
+  floors.receiveShadow = rims.receiveShadow = ejecta.receiveShadow = true;
+  parent.add(ejecta, floors, rims);
+}
+
 function makeLandingPad(parent) {
   const { x, z } = SPACE_LANDING_SITE;
   cylinder(parent, x, 0.1, z, 6.3, 6.3, 0.18, 0x58647e, 48).name =
@@ -223,14 +339,31 @@ export function buildSpace(scene) {
   );
   ground.name = "walkable-space-ground";
   ground.receiveShadow = true;
+  ground.material.color.set(0xb8b6b1);
+  ground.material.roughness = 1;
+  ground.material.metalness = 0;
+  // Some geometry tests provide a minimal document stub without image APIs.
+  // The browser gets the full textured material; tests retain the safe base.
+  if (typeof globalThis.document?.createElementNS === "function") {
+    const regolith = new THREE.TextureLoader().load(LUNAR_REGOLITH_URL);
+    regolith.name = "lunar-regolith-texture";
+    regolith.wrapS = regolith.wrapT = THREE.MirroredRepeatWrapping;
+    regolith.repeat.set(32, 32);
+    regolith.colorSpace = THREE.SRGBColorSpace;
+    regolith.anisotropy = 8;
+    ground.material.map = regolith;
+    ground.material.bumpMap = regolith;
+    ground.material.bumpScale = 0.18;
+    ground.material.needsUpdate = true;
+  }
 
   // A soft patchwork keeps the moon surface readable without making walking
   // unpredictable. Every decorative patch remains flat and fully traversable.
   for (const [x, z, radius, color] of [
-    [-23, -18, 13, 0x858ba4],
-    [21, -22, 11, 0x6d738e],
-    [-25, 24, 10, 0x8e92a8],
-    [24, 23, 14, 0x747991],
+    [-23, -18, 13, 0x858585],
+    [21, -22, 11, 0x777777],
+    [-25, 24, 10, 0x93918d],
+    [24, 23, 14, 0x727270],
   ]) {
     const patch = cylinder(g, x, 0.012, z, radius, radius, 0.025, color, 28);
     patch.scale.z = 0.7;
@@ -246,6 +379,7 @@ export function buildSpace(scene) {
     [-11, 31, 1.5, 1.1],
   ])
     makeCrater(g, ...crater);
+  makeCraterField(g);
 
   makeLandingPad(g);
   makeStars(g);
@@ -314,6 +448,8 @@ export function buildSpace(scene) {
     starCount: 420,
     hasPlanet: true,
     hasLandingPad: true,
+    hasRegolithTexture: true,
+    craterCount: LUNAR_CRATER_COUNT + 6,
   });
   return area;
 }

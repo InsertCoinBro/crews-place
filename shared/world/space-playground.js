@@ -43,8 +43,10 @@ export class SpacePlayground {
       )
         area.group.remove(mesh);
     }
-    area.bounds.minX = -83;
-    area.bounds.maxZ = 64;
+    // An attraction may extend a small moon, but must never shrink a larger
+    // one: the west raceway and the expanded flight area share these bounds.
+    area.bounds.minX = Math.min(area.bounds.minX, -83);
+    area.bounds.maxZ = Math.max(area.bounds.maxZ, 64);
     const g = new THREE.Group();
     g.name = "space-playground";
     area.group.add(g);

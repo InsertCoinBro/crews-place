@@ -193,6 +193,16 @@ test("alien spawn and routes work against the actual moon and playground collide
     // Playground scene construction is exercised in its own integration checks;
     // its colliders are added by the same constructor used in the game.
     new SpacePlayground(g);
+    assert.equal(
+      a.bounds.minX,
+      -805,
+      "playground must preserve the expanded west moon",
+    );
+    assert.equal(
+      a.bounds.maxZ,
+      805,
+      "playground must preserve the expanded south moon",
+    );
     const spawn = { x: -9, z: 12 };
     assert.ok(
       !a.colliders.some((c) => overlapsCircle(spawn.x, spawn.z, 0.48, c)),

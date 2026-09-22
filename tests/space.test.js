@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   createStarPositions,
+  createLunarCraterLayout,
+  LUNAR_CRATER_COUNT,
   SPACE_ALTITUDE,
   SPACE_BOUNDS,
   SPACE_LANDING_SITE,
@@ -19,6 +21,25 @@ test("space is a full-size world layer above the countryside", () => {
   assert.equal(SPACE_BOUNDS.maxZ - SPACE_BOUNDS.minZ, SPACE_WORLD_SIZE);
   assert.ok(SPACE_WORLD_RADIUS >= 804.672);
   assert.equal(SPACE_WORLD_SIZE, SPACE_WORLD_RADIUS * 2);
+});
+
+test("lunar regolith has a deterministic field of varied craters across the map", () => {
+  const first = createLunarCraterLayout();
+  const second = createLunarCraterLayout();
+  assert.deepEqual(first, second);
+  assert.equal(first.length, LUNAR_CRATER_COUNT);
+  assert.ok(first.filter((crater) => crater.radius < 2).length > 50);
+  assert.ok(first.some((crater) => crater.radius > 7));
+  assert.ok(first.some((crater) => crater.x < -600));
+  assert.ok(first.some((crater) => crater.x > 600));
+  assert.ok(first.some((crater) => crater.z < -600));
+  assert.ok(first.some((crater) => crater.z > 600));
+  for (const crater of first) {
+    assert.ok(crater.x > SPACE_BOUNDS.minX + 10);
+    assert.ok(crater.x < SPACE_BOUNDS.maxX - 10);
+    assert.ok(crater.z > SPACE_BOUNDS.minZ + 10);
+    assert.ok(crater.z < SPACE_BOUNDS.maxZ - 10);
+  }
 });
 
 test("the ringed planet floats fully above the lunar surface", () => {

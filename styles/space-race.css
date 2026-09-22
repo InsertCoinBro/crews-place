@@ -1,0 +1,87 @@
+.race-hud {
+  position: fixed;
+  z-index: 16;
+  top: 86px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 580px);
+  padding: 12px 18px;
+  border: 1px solid #a9efdb;
+  border-radius: 20px;
+  background: #152b40f2;
+  color: #f7f6ec;
+  text-align: center;
+}
+.race-eyebrow {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #b1f0db;
+}
+.race-phase {
+  display: block;
+  font-size: 22px;
+  margin: 4px 0;
+}
+.race-info {
+  font-size: 14px;
+  margin: 6px 0;
+}
+.race-help {
+  font-size: 13px;
+  color: #e2e9e8;
+  margin: 7px 0;
+}
+.race-help-touch {
+  display: none;
+}
+@media (pointer: coarse), (max-width: 900px) {
+  .race-help-keys {
+    display: none;
+  }
+  .race-help-touch {
+    display: inline;
+  }
+}
+.race-progress {
+  width: 100%;
+  height: 9px;
+  accent-color: #a7edd8;
+  border: 0;
+}
+.race-hud > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+}
+.race-hud button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #9cdac9;
+  border-radius: 12px;
+  background: #eaf5ee;
+  color: #193447;
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+}
+.race-hud button[aria-pressed="true"] {
+  background: #afe5d1;
+  border: 2px solid #e5fbe9;
+}
+.race-hud button:hover {
+  background: #c9eede;
+}
+@media (max-height: 600px) {
+  .race-hud {
+    top: 72px;
+    padding: 7px 12px;
+  }
+  .race-help {
+    display: none;
+  }
+  .race-phase {
+    font-size: 18px;
+  }
+}

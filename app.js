@@ -26,6 +26,8 @@ import { ArcadeManager } from "./games/arcade.js";
 import { RollerCoaster } from "./shared/world/coaster.js";
 import { Spaceship, SHIP_EXIT } from "./shared/world/spaceship.js";
 import { SpaceTube } from "./shared/world/space-tube.js";
+import { SpaceRace } from "./shared/world/space-race.js";
+import { RACE_ENTRY } from "./shared/world/space-race-track.js";
 import { TUBE_ENTRY } from "./shared/world/space-tube-track.js";
 import { SpaceDive } from "./shared/world/space-dive.js";
 import { SPACE_DIVE_EXIT } from "./shared/world/space-dive-track.js";
@@ -219,6 +221,7 @@ class Game {
     this.spaceDive = new SpaceDive(this);
     this.spaceship = new Spaceship(this);
     this.spaceTube = new SpaceTube(this);
+    this.spaceRace = new SpaceRace(this, characters.get("moon_mischief"));
     this.spaceAlien = new SpaceCombat(this, characters.get("moon_mischief"));
     this.farm = new Farm(this);
     this.cornMaze = new CornMaze(this);
@@ -405,6 +408,7 @@ class Game {
       return false;
     this.spaceship?.exit();
     this.spaceTube?.exit();
+    this.spaceRace?.exit();
     if (this.coaster?.occupied) this.coaster.exit();
     if (this.spaceDive?.occupied) this.spaceDive.exit();
     this.cornMaze?.exit();
@@ -654,6 +658,7 @@ class Game {
   enter(id, spawn) {
     const next = this.areas[id];
     if (!next) return;
+    this.spaceRace?.exit();
     this.spaceTube?.exit();
     this.spaceship?.exit();
     this.cornMaze?.exit();
@@ -699,6 +704,7 @@ class Game {
     }
     this.spaceship.update(this.mode === "playing" ? dt : 0);
     this.spaceTube.update(this.mode === "playing" ? dt : 0);
+    this.spaceRace.update(this.mode === "playing" ? dt : 0);
     this.spaceAlien.update(dt);
     if (this.mode === "arcade") {
       this.audio.stopAll();
@@ -714,7 +720,9 @@ class Game {
     this.interactionCooldown = Math.max(0, this.interactionCooldown - dt);
     let event = null;
     if (this.mode === "playing") {
-      if (this.spaceTube.occupied) {
+      if (this.spaceRace.occupied) {
+        this.ui.showPrompt(null);
+      } else if (this.spaceTube.occupied) {
         this.ui.showPrompt(null);
       } else if (this.spaceship.occupied) {
         this.ui.showPrompt(null);
@@ -842,7 +850,8 @@ class Game {
       if (this.mode !== "playing") return;
       this.spaceAlien.afterPlayer(dt);
       this.scene.updateMatrixWorld(true);
-      if (this.spaceTube.occupied) this.spaceTube.updateCamera(dt);
+      if (this.spaceRace.occupied) this.spaceRace.updateCamera(dt);
+      else if (this.spaceTube.occupied) this.spaceTube.updateCamera(dt);
       else if (this.spaceship.occupied) this.spaceship.updateCamera(dt);
       else if (this.spaceDive.occupied) this.spaceDive.updateCamera(dt);
       else if (this.coaster.occupied) this.coaster.updateCamera(dt);
@@ -1101,6 +1110,22 @@ async function boot() {
     game.start();
     game.enter("space", [TUBE_ENTRY.x - 5, TUBE_ENTRY.z]);
     game.follow.reset(-Math.PI / 2);
+  }
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("space-race-preview")
+  ) {
+    game.start();
+    game.enter("space", [RACE_ENTRY.x, RACE_ENTRY.z]);
+    game.follow.reset(Math.PI / 2);
+  }
+  if (
+    import.meta.env.DEV &&
+    new URLSearchParams(location.search).has("space-race-test")
+  ) {
+    import("./tests/space-race-browser-checks.js").then((m) =>
+      m.runSpaceRaceChecks(game),
+    );
   }
   if (
     import.meta.env.DEV &&

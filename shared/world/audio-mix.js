@@ -136,6 +136,14 @@ export function mixWorldAudio(game, weather) {
   );
   const dive = game.spaceDive.ride;
   const tube = game.spaceTube?.ride;
+  const race = game.spaceRace;
+  a.setLoop(
+    "hoverKart",
+    !!race?.occupied && race.run.state === "racing",
+    0.12 + unit((race?.run.racers[0].speed ?? 0) / 54) * 0.12,
+    SOURCES.spaceEngine,
+    0.8 + unit((race?.run.racers[0].speed ?? 0) / 54) * 0.4,
+  );
   const airflow = unit((tube?.speed ?? 0) / 62);
   a.setLoop(
     "spaceTubeWind",

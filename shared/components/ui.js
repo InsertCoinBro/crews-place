@@ -52,9 +52,13 @@ export class UI {
     }
     const name =
       area.id === "space"
-        ? player.position.x < -32
-          ? "Starlight Playground"
-          : area.name
+        ? player.position.x < -120 && player.position.x > -760 &&
+            player.position.z > -710 && player.position.z < 680
+          ? "Moonbeam Rally"
+          : player.position.x < -32 && player.position.x > -84 &&
+              player.position.z > -38 && player.position.z < 65
+            ? "Starlight Playground"
+            : area.name
         : player.position.x < -90 && player.position.z > -50
           ? "Harvest Corn Maze"
           : area.interior

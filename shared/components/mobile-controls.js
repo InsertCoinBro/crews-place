@@ -196,15 +196,20 @@ export class MobileControls {
     }
 
     use.hidden = false;
-    use.textContent = this.game.spaceship?.occupied
-      ? "Land"
-      : this.game.driving ||
-          this.game.flying ||
-          this.game.cornMaze?.occupied ||
-          this.game.spaceTube?.occupied
-        ? "Exit"
-        : "Use";
+    use.textContent = this.game.spaceRace?.occupied
+      ? ["ready", "finished"].includes(this.game.spaceRace.run.state)
+        ? "Start"
+        : "Exit"
+      : this.game.spaceship?.occupied
+        ? "Land"
+        : this.game.driving ||
+            this.game.flying ||
+            this.game.cornMaze?.occupied ||
+            this.game.spaceTube?.occupied
+          ? "Exit"
+          : "Use";
     jump.hidden =
+      this.game.spaceRace?.occupied ||
       this.game.driving ||
       this.game.flying ||
       this.game.cornMaze?.occupied ||
@@ -230,6 +235,7 @@ export class MobileControls {
     enter.hidden = true;
     pickup.hidden = !document.querySelector("#pickup-hint:not([hidden])");
     gesture.hidden = !!(
+      this.game.spaceRace?.occupied ||
       this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||
       this.game.driving ||
@@ -240,6 +246,7 @@ export class MobileControls {
       this.game.spaceDive?.occupied
     );
     this.look.hidden = !!(
+      this.game.spaceRace?.occupied ||
       this.game.spaceTube?.occupied ||
       this.game.flying ||
       this.game.driving ||
