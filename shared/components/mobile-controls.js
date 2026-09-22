@@ -198,11 +198,17 @@ export class MobileControls {
     use.hidden = false;
     use.textContent = this.game.spaceship?.occupied
       ? "Land"
-      : this.game.driving || this.game.flying || this.game.cornMaze?.occupied
+      : this.game.driving ||
+          this.game.flying ||
+          this.game.cornMaze?.occupied ||
+          this.game.spaceTube?.occupied
         ? "Exit"
         : "Use";
     jump.hidden =
-      this.game.driving || this.game.flying || this.game.cornMaze?.occupied;
+      this.game.driving ||
+      this.game.flying ||
+      this.game.cornMaze?.occupied ||
+      this.game.spaceTube?.occupied;
     jump.textContent = this.game.spaceship?.occupied
       ? "Rise"
       : this.game.playground?.active === "float"
@@ -214,6 +220,7 @@ export class MobileControls {
         ? "Float down"
         : "View";
     secondary.hidden = !(
+      this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||
       this.game.coaster?.occupied ||
       this.game.spaceDive?.occupied ||
@@ -223,6 +230,7 @@ export class MobileControls {
     enter.hidden = true;
     pickup.hidden = !document.querySelector("#pickup-hint:not([hidden])");
     gesture.hidden = !!(
+      this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||
       this.game.driving ||
       this.game.flying ||
@@ -232,6 +240,7 @@ export class MobileControls {
       this.game.spaceDive?.occupied
     );
     this.look.hidden = !!(
+      this.game.spaceTube?.occupied ||
       this.game.flying ||
       this.game.driving ||
       this.game.cornMaze?.occupied ||

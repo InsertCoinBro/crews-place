@@ -135,6 +135,15 @@ export function mixWorldAudio(game, weather) {
     SOURCES.rideWind,
   );
   const dive = game.spaceDive.ride;
+  const tube = game.spaceTube?.ride;
+  const airflow = unit((tube?.speed ?? 0) / 62);
+  a.setLoop(
+    "spaceTubeWind",
+    tube?.state === "riding",
+    airflow * 0.3,
+    SOURCES.rideWind,
+    0.8 + airflow * 0.3,
+  );
   const rush = unit(dive.speed / 66);
   a.setLoop(
     "spaceDiveWheels",

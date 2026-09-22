@@ -1035,6 +1035,59 @@ dialog .primary {
 .spaceship-hud p {
   margin: 7px 0;
 }
+
+.tube-hud {
+  position: fixed;
+  z-index: 16;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92vw, 540px);
+  padding: 12px 18px;
+  border: 1px solid #8df6ec;
+  border-radius: 18px;
+  background: #122642ed;
+  color: #fff;
+  text-align: center;
+  font-size: 16px;
+}
+.tube-hud > span {
+  display: block;
+  color: #a6fff1;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+}
+.tube-hud > strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 21px;
+}
+.tube-hud p {
+  margin: 8px 0;
+}
+.tube-hud > div {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.tube-hud button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #8ae0df;
+  border-radius: 13px;
+  background: #e8faf7;
+  color: #17374e;
+  font-weight: 700;
+  font-size: 14px;
+}
+.tube-hud button:hover {
+  background: #cbf4f1;
+}
+.tube-hud button[aria-pressed="true"] {
+  background: #a6fff1;
+  color: #122642;
+}
 .spaceship-hud button {
   min-height: 44px;
   padding: 8px 16px;
