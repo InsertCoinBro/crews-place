@@ -259,11 +259,11 @@
       <aside
         id="alien-hud"
         hidden
-        aria-label="Bubble launcher and alien chase"
+        aria-label="Bubble Basin arena controls"
         style="
           position: fixed;
           left: 50%;
-          bottom: var(--alien-hud-bottom, 110px);
+          bottom: var(--alien-hud-bottom, 20px);
           transform: translateX(-50%);
           z-index: 12;
           width: min(92vw, 480px);
@@ -277,7 +277,9 @@
         "
       >
         <p id="alien-status" role="status" style="margin: 0 0 8px"></p>
+        <progress id="alien-pressure" max="100" value="0" aria-label="Aliens too close: move away before this fills" style="width:100%;height:7px;display:block;margin-bottom:8px;accent-color:#f5c982"></progress>
         <button id="alien-fire" type="button">Blow bubble · B</button>
+        <button id="alien-exit" type="button">Leave arena</button>
         <button
           id="alien-toggle"
           type="button"

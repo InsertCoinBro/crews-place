@@ -1,4 +1,5 @@
 import { SpaceCombat } from "./shared/world/space-combat.js";
+import { BUBBLE_ARENA_EXIT } from "./shared/world/bubble-arena.js";
 import * as THREE from "three";
 import { Input } from "./shared/core/input.js";
 import { Player } from "./shared/core/player.js";
@@ -1149,8 +1150,8 @@ async function boot() {
   ) {
     game.start();
     game.enter("space");
-    game.player.teleport(-20, -20, game.area.groundY);
-    game.player.heading = 0;
+    game.player.teleport(BUBBLE_ARENA_EXIT.x, BUBBLE_ARENA_EXIT.z, game.area.groundY);
+    game.player.heading = Math.PI;
     game.follow.reset(0);
   }
   if (

@@ -5,6 +5,12 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { preparePlayerCharacter } from "../shared/world/player-character.js";
 import {
+  insideBubbleArena,
+  BUBBLE_ARENA_START,
+  BUBBLE_ARENA_EXIT,
+  CROWD_SECONDS,
+} from "../shared/world/bubble-arena.js";
+import {
   SpaceCombat,
   aimBlasterArm,
   rayBoxDistance,
@@ -26,7 +32,7 @@ async function setup() {
   const area = {
     id: "space",
     groundY: 180,
-    bounds: { minX: -83, maxX: 42, minZ: -42, maxZ: 64 },
+    bounds: { minX: -805, maxX: 805, minZ: -805, maxZ: 805 },
     colliders: [],
   };
   const g = {
@@ -35,7 +41,7 @@ async function setup() {
     areas: { space: area },
     mode: "playing",
     player: {
-      position: new THREE.Vector3(-20, 180, 0),
+      position: new THREE.Vector3(250, 180, -225),
       heading: 0,
       model: await model("cowboy"),
     },
@@ -47,9 +53,10 @@ async function setup() {
   g.player.model.position.copy(g.player.position);
   return new SpaceCombat(g, await model("moon_mischief"));
 }
-test("five independent aliens spawn at the boundary, chase, and freeze on pause", async () => {
+test("five independent aliens spawn in the arena, chase, and freeze on pause", async () => {
   const c = await setup();
   assert.equal(c.aliens.length, 5);
+  assert.ok(c.aliens.every((a) => insideBubbleArena(a.model.position, 2)));
   assert.equal(
     new Set(c.aliens.map((a) => a.model.getObjectByName("Head"))).size,
     5,
@@ -64,11 +71,11 @@ test("five independent aliens spawn at the boundary, chase, and freeze on pause"
   for (let i = 0; i < 60; i++) c.update(1 / 60);
   assert.ok(c.aliens.every((a, i) => a.model.position.equals(frozen[i])));
 });
-test("bubble launcher captures an alien and respawns it after it floats beyond the edge", async () => {
+test("bubbled aliens float upward and respawn within the square", async () => {
   const c = await setup(),
     a = c.aliens[0];
-  a.model.position.set(-20, 180, 9);
-  const origin = new THREE.Vector3(-20, 181.1, 1),
+  a.model.position.set(250, 180, -216);
+  const origin = new THREE.Vector3(250, 181.1, -224),
     direction = new THREE.Vector3(0, 0, 1);
   assert.equal(c.fire(origin, direction), a);
   assert.equal(c.defeated, 1);
@@ -76,7 +83,10 @@ test("bubble launcher captures an alien and respawns it after it floats beyond t
   assert.ok(c.bubbles.has(a));
   c.fire(origin, direction);
   assert.equal(c.defeated, 1);
-  for (let i = 0; i < 1000; i++) c.update(1 / 60);
+  for (let i = 0; i < 1000; i++) {
+    c.update(1 / 60);
+    assert.ok(insideBubbleArena(a.model.position, 1.5));
+  }
   assert.equal(a.respawn, 0);
   assert.equal(a.model.scale.x, 1);
   assert.equal(c.bubbles.has(a), false);
@@ -87,18 +97,94 @@ test("bubble launcher captures an alien and respawns it after it floats beyond t
 test("cover blocks shots and targets behind the player are not hit", async () => {
   const c = await setup(),
     a = c.aliens[0];
-  a.model.position.set(-20, 180, 9);
-  c.game.area.colliders = [
-    { minX: -22, maxX: -18, minZ: 4, maxZ: 5, minY: 180, maxY: 184 },
-  ];
-  const origin = new THREE.Vector3(-20, 181.1, 1),
+  a.model.position.set(250, 180, -216);
+  const cover = {
+    minX: 248,
+    maxX: 252,
+    minZ: -221,
+    maxZ: -220,
+    minY: 180,
+    maxY: 184,
+  };
+  c.game.area.colliders.push(cover);
+  const origin = new THREE.Vector3(250, 181.1, -224),
     direction = new THREE.Vector3(0, 0, 1);
-  assert.equal(rayBoxDistance(origin, direction, c.game.area.colliders[0]), 3);
+  assert.equal(rayBoxDistance(origin, direction, cover), 3);
   assert.equal(c.fire(origin, direction), null);
   assert.equal(a.respawn, 0);
-  c.game.area.colliders = [];
-  a.model.position.z = -9;
+  c.game.area.colliders.splice(c.game.area.colliders.indexOf(cover), 1);
+  a.model.position.z = -234;
   assert.equal(c.fire(origin, direction), null);
+});
+test("outside the square there is no gun or chase, including after leaving through the gate", async () => {
+  const c = await setup();
+  c.game.player.position.set(BUBBLE_ARENA_EXIT.x, 180, BUBBLE_ARENA_EXIT.z);
+  const before = c.aliens.map((a) => a.model.position.clone());
+  for (let i = 0; i < 180; i++) c.update(1 / 60);
+  assert.equal(c.canPlay(), false);
+  assert.equal(
+    c.fire(new THREE.Vector3(250, 181, -225), new THREE.Vector3(0, 0, -1)),
+    null,
+  );
+  assert.ok(c.aliens.every((a, i) => a.model.position.equals(before[i])));
+  assert.equal(c.gun.visible, false);
+  c.game.player.position.set(250, 180, -225);
+  assert.equal(c.canPlay(), true);
+  c.returnToEntrance(true);
+  assert.equal(c.canPlay(), false);
+});
+test("sustained visible crowding resets gently; cover, distance and safe circle protect the player", async () => {
+  const c = await setup(),
+    p = c.game.player.position,
+    a = c.aliens[0];
+  c.grace = 0;
+  a.model.position.copy(p).add(new THREE.Vector3(1.8, 0, 0));
+  for (let i = 0; i < 100; i++) c.updateCrowding(1 / 60, true);
+  assert.ok(c.crowdTime > 1);
+  a.model.position.x += 10;
+  c.updateCrowding(1 / 60, true);
+  assert.equal(c.crowdTime, 0);
+  a.model.position.copy(p).add(new THREE.Vector3(1.8, 0, 0));
+  const wall = {
+    minX: 250.7,
+    maxX: 251,
+    minZ: -227,
+    maxZ: -223,
+    minY: 180,
+    maxY: 184,
+  };
+  c.arena.colliders.push(wall);
+  for (let i = 0; i < 200; i++) c.updateCrowding(1 / 60, true);
+  assert.equal(c.resetCount, 0);
+  c.arena.colliders.splice(c.arena.colliders.indexOf(wall), 1);
+  for (let i = 0; i < Math.ceil(CROWD_SECONDS * 60) + 2; i++)
+    c.updateCrowding(1 / 60, true);
+  assert.equal(c.resetCount, 1);
+  assert.equal(p.x, BUBBLE_ARENA_START.x);
+  assert.equal(p.z, BUBBLE_ARENA_START.z);
+  assert.equal(c.bubbles.size, 0);
+  assert.ok(
+    c.aliens.every((alien) => insideBubbleArena(alien.model.position, 2)),
+  );
+  c.grace = 0;
+  a.model.position.copy(p);
+  for (let i = 0; i < 240; i++) c.updateCrowding(1 / 60, true);
+  assert.equal(c.resetCount, 1);
+});
+test("aliens cannot follow the player outside even through the open doorway", async () => {
+  const c = await setup(),
+    a = c.aliens[0];
+  c.game.player.position.set(265, 180, -192);
+  a.model.position.set(265, 180, -195);
+  a.delay = 0;
+  for (let i = 0; i < 600; i++) {
+    c.update(1 / 60);
+    assert.ok(insideBubbleArena(a.model.position, 1.5));
+  }
+  c.game.player.position.z = -175;
+  const before = a.model.position.clone();
+  for (let i = 0; i < 180; i++) c.update(1 / 60);
+  assert.ok(a.model.position.equals(before));
 });
 test("cowboy, robot and alien arms aim forward and recoil without invalid joints", async () => {
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"]) {

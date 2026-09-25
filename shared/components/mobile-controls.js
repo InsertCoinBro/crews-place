@@ -13,6 +13,7 @@ export class MobileControls {
       </div>
       <div class="mobile-actions">
         <button type="button" data-code="KeyE" class="mobile-action mobile-use">Use</button>
+        <button type="button" data-code="KeyB" class="mobile-action mobile-bubble" hidden>Bubble</button>
         <button type="button" data-code="Space" class="mobile-action mobile-jump">Jump</button>
         <button type="button" data-code="KeyC" class="mobile-action mobile-secondary">View</button>
         <button type="button" data-code="KeyR" class="mobile-action mobile-restart" hidden>Restart</button>
@@ -182,6 +183,10 @@ export class MobileControls {
     const enter = this.root.querySelector(".mobile-enter");
     const pickup = this.root.querySelector(".mobile-pickup");
     const gesture = this.root.querySelector(".mobile-gesture");
+    const bubble = this.root.querySelector(".mobile-bubble");
+    const arena = !!this.game.spaceAlien?.canPlay();
+    bubble.hidden = !arena || arcade;
+    bubble.disabled = !this.game.spaceAlien?.enabled;
     if (arcade) {
       use.hidden = true;
       jump.hidden = false;
@@ -195,7 +200,7 @@ export class MobileControls {
       return;
     }
 
-    use.hidden = false;
+    use.hidden = arena;
     use.textContent = this.game.spaceRace?.occupied
       ? ["ready", "finished"].includes(this.game.spaceRace.run.state)
         ? "Start"
@@ -235,6 +240,7 @@ export class MobileControls {
     enter.hidden = true;
     pickup.hidden = !document.querySelector("#pickup-hint:not([hidden])");
     gesture.hidden = !!(
+      arena ||
       this.game.spaceRace?.occupied ||
       this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||

@@ -11,6 +11,7 @@ import {
   NORTH_AIRFIELD_SITE,
 } from "../world/airfield.js";
 import { SPACE_BOUNDS, SPACE_LANDING_SITE } from "../world/space.js";
+import { insideBubbleArena } from "../world/bubble-arena.js";
 import { ROCKET_BOUNDS, ROCKET_SITE } from "../world/rocket.js";
 export class UI {
   constructor() {
@@ -52,7 +53,9 @@ export class UI {
     }
     const name =
       area.id === "space"
-        ? player.position.x < -120 && player.position.x > -760 &&
+        ? insideBubbleArena(player.position)
+          ? "Bubble Basin"
+          : player.position.x < -120 && player.position.x > -760 &&
             player.position.z > -710 && player.position.z < 680
           ? "Moonbeam Rally"
           : player.position.x < -32 && player.position.x > -84 &&

@@ -1,16 +1,16 @@
 .race-hud {
   position: fixed;
   z-index: 16;
-  top: 86px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(92vw, 580px);
-  padding: 12px 18px;
+  top: max(108px, calc(env(safe-area-inset-top) + 96px));
+  right: max(12px, env(safe-area-inset-right));
+  width: min(260px, calc(100vw - 24px));
+  box-sizing: border-box;
+  padding: 12px;
   border: 1px solid #a9efdb;
   border-radius: 20px;
   background: #152b40f2;
   color: #f7f6ec;
-  text-align: center;
+  text-align: left;
 }
 .race-eyebrow {
   display: block;
@@ -20,11 +20,11 @@
 }
 .race-phase {
   display: block;
-  font-size: 22px;
+  font-size: 18px;
   margin: 4px 0;
 }
 .race-info {
-  font-size: 14px;
+  font-size: 13px;
   margin: 6px 0;
 }
 .race-help {
@@ -49,11 +49,13 @@
   accent-color: #a7edd8;
   border: 0;
 }
-.race-hud > div {
+.race-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 7px;
+}
+.race-actions[hidden] {
+  display: none;
 }
 .race-hud button {
   min-height: 44px;
@@ -66,6 +68,25 @@
   font-weight: 700;
   font-size: 13px;
 }
+.race-options {
+  width: 100%;
+  margin-top: 8px;
+}
+.race-hud:not([data-race-state="racing"]) .race-options,
+.race-hud[data-race-state="racing"] .race-eyebrow,
+.race-hud[data-race-state="racing"] .race-help {
+  display: none;
+}
+.race-hud[data-race-state="racing"] {
+  padding: 9px 12px;
+  background: #152b40e8;
+}
+.race-hud[data-race-state="racing"] .race-phase {
+  font-size: 16px;
+}
+.race-hud[data-race-state="racing"] .race-info {
+  margin: 4px 0;
+}
 .race-hud button[aria-pressed="true"] {
   background: #afe5d1;
   border: 2px solid #e5fbe9;
@@ -75,7 +96,7 @@
 }
 @media (max-height: 600px) {
   .race-hud {
-    top: 72px;
+    top: max(74px, calc(env(safe-area-inset-top) + 68px));
     padding: 7px 12px;
   }
   .race-help {
@@ -83,5 +104,19 @@
   }
   .race-phase {
     font-size: 18px;
+  }
+}
+@media (max-width: 650px) {
+  .race-hud {
+    width: min(174px, calc(100vw - 16px));
+    right: max(8px, env(safe-area-inset-right));
+    padding: 9px;
+  }
+  .race-hud .race-info,
+  .race-hud .race-help {
+    font-size: 12px;
+  }
+  .race-hud button {
+    width: 100%;
   }
 }

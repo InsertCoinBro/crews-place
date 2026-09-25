@@ -762,7 +762,10 @@ dialog .primary {
 
 @media (pointer: coarse), (max-width: 900px) {
   #alien-hud {
-    --alien-hud-bottom: max(220px, calc(env(safe-area-inset-bottom) + 200px));
+    --alien-hud-bottom: max(170px, calc(env(safe-area-inset-bottom) + 160px));
+  }
+  #alien-fire {
+    display: none;
   }
   #mobile-controls {
     position: absolute;
@@ -998,7 +1001,8 @@ dialog .primary {
   color: #284c32;
   cursor: pointer;
 }
-#alien-fire {
+#alien-fire,
+#alien-exit {
   min-height: 44px;
   padding: 8px 20px;
   margin: 4px;
@@ -1010,12 +1014,16 @@ dialog .primary {
   cursor: pointer;
 }
 #alien-fire:focus-visible,
+#alien-exit:focus-visible,
 #alien-toggle:focus-visible {
   outline: 3px solid #f4d982;
   outline-offset: 3px;
 }
 #alien-fire:disabled {
   opacity: 0.5;
+}
+body:has(#alien-hud:not([hidden])) .controls {
+  visibility: hidden;
 }
 
 .spaceship-hud {

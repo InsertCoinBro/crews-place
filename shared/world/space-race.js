@@ -402,7 +402,7 @@ export class SpaceRace {
     this.hud.hidden = true;
     this.hud.setAttribute("aria-label", "Moonbeam Rally race controls");
     this.hud.innerHTML =
-      '<span class="race-eyebrow">MOONBEAM RALLY</span><strong class="race-phase" role="status"></strong><p class="race-info"></p><progress class="race-progress" max="100" value="0" aria-label="Race progress"></progress><p class="race-help"><span class="race-help-keys">A/D or ←/→ steer · W accelerates · S brakes.</span><span class="race-help-touch">Thumbstick: left/right to steer, down to brake.</span> Jumps are automatic.</p><div><button class="race-start">Start race · E</button><button class="race-auto" aria-pressed="true">Auto-accelerate</button><button class="race-gentle" aria-pressed="false">Gentler motion</button><button class="race-exit">Exit safely</button></div>';
+      '<span class="race-eyebrow">MOONBEAM RALLY</span><strong class="race-phase" role="status"></strong><p class="race-info"></p><progress class="race-progress" max="100" value="0" aria-label="Race progress"></progress><p class="race-help"><span class="race-help-keys">A/D or ←/→ steer · W accelerates · S brakes.</span><span class="race-help-touch">Thumbstick: left/right to steer, down to brake.</span> Jumps are automatic.</p><button class="race-options" aria-expanded="false" aria-controls="race-actions">Controls</button><div class="race-actions" id="race-actions"><button class="race-start">Start race · E</button><button class="race-auto" aria-pressed="true">Auto-accelerate</button><button class="race-gentle" aria-pressed="false">Gentler motion</button><button class="race-exit">Exit safely</button></div>';
     document.querySelector("#game").append(this.hud);
     this.phaseText = this.hud.querySelector(".race-phase");
     this.info = this.hud.querySelector(".race-info");
@@ -422,6 +422,9 @@ export class SpaceRace {
     });
     act(".race-gentle", () => {
       this.gentle = !this.gentle;
+    });
+    act(".race-options", () => {
+      this.optionsExpanded = !this.optionsExpanded;
     });
   }
   board() {
@@ -446,6 +449,7 @@ export class SpaceRace {
     this.run.reset();
     this.resultShown = false;
     this.cameraReady = false;
+    this.optionsExpanded = false;
     g.player.inVehicle = true;
     g.player.velocity.set(0, 0);
     g.player.velocityY = 0;
@@ -479,6 +483,7 @@ export class SpaceRace {
       this.cameraReady = false;
     }
     if (this.run.start()) {
+      this.optionsExpanded = false;
       this.game.input.clear();
       this.game.audio?.oneShot("confirm", 0.16);
       this.placeKarts();
@@ -567,6 +572,14 @@ export class SpaceRace {
     const state = this.run.state,
       r = this.run.racers[0],
       place = ["", "1st", "2nd", "3rd"][this.run.place];
+    const racing = state === "racing" || state === "countdown";
+    this.hud.dataset.raceState = racing ? "racing" : state;
+    const options = this.hud.querySelector(".race-options");
+    const actions = this.hud.querySelector(".race-actions");
+    options.hidden = !racing;
+    options.setAttribute("aria-expanded", String(racing && this.optionsExpanded));
+    options.textContent = this.optionsExpanded ? "Hide controls" : "Controls";
+    actions.hidden = racing && !this.optionsExpanded;
     const title =
       state === "ready"
         ? "Ready when you are"

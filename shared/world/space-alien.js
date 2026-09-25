@@ -14,8 +14,14 @@ export function inAlienSafeZone(p) {
 // cells after Space expanded and stalled the main thread during every replan.
 export function alienPath(from, to, area) {
   const clearance = RADIUS + 0.72;
+  const safeZone = area.alienSafeZone ?? inAlienSafeZone;
   const clear = (p) =>
-    !inAlienSafeZone(p) &&
+    !safeZone(p) &&
+    (!area.bounds ||
+      (p.x >= area.bounds.minX + RADIUS &&
+        p.x <= area.bounds.maxX - RADIUS &&
+        p.z >= area.bounds.minZ + RADIUS &&
+        p.z <= area.bounds.maxZ - RADIUS)) &&
     !area.colliders.some(
       (c) =>
         (c.minY ?? 0) < area.groundY + 1.9 &&
@@ -168,6 +174,8 @@ export class SpaceAlien {
     dt = Math.min(Math.max(dt, 0), 0.05);
     const a = this.model.animator,
       p = g.player.position;
+    const area = this.navigationArea ?? g.area;
+    const safeZone = area.alienSafeZone ?? inAlienSafeZone;
     const syncVisibility = () => {
       this.model.visible =
         this.model.position.distanceToSquared(p) <= ALIEN_RENDER_DISTANCE ** 2;
@@ -177,9 +185,7 @@ export class SpaceAlien {
       if (syncVisibility()) a.mixer.update(dt);
     };
     const safe =
-      inAlienSafeZone(p) ||
-      g.playground?.active ||
-      Math.abs(p.y - g.area.groundY) > 2;
+      safeZone(p) || g.playground?.active || Math.abs(p.y - g.area.groundY) > 2;
     if (!this.enabled || safe || this.state === "tagged") {
       if (this.state !== "tagged") this.state = "waiting";
       a.play(this.state === "tagged" ? "Wave" : "Idle");
@@ -200,7 +206,7 @@ export class SpaceAlien {
       p.z - this.model.position.z,
     );
     // Avoid tagging through walls, or reaching a player above the alien.
-    const blocked = g.area.colliders.some((c) => {
+    const blocked = area.colliders.some((c) => {
       for (let i = 0; i <= 5; i++) {
         const t = i / 5;
         if (
@@ -229,7 +235,7 @@ export class SpaceAlien {
     this.state = "chasing";
     this.pathTime -= dt;
     if (this.pathTime <= 0) {
-      this.path = alienPath(this.model.position, p, g.area);
+      this.path = alienPath(this.model.position, p, area);
       this.pathTime = 0.8;
     }
     while (
@@ -254,12 +260,11 @@ export class SpaceAlien {
           this.model.position,
           (dx / d) * distance,
           (dz / d) * distance,
-          g.area.colliders,
-          g.area.bounds,
+          area.colliders,
+          area.bounds,
           RADIUS,
         );
-        if (inAlienSafeZone(this.model.position))
-          this.model.position.copy(before);
+        if (safeZone(this.model.position)) this.model.position.copy(before);
         this.model.rotation.y = Math.atan2(dx, dz);
         moved = this.model.position.distanceTo(before);
       }
