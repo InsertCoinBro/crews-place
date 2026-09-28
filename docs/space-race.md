@@ -2,7 +2,7 @@
 
 A 3.88 km hover-kart circuit on the west side of the expanded moon. The boarding
 plaza is at `(-141, 80)`; mint approach lights lead west from the space hub.
-The route stays clear of the central playground, rocket and ship docks, and
+The route stays clear of the rocket and ship docks, and
 the eastern tube slide. Colored shoulders and raised edges mark the full track.
 
 The selected player races the Moon Mischief aliens Nova and Pip. Their speeds
@@ -32,8 +32,8 @@ count saved in this browser. Other finishes receive an encouraging completion
 message and can retry. If browser storage is unavailable, awards still work
 for the current visit. Avatar and area changes restore walking and clear the race.
 
-The playground no longer overwrites the expanded moon's western/southern bounds;
-this fixes access to the race plaza and preserves the full spaceship flight area.
+The expanded moon's western and southern bounds remain accessible, preserving
+the race plaza and full spaceship flight area.
 
 Development previews: `/?space-race-preview` and `/?space-race-test`. The latter
 checks full races with all three avatars, every jump, win and non-win rewards,

@@ -61,7 +61,7 @@ The controls guide and contextual prompts remain on screen. The game pauses when
 
 Space Dive's station is north of Rainbow Rush at `(59, -118)`. Follow the path along the east side of Rainbow Rush, then turn toward the Space Dive sign. Press **E** to board, press **E** again or use **Launch ride**, and use **C** to switch between following the carts and a front-seat view.
 
-The continuous track climbs to about 222 meters, passes above the existing moon and Starlight Playground for roughly 13 seconds, then dives back to its starting station. The full ride takes about 43 seconds. The sky, stars, planet, and lighting change as the character climbs and descends. Pause works throughout, and **Return to station** provides an early exit. Gentler motion keeps the camera upright.
+The continuous track climbs to about 222 meters, passes above the existing moon for roughly 13 seconds, then dives back to its starting station. The full ride takes about 43 seconds. The sky, stars, planet, and lighting change as the character climbs and descends. Pause works throughout, and **Return to station** provides an early exit. Gentler motion keeps the camera upright.
 
 For local development, `/?space-dive-preview` starts beside its boarding area. `/?space-dive-test` provides a button to run the browser integration checks.
 

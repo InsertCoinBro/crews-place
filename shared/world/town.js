@@ -100,7 +100,7 @@ export function buildTown(scene, interactions) {
     box(g, b.x, 0.015, b.z + b.d / 2 + 2, b.w * 0.42, 0.07, 4, 0xe8ddbf);
   }
   for (const b of BUILDINGS.filter((b) =>
-    ["arcade", "library", "rec"].includes(b.id),
+    ["arcade", "library", "rec", "cafe"].includes(b.id),
   )) {
     interactions.register({
       id: b.id + "-door",
@@ -115,7 +115,9 @@ export function buildTown(scene, interactions) {
           ? "Star Arcade"
           : b.id === "library"
             ? "Little Library"
-            : "Recreation Club"),
+            : b.id === "cafe"
+              ? "Sunny Side Café"
+              : "Recreation Club"),
       hint: "Come on in",
     });
     cylinder(g, b.x, 0.07, b.z + b.d / 2 + 1, 0.9, 0.9, 0.05, 0xf8d77f, 24);

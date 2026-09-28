@@ -38,7 +38,6 @@ function game(template) {
       mode: "playing",
       player: { position: new THREE.Vector3(0, 180, 12) },
       ui: { toast() {} },
-      playground: { active: false },
       calm: false,
     };
   g.alien = new SpaceAlien(g, template);
@@ -157,15 +156,11 @@ test("long open-space routes stay compact after the one-mile expansion", () => {
   const path = alienPath({ x: -803, z: -420 }, { x: -20, z: 0 }, a);
   assert.deepEqual(path, [{ x: -20, z: 0 }]);
 });
-test("playground participation suspends chasing and gentle mode slows movement", async () => {
+test("gentle mode slows alien movement", async () => {
   const g = game(await alien()),
     c = g.alien;
   g.player.position.set(-25, 180, 12);
   c.delay = 0;
-  g.playground.active = true;
-  c.update(0.05);
-  assert.equal(c.model.position.x, -9);
-  g.playground.active = false;
   c.update(0.05);
   const fast = c.model.position.distanceTo(new THREE.Vector3(-9, 180, 12));
   c.reset();
@@ -174,11 +169,8 @@ test("playground participation suspends chasing and gentle mode slows movement",
   c.update(0.05);
   assert.ok(c.model.position.distanceTo(new THREE.Vector3(-9, 180, 12)) < fast);
 });
-test("alien spawn and routes work against the actual moon and playground colliders", async () => {
+test("alien spawn and routes work against the actual moon colliders", async () => {
   const { buildSpace } = await import("../shared/world/space.js");
-  const { SpacePlayground } = await import(
-    "../shared/world/space-playground.js"
-  );
   const previous = globalThis.document;
   const element = () => ({
     getContext: () => ({ fillRect() {}, fillText() {} }),
@@ -190,25 +182,15 @@ test("alien spawn and routes work against the actual moon and playground collide
   try {
     const scene = new THREE.Scene(),
       a = buildSpace(scene);
-    const g = {
-      scene,
-      areas: { space: a },
-      interactions: { register() {}, on() {} },
-      ui: {},
-      player: {},
-    };
-    // Playground scene construction is exercised in its own integration checks;
-    // its colliders are added by the same constructor used in the game.
-    new SpacePlayground(g);
     assert.equal(
       a.bounds.minX,
       -805,
-      "playground must preserve the expanded west moon",
+      "expanded west moon remains playable",
     );
     assert.equal(
       a.bounds.maxZ,
       805,
-      "playground must preserve the expanded south moon",
+      "expanded south moon remains playable",
     );
     const spawn = { x: -9, z: 12 };
     assert.ok(

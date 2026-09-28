@@ -1,3 +1,4 @@
+import { buildCafe } from "./shared/world/cafe.js";
 import { SpaceCombat } from "./shared/world/space-combat.js";
 import { BUBBLE_ARENA_EXIT } from "./shared/world/bubble-arena.js";
 import * as THREE from "three";
@@ -37,10 +38,6 @@ import { LibraryReader } from "./games/library.js";
 import { CornMaze, MAZE_START } from "./shared/world/corn-maze.js";
 import { Farm, FARM_SITE } from "./shared/world/farm.js";
 import { buildSpace } from "./shared/world/space.js";
-import {
-  SpacePlayground,
-  PLAYGROUND,
-} from "./shared/world/space-playground.js";
 import {
   buildAirfield,
   FlyablePlane,
@@ -132,6 +129,7 @@ class Game {
       arcade: buildInterior(this.scene, this.interactions, "arcade", 100),
       library: buildInterior(this.scene, this.interactions, "library", 130),
       rec: buildInterior(this.scene, this.interactions, "rec", 160),
+      cafe: buildCafe(this.scene, this.interactions),
       space: buildSpace(this.scene),
     };
     this.area = town;
@@ -199,7 +197,6 @@ class Game {
       hint: "Walk forward up the golden rungs",
     });
     this.rocketCameraReady = false;
-    this.playground = new SpacePlayground(this);
     this.rocketReturnInteraction = this.interactions.register({
       id: "starbound-rocket-return",
       area: "rocket-in-transit",
@@ -230,6 +227,7 @@ class Game {
       this.pickups.reset();
       this.arcade.launch(item);
     });
+    this.interactions.on("cafePortal", () => this.enterCafePortal());
     this.interactions.on("book", (item) => this.library.open(item.bookId));
     this.interactions.on("door", (item) => this.enter(item.target, item.spawn));
     this.interactions.on("destination", (item) =>
@@ -413,7 +411,6 @@ class Game {
     if (this.coaster?.occupied) this.coaster.exit();
     if (this.spaceDive?.occupied) this.spaceDive.exit();
     this.cornMaze?.exit();
-    this.playground?.exit();
     this.pickups.reset();
     this.player.setModel(this.characters.get(id));
     if (this.driving || this.flying || this.mode === "rocket")
@@ -656,6 +653,12 @@ class Game {
       }
     }
   }
+  enterCafePortal() {
+    if (this.area.id !== "cafe" || this.mode !== "playing") return;
+    const destination = this.spaceship.boardingPoint;
+    this.enter("space", [destination.x, destination.z]);
+    this.ui.toast("Welcome to Space! The spacecraft is right beside you.");
+  }
   enter(id, spawn) {
     const next = this.areas[id];
     if (!next) return;
@@ -663,7 +666,6 @@ class Game {
     this.spaceTube?.exit();
     this.spaceship?.exit();
     this.cornMaze?.exit();
-    this.playground?.exit();
     this.farm?.closeSign();
     this.pickups.reset();
     this.area.group.visible = false;
@@ -689,9 +691,9 @@ class Game {
     this.scene.fog.near = environment?.fogNear ?? 105;
     this.scene.fog.far = environment?.fogFar ?? 235;
     this.renderer.toneMappingExposure = environment?.exposure ?? 1.25;
-    this.scene.environmentIntensity = id === "space" ? 0.3 : 1;
-    this.skyLight.intensity = id === "space" ? 0.35 : 2.2;
-    this.sun.intensity = id === "space" ? 1.1 : 3.2;
+    this.scene.environmentIntensity = environment?.environmentIntensity ?? (id === "space" ? 0.3 : 1);
+    this.skyLight.intensity = environment?.skyIntensity ?? (id === "space" ? 0.35 : 2.2);
+    this.sun.intensity = environment?.sunIntensity ?? (id === "space" ? 1.1 : 3.2);
     this.ui.showPrompt(null);
     if (id !== "town") this.audio.oneShot("doorOpen", 0.18);
     this.ui.toast(
@@ -703,6 +705,7 @@ class Game {
       this.audio.stopAll();
       return;
     }
+    if (this.mode === "playing") this.area.updatePortal?.(dt, this.calm);
     this.spaceship.update(this.mode === "playing" ? dt : 0);
     this.spaceTube.update(this.mode === "playing" ? dt : 0);
     this.spaceRace.update(this.mode === "playing" ? dt : 0);
@@ -726,9 +729,6 @@ class Game {
       } else if (this.spaceTube.occupied) {
         this.ui.showPrompt(null);
       } else if (this.spaceship.occupied) {
-        this.ui.showPrompt(null);
-      } else if (this.playground.active) {
-        this.playground.update(dt);
         this.ui.showPrompt(null);
       } else if (this.spaceDive.occupied) {
         this.spaceDive.update(dt);
@@ -833,6 +833,7 @@ class Game {
         );
       } else {
         event = this.player.update(dt, this.input, this.follow.yaw, this.area);
+        if (this.area.containsPortal?.(this.player.position)) this.enterCafePortal();
         if (this.area.id === "town")
           this.pickups.update(dt, this.player, this.input, this.area);
         const pickupHint = document.querySelector("#pickup-hint");
@@ -861,36 +862,28 @@ class Game {
           this.player,
           this.input,
           this.area,
-          this.playground.active
+          this.cornMaze.occupied
             ? {
-                distance: this.playground.active === "slide" ? 15 : 11,
-                targetHeight: 2,
-                ...(this.playground.active === "slide"
-                  ? { yaw: Math.PI + 0.5, turnRate: 2 }
-                  : {}),
+                yaw: this.cornMaze.model.rotation.y + Math.PI,
+                distance: 10,
+                targetHeight: 3.3,
+                turnRate: 5,
               }
-            : this.cornMaze.occupied
+            : this.flying
               ? {
-                  yaw: this.cornMaze.model.rotation.y + Math.PI,
-                  distance: 10,
-                  targetHeight: 3.3,
-                  turnRate: 5,
+                  yaw: this.plane.cameraYaw(),
+                  distance: 13.5,
+                  targetHeight: 1.15,
+                  turnRate: 6.5,
                 }
-              : this.flying
+              : this.driving
                 ? {
-                    yaw: this.plane.cameraYaw(),
-                    distance: 13.5,
-                    targetHeight: 1.15,
-                    turnRate: 6.5,
+                    yaw: this.vehicle.cameraYaw(),
+                    distance: 8.8,
+                    targetHeight: 1.55,
+                    turnRate: 7.5,
                   }
-                : this.driving
-                  ? {
-                      yaw: this.vehicle.cameraYaw(),
-                      distance: 8.8,
-                      targetHeight: 1.55,
-                      turnRate: 7.5,
-                    }
-                  : undefined,
+                : this.area.cameraView,
         );
       if (event === "bounce") {
         this.bouncePulse = 1;
@@ -1035,6 +1028,14 @@ async function boot() {
     selected,
     horseResult.status === "fulfilled" ? horseResult.value : null,
   );
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-test")) {
+    const { runCafeChecks } = await import("./tests/cafe-browser-checks.js");
+    runCafeChecks(game);
+  }
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-preview")) {
+    game.start();
+    game.enter("cafe");
+  }
   if (
     import.meta.env.DEV &&
     new URLSearchParams(location.search).has("audio-test")
@@ -1189,30 +1190,6 @@ async function boot() {
     game.player.teleport(SPACE_LANDING_SITE.x + 3, SPACE_LANDING_SITE.z + 2);
     game.player.position.y = SPACE_ALTITUDE;
     game.player.sync();
-  }
-  if (
-    import.meta.env.DEV &&
-    new URLSearchParams(location.search).has("playground-preview")
-  ) {
-    game.start();
-    game.enter("space", PLAYGROUND.entrance);
-    game.follow.reset(Math.PI / 2);
-    const ride = new URLSearchParams(location.search).get("ride");
-    const item = game.interactions.items.find(
-      (i) => i.id === `playground-${ride}`,
-    );
-    if (item) {
-      game.player.teleport(item.x, item.z, SPACE_ALTITUDE);
-      game.follow.reset(0);
-    }
-  }
-  if (
-    import.meta.env.DEV &&
-    new URLSearchParams(location.search).has("playground-test")
-  ) {
-    import("./tests/playground-browser-checks.js").then((m) =>
-      m.runPlaygroundChecks(game),
-    );
   }
   if (
     import.meta.env.DEV &&

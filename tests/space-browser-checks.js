@@ -44,6 +44,25 @@ export function runSpaceChecks(game) {
     assert(game.renderer.getContext().getError() === 0, "WebGL error");
   });
 
+  check("Removed playground leaves Space and other attractions intact", () => {
+    assert(
+      !game.area.group.getObjectByName("space-playground"),
+      "playground geometry remains",
+    );
+    assert(
+      !game.interactions.items.some((item) => item.kind === "playground"),
+      "playground interaction remains",
+    );
+    assert(
+      !document.querySelector(".playground-controls"),
+      "playground controls remain",
+    );
+    assert(
+      game.spaceship.model && game.spaceTube.group && game.spaceRace.group,
+      "another Space attraction was removed",
+    );
+  });
+
   check("The character can walk and jump on the space surface", () => {
     const beforeZ = game.player.position.z;
     key("KeyW");

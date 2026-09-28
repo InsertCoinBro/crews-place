@@ -278,7 +278,6 @@ export class SpaceCombat {
       insideBubbleArena(g.player.position, 1.1) &&
       Math.abs(g.player.position.y - g.area.groundY) < 8 &&
       g.mode === "playing" &&
-      !g.playground?.active &&
       !g.spaceDive?.occupied &&
       !g.player.inVehicle
     );

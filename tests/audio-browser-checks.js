@@ -161,27 +161,6 @@ export function addAudioChecks(game) {
         "Plane uses the shared recording mixer",
       );
       game.exitPlane();
-      game.enter("space");
-      for (const ride of ["swing", "spinner", "slide"]) {
-        await clear();
-        game.playground.enter(ride);
-        if (ride === "slide") {
-          await mix();
-          check(
-            !a.loops.get("slide")?.voice,
-            "Slide lift is silent before descent",
-          );
-          game.playground.update(8);
-        }
-        await mix();
-        check(
-          a.loops.get(ride)?.voice,
-          `${ride}: sound starts during movement`,
-        );
-        game.playground.exit();
-        await mix();
-        check(!a.loops.get(ride)?.voice, `${ride}: exit stops sound`);
-      }
       game.enter("town");
       game.player.teleport(0, 110);
       await clear();

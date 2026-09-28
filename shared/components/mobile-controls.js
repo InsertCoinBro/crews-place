@@ -219,22 +219,13 @@ export class MobileControls {
       this.game.flying ||
       this.game.cornMaze?.occupied ||
       this.game.spaceTube?.occupied;
-    jump.textContent = this.game.spaceship?.occupied
-      ? "Rise"
-      : this.game.playground?.active === "float"
-        ? "Float up"
-        : "Jump";
-    secondary.textContent = this.game.spaceship?.occupied
-      ? "Lower"
-      : this.game.playground?.active === "float"
-        ? "Float down"
-        : "View";
+    jump.textContent = this.game.spaceship?.occupied ? "Rise" : "Jump";
+    secondary.textContent = this.game.spaceship?.occupied ? "Lower" : "View";
     secondary.hidden = !(
       this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||
       this.game.coaster?.occupied ||
-      this.game.spaceDive?.occupied ||
-      this.game.playground?.active === "float"
+      this.game.spaceDive?.occupied
     );
     restart.hidden = true;
     enter.hidden = true;
@@ -247,7 +238,6 @@ export class MobileControls {
       this.game.driving ||
       this.game.flying ||
       this.game.cornMaze?.occupied ||
-      this.game.playground?.active ||
       this.game.coaster?.occupied ||
       this.game.spaceDive?.occupied
     );
@@ -257,7 +247,6 @@ export class MobileControls {
       this.game.flying ||
       this.game.driving ||
       this.game.cornMaze?.occupied ||
-      this.game.playground?.active ||
       this.game.coaster?.occupied ||
       this.game.spaceDive?.occupied
     );

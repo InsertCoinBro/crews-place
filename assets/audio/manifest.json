@@ -83,6 +83,6 @@
     "nature": ["leaf pile burst", "leaves settling", "fountain ambience", "park ambience placeholder"],
     "space": ["rocket launch", "rocket ascent", "spaceship engine", "thrusters", "spaceship doors", "bubble launcher", "alien bubble/force field", "space ambience"],
     "rides": ["Rainbow Rush chain lift", "coaster boarding placeholder", "coaster arrival placeholder", "Space Dive launch placeholder", "ride wind placeholder"],
-    "still_needs_dedicated_source": ["trampoline spring", "coaster wheels/rail", "Space Dive wind", "tractor engine", "car engine", "traffic ambience", "horse/animal ambience", "rain", "snow", "wind", "playground swing", "playground spinner", "playground slide", "flight hoop pass"]
+    "still_needs_dedicated_source": ["trampoline spring", "coaster wheels/rail", "Space Dive wind", "tractor engine", "car engine", "traffic ambience", "horse/animal ambience", "rain", "snow", "wind", "flight hoop pass"]
   }
 }

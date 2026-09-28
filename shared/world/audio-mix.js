@@ -91,28 +91,6 @@ export function mixWorldAudio(game, weather) {
     "ambience",
   );
 
-  const ride = game.playground.active;
-  a.setLoop(
-    "swing",
-    ride === "swing",
-    0.35,
-    SOURCES.swing,
-    0.75 + game.playground.speed * 0.4,
-  );
-  a.setLoop(
-    "spinner",
-    ride === "spinner",
-    0.2,
-    SOURCES.spinner,
-    0.65 + game.playground.speed * 0.4,
-  );
-  a.setLoop(
-    "slide",
-    ride === "slide" && game.playground.time >= 4,
-    0.28,
-    SOURCES.slide,
-  );
-
   const coaster = game.coaster.ride;
   const running = coaster.state === "riding";
   const roll = unit(coaster.speed / 29);

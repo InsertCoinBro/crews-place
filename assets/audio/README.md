@@ -17,13 +17,13 @@ This folder is the audio library used by Crew's Place. Files are grouped by inte
 - `sfx/nature/` — leaves and fountain ambience.
 - `sfx/space/` — doors, engines, thrusters, bubble/beam, rocket cues.
 - `sfx/interactions/` — pickup, reward, navigation, and positive feedback tones.
-- `sfx/realistic/` — farm animals, coaster wheels and chain, car and tractor engines, rocket, propeller, weather, playground, and ride ambience.
+- `sfx/realistic/` — farm animals, coaster wheels and chain, car and tractor engines, rocket, propeller, weather, and ride ambience. Older playground recordings remain in the source catalog but are not used by the game.
 
 ## Important implementation notes
 
 The runtime mixer starts sounds from the player's proximity or active ride state, then fades, pitches, and ducks them through one shared Web Audio graph. Animal calls are scheduled independently, so the player can hear the nearby animal rather than a single farm-wide loop. The pause dialog includes master volume, ambience volume, mute, and gentler-sounds controls.
 
-The rolling foley recording supplies both coaster wheels and the quieter playground spinner. Snow uses a soft outdoor breeze. Rabbit audio is movement in bedding. Rocket thrust uses a processed NASA-derived shuttle recording. The approved trampoline, landing/jump, and bubble effects are retained, along with short interface and fictional spaceship effects.
+The rolling foley recording supplies coaster wheels. Snow uses a soft outdoor breeze. Rabbit audio is movement in bedding. Rocket thrust uses a processed NASA-derived shuttle recording. The approved trampoline, landing/jump, and bubble effects are retained, along with short interface and fictional spaceship effects.
 
 Sound preferences are saved independently of motion preferences. Background volume includes animal calls, traffic, fountain, and weather. World mute remains accessible during rocket travel; narrated lessons retain their separate controls.
 

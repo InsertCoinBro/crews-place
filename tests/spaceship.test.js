@@ -66,7 +66,6 @@ async function setup(id = "cowboy") {
       on() {},
     },
     ui: { toast() {}, showPrompt() {} },
-    playground: { active: null },
   };
   const ship = new Spaceship(game);
   game.spaceship = ship;

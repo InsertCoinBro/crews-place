@@ -186,7 +186,7 @@ export class SpaceAlien {
       if (syncVisibility()) a.mixer.update(dt);
     };
     const safe =
-      safeZone(p) || g.playground?.active || Math.abs(p.y - g.area.groundY) > 2;
+      safeZone(p) || Math.abs(p.y - g.area.groundY) > 2;
     if (!this.enabled || safe || this.state === "tagged") {
       if (this.state !== "tagged") this.state = "waiting";
       a.play(this.state === "tagged" ? "Wave" : "Idle");

@@ -70,14 +70,6 @@ export const SOURCES = Object.freeze({
     "../../assets/audio/sfx/realistic/ride-wind.mp3",
     import.meta.url,
   ).href,
-  swing: new URL("../../assets/audio/sfx/realistic/swing.mp3", import.meta.url)
-    .href,
-  slide: new URL("../../assets/audio/sfx/realistic/slide.mp3", import.meta.url)
-    .href,
-  spinner: new URL(
-    "../../assets/audio/sfx/realistic/coaster-roll.mp3",
-    import.meta.url,
-  ).href,
   fountain: new URL(
     "../../assets/audio/sfx/realistic/fountain.mp3",
     import.meta.url,

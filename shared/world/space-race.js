@@ -433,8 +433,7 @@ export class SpaceRace {
       this.occupied ||
       g.mode !== "playing" ||
       g.area.id !== "space" ||
-      g.player.inVehicle ||
-      g.playground?.active
+      g.player.inVehicle
     )
       return false;
     g.pickups?.reset();

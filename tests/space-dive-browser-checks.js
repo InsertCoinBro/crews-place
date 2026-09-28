@@ -86,7 +86,7 @@ function executeChecks(game) {
     assert(ride.ride.distance > d, "resume failed");
   });
   check(
-    "Continuous ascent reveals the existing moon, planet, and playground",
+    "Continuous ascent reveals the existing moon and planet",
     () => {
       let budget = 4000;
       while (ride.ride.distance < ride.track.panoramaStart + 10 && budget--)

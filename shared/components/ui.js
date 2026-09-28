@@ -58,9 +58,6 @@ export class UI {
           : player.position.x < -120 && player.position.x > -760 &&
             player.position.z > -710 && player.position.z < 680
           ? "Moonbeam Rally"
-          : player.position.x < -32 && player.position.x > -84 &&
-              player.position.z > -38 && player.position.z < 65
-            ? "Starlight Playground"
             : area.name
         : player.position.x < -90 && player.position.z > -50
           ? "Harvest Corn Maze"
@@ -178,7 +175,7 @@ export class UI {
       c.restore();
       document.querySelector("#map-title").textContent = "SPACE ZONE";
       document.querySelector("#map-caption").textContent =
-        "Rocket & playground";
+        "Rocket & moon activities";
       document
         .querySelector("#map")
         .setAttribute(

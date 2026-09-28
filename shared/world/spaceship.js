@@ -209,8 +209,7 @@ export class Spaceship {
       this.occupied ||
       g.mode !== "playing" ||
       g.area.id !== "space" ||
-      g.player.inVehicle ||
-      g.playground?.active
+      g.player.inVehicle
     )
       return false;
     this.savedParent = g.player.model.parent;
