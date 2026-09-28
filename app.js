@@ -1,4 +1,4 @@
-import { buildCafe } from "./shared/world/cafe.js";
+import { buildCafe, buildSpaceCafePortal } from "./shared/world/cafe.js";
 import { SpaceCombat } from "./shared/world/space-combat.js";
 import { BUBBLE_ARENA_EXIT } from "./shared/world/bubble-arena.js";
 import * as THREE from "three";
@@ -132,6 +132,7 @@ class Game {
       cafe: buildCafe(this.scene, this.interactions),
       space: buildSpace(this.scene),
     };
+    buildSpaceCafePortal(this.areas.cafe, this.areas.space, this.interactions);
     this.area = town;
     this.player = new Player(this.scene, characters.get(initialCharacter));
     this.pickups = new Pickups(town.group);
@@ -654,7 +655,13 @@ class Game {
     }
   }
   enterCafePortal() {
-    if (this.area.id !== "cafe" || this.mode !== "playing") return;
+    if (this.mode !== "playing") return;
+    if (this.area.id === "space") {
+      this.enter("cafe", this.areas.cafe.portalReturnSpawn);
+      this.ui.toast("Welcome back to Sunny Side Café!");
+      return;
+    }
+    if (this.area.id !== "cafe") return;
     const destination = this.spaceship.boardingPoint;
     this.enter("space", [destination.x, destination.z]);
     this.ui.toast("Welcome to Space! The spacecraft is right beside you.");
@@ -1031,6 +1038,11 @@ async function boot() {
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-test")) {
     const { runCafeChecks } = await import("./tests/cafe-browser-checks.js");
     runCafeChecks(game);
+  }
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-return-preview")) {
+    game.start();
+    const portal = game.areas.space.group.getObjectByName("space-cafe-portal");
+    game.enter("space", [portal.position.x, portal.position.z + 6]);
   }
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-preview")) {
     game.start();

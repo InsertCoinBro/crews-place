@@ -1,20 +1,23 @@
 import * as THREE from "three";
 import { createArea, BUILDINGS } from "./town.js";
 import { box, collider, label } from "./models.js";
+import { SHIP_EXIT } from "./spaceship.js";
 
 export function buildCafe(scene, interactions, origin = 190) {
+  const portalZ = -3;
   const area = createArea(
     "cafe",
     "Sunny Side Café",
     {
       minX: origin - 7,
       maxX: origin + 7,
-      minZ: -9,
+      minZ: -13,
       maxZ: 9,
     },
     true,
   );
   area.spawn = [origin, 3.5];
+  area.portalReturnSpawn = [origin, portalZ + 2];
   area.cameraView = { targetHeight: 2, distance: 5 };
   area.environment = {
     background: 0x000000,
@@ -28,10 +31,10 @@ export function buildCafe(scene, interactions, origin = 190) {
   area.group.visible = false;
   const black = new THREE.MeshBasicMaterial({ color: 0x000000 });
   for (const [x, y, z, w, h, d] of [
-    [origin, -0.12, 0, 14, 0.2, 18],
-    [origin, 2.5, -9, 14, 5, 0.3],
-    [origin - 7, 2.5, 0, 0.3, 5, 18],
-    [origin + 7, 2.5, 0, 0.3, 5, 18],
+    [origin, -0.12, -2, 14, 0.2, 22],
+    [origin, 2.5, -13, 14, 5, 0.3],
+    [origin - 7, 2.5, -2, 0.3, 5, 22],
+    [origin + 7, 2.5, -2, 0.3, 5, 22],
     [origin, 2.5, 9, 14, 5, 0.3],
   ]) {
     const mesh = box(area.group, x, y, z, w, h, d, 0x000000);
@@ -75,14 +78,14 @@ export function buildCafe(scene, interactions, origin = 190) {
   });
   const portal = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 4.2), material);
   portal.name = "cafe-space-portal";
-  portal.position.set(origin, 2.1, 0);
+  portal.position.set(origin, 2.1, portalZ);
   area.group.add(portal);
   interactions.register({
     id: "cafe-space-portal",
     area: "cafe",
     kind: "cafePortal",
     x: origin,
-    z: 0,
+    z: portalZ,
     radius: 2.7,
     label: "Enter the Space portal",
     hint: "Walk into the swirl or press E",
@@ -92,8 +95,39 @@ export function buildCafe(scene, interactions, origin = 190) {
   };
   area.containsPortal = (position) =>
     Math.abs(position.x - origin) < 1.15 &&
-    Math.abs(position.z) < 0.65 &&
+    Math.abs(position.z - portalZ) < 0.65 &&
     position.y >= 0 &&
     position.y < 3.5;
   return area;
+}
+
+export function buildSpaceCafePortal(cafe, space, interactions) {
+  // Stay at the spacecraft dock so the return route remains in a predictable place.
+  const x = SHIP_EXIT.x;
+  const z = SHIP_EXIT.z + 5;
+  const portal = cafe.group.getObjectByName("cafe-space-portal").clone();
+  portal.material = portal.material.clone();
+  portal.name = "space-cafe-portal";
+  portal.position.set(x, 2.1, z);
+  space.group.add(portal);
+  label(space.group, "SUNNY SIDE CAFÉ", x, 4.7, z, 3.4);
+  interactions.register({
+    id: "space-cafe-portal",
+    area: "space",
+    kind: "cafePortal",
+    x,
+    y: space.groundY,
+    z,
+    radius: 2.7,
+    label: "Return to Sunny Side Café",
+    hint: "Walk into the swirl or press E",
+  });
+  space.updatePortal = (dt, calm) => {
+    portal.material.uniforms.time.value += dt * (calm ? 0.25 : 1);
+  };
+  space.containsPortal = (position) =>
+    Math.abs(position.x - x) < 1.15 &&
+    Math.abs(position.z - z) < 0.65 &&
+    position.y >= space.groundY &&
+    position.y < space.groundY + 3.5;
 }

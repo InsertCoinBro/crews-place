@@ -50,7 +50,8 @@ export function runCafeChecks(game) {
   check(
     "Walking into the portal arrives beside the spacecraft at Space altitude",
     () => {
-      game.player.teleport(190, 0.8, 0);
+      const portal = game.areas.cafe.group.getObjectByName("cafe-space-portal");
+      game.player.teleport(portal.position.x, portal.position.z + 0.8, 0);
       game.follow.reset(0);
       window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
       for (let i = 0; i < 30 && game.area.id === "cafe"; i++) game.tick(1 / 60);
@@ -81,12 +82,56 @@ export function runCafeChecks(game) {
     },
   );
   check("Interact key activates portal without needing to walk through", () => {
-    game.enter("cafe", [190, 2]);
+    const portal = game.areas.cafe.group.getObjectByName("cafe-space-portal");
+    game.enter("cafe", [portal.position.x, portal.position.z + 2]);
     for (let i = 0; i < 60; i++) game.tick(1 / 60);
     window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyE" }));
     game.tick(1 / 60);
     window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyE" }));
     assert(game.area.id === "space", "interact failed");
+  });
+  check(
+    "Space portal stays at the dock and returns on foot without bouncing back",
+    () => {
+      const portal =
+        game.areas.space.group.getObjectByName("space-cafe-portal");
+      assert(portal, "return portal missing");
+      game.enter("space", [portal.position.x, portal.position.z + 0.8]);
+      game.follow.reset(0);
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyW" }));
+      for (let i = 0; i < 30 && game.area.id === "space"; i++)
+        game.tick(1 / 60);
+      window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyW" }));
+      assert(game.area.id === "cafe", "return walk-through failed");
+      for (let i = 0; i < 90; i++) game.tick(1 / 60);
+      assert(game.area.id === "cafe", "arrival bounced back to Space");
+      assert(game.player.position.y === 0, "café arrival altitude wrong");
+      assert(
+        game.sun.intensity === 0 && game.skyLight.intensity === 0,
+        "café lighting not black",
+      );
+      assert(
+        game.areas.space.group.getObjectByName("space-cafe-portal") === portal,
+        "portal disappeared",
+      );
+    },
+  );
+  check("Space portal supports interact and repeated round trips", () => {
+    const portal = game.areas.space.group.getObjectByName("space-cafe-portal");
+    for (let trip = 0; trip < 2; trip++) {
+      game.enterCafePortal();
+      for (let i = 0; i < 60; i++) game.tick(1 / 60);
+      assert(game.area.id === "space", "Space arrival bounced back");
+      game.player.teleport(
+        portal.position.x,
+        portal.position.z + 2,
+        SPACE_ALTITUDE,
+      );
+      window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyE" }));
+      game.tick(1 / 60);
+      window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyE" }));
+      assert(game.area.id === "cafe", "return interaction failed");
+    }
   });
   check("Café exit restores town and its lighting", () => {
     game.enter("cafe");
