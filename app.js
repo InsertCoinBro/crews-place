@@ -850,7 +850,6 @@ class Game {
       }
       if (this.mode !== "playing") return;
       this.spaceAlien.afterPlayer(dt);
-      this.scene.updateMatrixWorld(true);
       if (this.spaceRace.occupied) this.spaceRace.updateCamera(dt);
       else if (this.spaceTube.occupied) this.spaceTube.updateCamera(dt);
       else if (this.spaceship.occupied) this.spaceship.updateCamera(dt);
@@ -903,20 +902,22 @@ class Game {
     }
     if (this.mode === "opening" || this.mode === "playing") {
       if (this.mode === "opening") this.player.model.animator?.update(dt);
-      this.traffic.update(dt, this.area.interior ? null : this.player);
-      this.npcs.update(dt, this.area.interior ? null : this.player);
-      this.wildlife.update(dt, this.area.interior ? null : this.player);
-      this.farm.update(dt);
-      if (
-        this.leaves.update(
-          dt,
-          this.mode === "playing" && !this.area.interior ? this.player : null,
-          event,
-          this.calm,
+      if (this.area.id !== "space") {
+        this.traffic.update(dt, this.area.interior ? null : this.player);
+        this.npcs.update(dt, this.area.interior ? null : this.player);
+        this.wildlife.update(dt, this.area.interior ? null : this.player);
+        this.farm.update(dt);
+        if (
+          this.leaves.update(
+            dt,
+            this.mode === "playing" && !this.area.interior ? this.player : null,
+            event,
+            this.calm,
+          )
         )
-      )
-        (this.audio.oneShot("leavesRustle", this.calm ? 0.16 : 0.3),
-          this.ui.toast("A little rustle of autumn."));
+          (this.audio.oneShot("leavesRustle", this.calm ? 0.16 : 0.3),
+            this.ui.toast("A little rustle of autumn."));
+      }
       this.bouncePulse = Math.max(0, this.bouncePulse - dt * 3);
       this.areas.town.trampolineMesh.position.y =
         0.44 - Math.sin(this.bouncePulse * Math.PI) * 0.12;
