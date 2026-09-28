@@ -151,7 +151,7 @@ export class Spaceship {
     if (globalThis.document)
       label(
         game.areas.space.group,
-        "STARLIGHT EXPLORER",
+        "STARLIGHT EXPLORER DOCK",
         31,
         2,
         -36,
@@ -160,11 +160,11 @@ export class Spaceship {
         "#9ff5ee",
       );
     if (globalThis.document)
-      label(
+      this.boardingSign = label(
         game.areas.space.group,
         "BOARD HERE · E",
         SHIP_EXIT.x,
-        1.3,
+        2.7,
         SHIP_EXIT.z,
         3.8,
         "#17304f",
@@ -179,7 +179,9 @@ export class Spaceship {
       maxY: game.areas.space.groundY + 3.5,
     };
     game.areas.space.colliders.push(this.collider);
-    game.interactions.register({
+    this.boardingPoint = { ...SHIP_EXIT };
+    this.parkedPosition = this.home.clone();
+    this.interaction = game.interactions.register({
       id: "spaceship",
       kind: "spaceship",
       area: "space",
@@ -188,7 +190,7 @@ export class Spaceship {
       z: SHIP_EXIT.z,
       radius: 3,
       label: "Fly the Starlight Explorer",
-      hint: "E to board · Glass cockpit · Return safely anytime",
+      hint: "E to board · Land and get out wherever there is clear ground",
     });
     game.interactions.on("spaceship", () => this.board());
     if (globalThis.document) {
@@ -196,9 +198,9 @@ export class Spaceship {
       this.hud.className = "spaceship-hud";
       this.hud.hidden = true;
       this.hud.innerHTML =
-        '<strong>Starlight Explorer</strong><p>W/S fly · A/D steer · Space rise · C lower</p><p class="ship-status" role="status"></p><button type="button">Return and land · E</button>';
+        '<strong>Starlight Explorer</strong><p>W/S fly · A/D steer · Space rise · C lower</p><p class="ship-status" role="status"></p><button type="button">Land here · E</button>';
       document.querySelector("#game").append(this.hud);
-      this.hud.querySelector("button").onclick = () => this.requestReturn();
+      this.hud.querySelector("button").onclick = () => this.requestLanding();
     }
   }
   board() {
@@ -213,9 +215,10 @@ export class Spaceship {
       return false;
     this.savedParent = g.player.model.parent;
     this.occupied = true;
+    if (this.boardingSign) this.boardingSign.visible = false;
     this.phase = "flying";
     this.speed = 0;
-    this.heading = 0;
+    this.heading = this.model.rotation.y;
     this.cameraReady = false;
     this.viewAngle = 0.5;
     g.player.inVehicle = true;
@@ -241,43 +244,166 @@ export class Spaceship {
       document.querySelector("#cowboy-controls").hidden = true;
       document.querySelector("#robot-gestures").hidden = true;
     }
-    g.ui.toast("Ready to fly! Space rises; E returns you safely to this dock.");
+    g.ui.toast(
+      "Ready to fly! Press E to land and get out near any clear spot.",
+    );
     g.canvas?.focus();
     return true;
   }
-  requestReturn() {
+  landingSpot(x, z) {
+    const area = this.game.areas.space;
+    const b = area.bounds;
+    if (x < b.minX + 5 || x > b.maxX - 5 || z < b.minZ + 5 || z > b.maxZ - 5)
+      return null;
+    // A clear ground point alone is not enough: the entire descent column
+    // must avoid attractions that pass overhead.
+    if (
+      area.colliders.some(
+        (c) =>
+          c !== this.collider &&
+          x > c.minX - 3.6 &&
+          x < c.maxX + 3.6 &&
+          z > c.minZ - 3.6 &&
+          z < c.maxZ + 3.6,
+      )
+    )
+      return null;
+    const offsets = [
+      [-6, 4],
+      [6, 4],
+      [-6, -4],
+      [6, -4],
+      [0, 7],
+      [0, -7],
+    ];
+    for (const [side, front] of offsets) {
+      const ex =
+        x + side * Math.cos(this.heading) + front * Math.sin(this.heading);
+      const ez =
+        z - side * Math.sin(this.heading) + front * Math.cos(this.heading);
+      if (
+        ex < b.minX + 0.36 ||
+        ex > b.maxX - 0.36 ||
+        ez < b.minZ + 0.36 ||
+        ez > b.maxZ - 0.36
+      )
+        continue;
+      if (
+        area.colliders.some(
+          (c) =>
+            area.groundY < c.maxY &&
+            area.groundY + 1.65 > (c.minY ?? 0) &&
+            (Math.max(c.minX, Math.min(ex, c.maxX)) - ex) ** 2 +
+              (Math.max(c.minZ, Math.min(ez, c.maxZ)) - ez) ** 2 <
+              0.36 ** 2,
+        )
+      )
+        continue;
+      return {
+        position: new THREE.Vector3(x, this.home.y, z),
+        exit: { x: ex, z: ez },
+      };
+    }
+    return null;
+  }
+  requestLanding() {
     if (
       !this.occupied ||
       this.phase !== "flying" ||
       this.game.mode !== "playing"
     )
       return;
-    this.phase = "returning";
-    this.returnStage = "rise";
+    const p = this.model.position;
+    let spot = this.landingSpot(p.x, p.z);
+    if (!spot) {
+      for (const radius of [4, 8, 12, 16, 24]) {
+        for (let i = 0; i < 16 && !spot; i++) {
+          const angle = (i * Math.PI * 2) / 16;
+          spot = this.landingSpot(
+            p.x + Math.cos(angle) * radius,
+            p.z + Math.sin(angle) * radius,
+          );
+        }
+        if (spot) break;
+      }
+    }
+    if (!spot) {
+      this.game.ui.toast(
+        "No clear landing spot nearby. Fly over open moon ground and try again.",
+      );
+      return;
+    }
+    this.landingTarget = spot;
+    this.phase = "landing";
+    const crossing = this.game.areas.space.colliders.filter((c) => {
+      if (c === this.collider) return false;
+      const steps = Math.max(
+        1,
+        Math.ceil(Math.hypot(p.x - spot.position.x, p.z - spot.position.z) / 2),
+      );
+      for (let i = 0; i <= steps; i++) {
+        const x = THREE.MathUtils.lerp(p.x, spot.position.x, i / steps);
+        const z = THREE.MathUtils.lerp(p.z, spot.position.z, i / steps);
+        if (
+          x > c.minX - 3.6 &&
+          x < c.maxX + 3.6 &&
+          z > c.minZ - 3.6 &&
+          z < c.maxZ + 3.6
+        )
+          return true;
+      }
+      return false;
+    });
+    this.approachHeight = Math.max(p.y, ...crossing.map((c) => c.maxY + 4));
+    this.landingStage =
+      this.approachHeight > p.y + 0.1
+        ? "rise"
+        : Math.hypot(p.x - spot.position.x, p.z - spot.position.z) > 0.1
+          ? "approach"
+          : "descend";
     this.speed = 0;
     this.game.input.clear();
-    this.returnHeight = Math.max(
-      this.game.areas.space.groundY + 45,
-      ...this.game.areas.space.colliders.map((c) => (c.maxY ?? 0) + 6),
-      this.model.position.y,
+    this.game.ui.toast(
+      "Landing nearby. Stay seated until the ship touches down.",
     );
   }
-  exit() {
+  // Keep the old method name for callers outside the cockpit.
+  requestReturn() {
+    this.requestLanding();
+  }
+  exit(landed = false) {
     if (!this.occupied) return;
     const g = this.game;
     this.savedParent.add(g.player.model);
     for (const [bone, q] of this.savedBones) bone.quaternion.copy(q);
     this.occupied = false;
     this.phase = "parked";
-    this.model.position.copy(this.home);
-    this.model.rotation.set(0, 0, 0);
+    if (landed) {
+      this.parkedPosition.copy(this.landingTarget.position);
+      this.boardingPoint = this.landingTarget.exit;
+      this.interaction.x = this.boardingPoint.x;
+      this.interaction.z = this.boardingPoint.z;
+      if (this.boardingSign)
+        this.boardingSign.position.set(
+          this.boardingPoint.x,
+          2.7,
+          this.boardingPoint.z,
+        );
+    } else {
+      this.model.position.copy(this.parkedPosition);
+    }
     this.model.userData.flames.visible = false;
+    if (this.boardingSign) this.boardingSign.visible = true;
     this.speed = 0;
     g.player.inVehicle = false;
     g.player.model.visible = true;
     g.player.model.rotation.set(0, 0, 0);
-    g.player.heading = 0;
-    g.player.teleport(SHIP_EXIT.x, SHIP_EXIT.z, g.areas.space.groundY);
+    g.player.heading = this.heading;
+    g.player.teleport(
+      this.boardingPoint.x,
+      this.boardingPoint.z,
+      g.areas.space.groundY,
+    );
     g.input.clear();
     g.follow.reset(Math.PI);
     g.interactionCooldown = 0.6;
@@ -300,42 +426,39 @@ export class Spaceship {
   update(dt) {
     const g = this.game;
     this.model.visible = g.area.id === "space";
+    if (this.boardingSign?.visible && g.area.id === "space")
+      this.boardingSign.lookAt(g.camera.position);
     if (this.hud) this.hud.hidden = !this.occupied || g.mode !== "playing";
     if (!this.occupied || g.mode !== "playing") return;
     dt = Math.min(0.05, Math.max(0, dt));
     this.time += dt;
-    if (g.input.consume("KeyE")) this.requestReturn();
+    if (g.input.consume("KeyE")) this.requestLanding();
     const p = this.model.position,
       old = p.clone();
-    if (this.phase === "returning") {
+    if (this.phase === "landing") {
       const target =
-        this.returnStage === "rise"
-          ? new THREE.Vector3(p.x, this.returnHeight, p.z)
-          : this.returnStage === "cruise"
-            ? new THREE.Vector3(this.home.x, this.returnHeight, this.home.z)
-            : this.home;
+        this.landingStage === "rise"
+          ? new THREE.Vector3(p.x, this.approachHeight, p.z)
+          : this.landingStage === "approach"
+            ? new THREE.Vector3(
+                this.landingTarget.position.x,
+                p.y,
+                this.landingTarget.position.z,
+              )
+            : this.landingTarget.position;
       const delta = target.clone().sub(p),
         distance = delta.length();
-      if (this.returnStage === "cruise" && Math.hypot(delta.x, delta.z) > 0.1) {
-        const desiredHeading = Math.atan2(delta.x, delta.z);
-        this.heading +=
-          Math.atan2(
-            Math.sin(desiredHeading - this.heading),
-            Math.cos(desiredHeading - this.heading),
-          ) *
-          (1 - Math.exp(-4 * dt));
-        this.model.rotation.y = this.heading;
-      }
       p.addScaledVector(
         delta.normalize(),
-        Math.min(distance, dt * (this.returnStage === "cruise" ? 16 : 9)),
+        Math.min(distance, dt * (this.landingStage === "approach" ? 10 : 25)),
       );
       if (distance < 0.08) {
-        if (this.returnStage === "rise") this.returnStage = "cruise";
-        else if (this.returnStage === "cruise") this.returnStage = "land";
+        if (this.landingStage === "rise") this.landingStage = "approach";
+        else if (this.landingStage === "approach")
+          this.landingStage = "descend";
         else {
-          this.exit();
-          g.ui.toast("Landed! You can explore on foot or fly again.");
+          this.exit(true);
+          g.ui.toast("Landed! Explore here or board the ship again.");
           return;
         }
       }
@@ -396,14 +519,14 @@ export class Spaceship {
     g.player.model.visible = true;
     if (this.hud) {
       const text =
-        this.phase === "returning"
-          ? "Returning to the northeast dock…"
+        this.phase === "landing"
+          ? "Landing on clear moon ground nearby…"
           : `${Math.round(p.y - this.home.y)} m high · ${Math.round(
               Math.hypot(p.x, p.z),
-            )} m from space center · Full-space flight · E to land`;
+            )} m from space center · Full-space flight · E to land here`;
       const status = this.hud.querySelector(".ship-status");
       if (status.textContent !== text) status.textContent = text;
-      this.hud.querySelector("button").disabled = this.phase === "returning";
+      this.hud.querySelector("button").disabled = this.phase === "landing";
     }
   }
   updateCamera(dt) {

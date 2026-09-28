@@ -23,6 +23,31 @@ async function loadCowboy() {
   return preparePlayerCharacter(gltf);
 }
 
+test("on-foot movement is 25% faster only in Space", () => {
+  const distance = (areaId, running) => {
+    const player = new Player(new THREE.Scene(), new THREE.Group());
+    player.teleport(0, 0, 0);
+    const held = new Set(running ? ["KeyW", "ShiftLeft"] : ["KeyW"]);
+    const input = {
+      down: (...keys) => keys.some((key) => held.has(key)),
+      consume: () => false,
+    };
+    const area = {
+      id: areaId,
+      colliders: [],
+      bounds: { minX: -100, maxX: 100, minZ: -100, maxZ: 100 },
+    };
+    for (let i = 0; i < 120; i++) player.update(1 / 60, input, 0, area);
+    return -player.position.z;
+  };
+  for (const running of [false, true]) {
+    const town = distance("town", running);
+    const space = distance("space", running);
+    assert.ok(Math.abs(space / town - 1.25) < 0.001);
+    assert.equal(distance("farm", running), town);
+  }
+});
+
 test("held side movement keeps steering while the follow camera turns behind it", () => {
   const player = new Player(new THREE.Scene(), new THREE.Group());
   const follow = new FollowCamera(new THREE.PerspectiveCamera());
@@ -90,7 +115,10 @@ test("forward movement keeps moving while a held side key steers", () => {
     player.update(1 / 60, input, follow.yaw, area);
     follow.update(1 / 60, player, input, area);
   }
-  assert.ok(player.position.x > 0, "side input should steer while moving ahead");
+  assert.ok(
+    player.position.x > 0,
+    "side input should steer while moving ahead",
+  );
   assert.ok(
     player.movementViewYaw < -2,
     "held right input should keep turning forward movement",

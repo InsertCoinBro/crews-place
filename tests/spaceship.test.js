@@ -59,7 +59,12 @@ async function setup(id = "cowboy") {
         pressed.clear();
       },
     },
-    interactions: { register() {}, on() {} },
+    interactions: {
+      register(item) {
+        return item;
+      },
+      on() {},
+    },
     ui: { toast() {}, showPrompt() {} },
     playground: { active: null },
   };
@@ -86,7 +91,7 @@ test("spaceship docks northeast, with a transparent cockpit and two rear booster
 });
 
 for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
-  test(`${id} remains visible in cockpit, flies, pauses, returns and exits safely`, async () => {
+  test(`${id} remains visible in cockpit, flies, pauses, lands locally and reboards`, async () => {
     const { ship, game, keys } = await setup(id);
     assert.equal(ship.board(), true);
     assert.equal(game.player.model.parent, ship.model);
@@ -110,33 +115,86 @@ for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     const frozen = ship.model.position.clone();
     ship.update(1);
     assert.ok(ship.model.position.equals(frozen));
-    ship.requestReturn();
+    ship.requestLanding();
     assert.equal(ship.phase, "flying");
     game.mode = "playing";
-    ship.requestReturn();
-    let sawCruise = false,
-      sawLanding = false;
+    const requested = ship.model.position.clone();
+    ship.requestLanding();
+    let sawLanding = false;
     for (let i = 0; i < 2000 && ship.occupied; i++) {
       ship.update(1 / 60);
-      sawCruise ||= ship.returnStage === "cruise";
-      sawLanding ||= ship.returnStage === "land";
+      sawLanding ||= ship.landingStage === "descend";
     }
-    assert.ok(sawCruise && sawLanding);
+    assert.ok(sawLanding);
     assert.equal(ship.occupied, false);
     assert.equal(game.player.model.parent, game.scene);
     assert.equal(game.player.inVehicle, false);
     assert.equal(game.player.model.visible, true);
+    assert.ok(
+      Math.hypot(
+        ship.model.position.x - requested.x,
+        ship.model.position.z - requested.z,
+      ) < 25,
+    );
+    assert.ok(
+      Math.hypot(
+        ship.model.position.x - SHIP_DOCK.x,
+        ship.model.position.z - SHIP_DOCK.z,
+      ) > 10,
+    );
     assert.deepEqual(game.player.position.toArray(), [
-      SHIP_EXIT.x,
+      ship.boardingPoint.x,
       180,
-      SHIP_EXIT.z,
+      ship.boardingPoint.z,
     ]);
-    assert.ok(ship.model.position.equals(ship.home));
+    assert.equal(ship.interaction.x, ship.boardingPoint.x);
+    assert.equal(ship.interaction.z, ship.boardingPoint.z);
+    assert.ok(ship.model.position.equals(ship.parkedPosition));
     assert.equal(ship.model.userData.flames.visible, false);
     assert.equal(ship.board(), true);
     ship.exit();
     assert.equal(game.player.model.parent, game.scene);
+    assert.ok(ship.model.position.equals(ship.parkedPosition));
   });
+
+test("landing avoids obstacles and rejects a fully obstructed destination", async () => {
+  const { ship, game } = await setup();
+  ship.board();
+  ship.model.position.set(100, 210, 100);
+  game.area.colliders.push({
+    minX: 96,
+    maxX: 104,
+    minZ: 96,
+    maxZ: 104,
+    minY: 180,
+    maxY: 230,
+  });
+  ship.requestLanding();
+  assert.equal(ship.phase, "landing");
+  assert.ok(
+    Math.hypot(
+      ship.landingTarget.position.x - 100,
+      ship.landingTarget.position.z - 100,
+    ) >= 8,
+  );
+  for (let i = 0; i < 2000 && ship.occupied; i++) ship.update(1 / 60);
+  assert.equal(ship.occupied, false);
+  assert.ok(ship.model.position.equals(ship.parkedPosition));
+  assert.equal(game.player.position.y, 180);
+  ship.board();
+  ship.model.position.set(200, 210, 200);
+  game.area.colliders.push({
+    minX: 165,
+    maxX: 235,
+    minZ: 165,
+    maxZ: 235,
+    minY: 180,
+    maxY: 230,
+  });
+  ship.requestLanding();
+  assert.equal(ship.phase, "flying");
+  assert.equal(ship.occupied, true);
+});
 
 test("flight reaches every edge of the full space map and respects safe limits", async () => {
   const { ship, game, keys } = await setup();

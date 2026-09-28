@@ -75,7 +75,8 @@ export class Player {
       forward /= length;
     }
     this.isRunning = input.down("ShiftLeft", "ShiftRight") && length > 0;
-    const speed = this.isRunning ? 8.2 : 5.2;
+    const speed =
+      (this.isRunning ? 8.2 : 5.2) * (area.id === "space" ? 1.25 : 1);
     const inputKey = `${rawSide},${rawForward}`;
     if (!length) {
       this.movementBasisYaw = null;
