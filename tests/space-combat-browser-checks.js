@@ -3,6 +3,7 @@ import {
   BUBBLE_ARENA_EXIT,
   insideBubbleArena,
 } from "../shared/world/bubble-arena.js";
+import { ALIEN_COUNT, ARENA_ALIEN_SCALE } from "../shared/world/space-combat.js";
 
 export function runSpaceCombatChecks(game) {
   const results = [];
@@ -35,6 +36,8 @@ export function runSpaceCombatChecks(game) {
   game.enter("space", [BUBBLE_ARENA_EXIT.x, BUBBLE_ARENA_EXIT.z]);
   frames(2);
   check("Outside the arena: no gun, no controls, no pursuit", () => {
+    assert(ALIEN_COUNT === 10 && c.aliens.length === 10, "wrong alien count");
+    assert(c.aliens.every(a => a.model.scale.x === ARENA_ALIEN_SCALE), "alien size is inconsistent");
     assert(
       !c.canPlay() && !c.gun.visible && c.hud.hidden,
       "arena leaked into the moon",

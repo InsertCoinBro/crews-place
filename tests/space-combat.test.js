@@ -12,6 +12,7 @@ import {
 } from "../shared/world/bubble-arena.js";
 import {
   SpaceCombat,
+  ARENA_ALIEN_SCALE,
   aimBlasterArm,
   rayBoxDistance,
 } from "../shared/world/space-combat.js";
@@ -53,13 +54,14 @@ async function setup() {
   g.player.model.position.copy(g.player.position);
   return new SpaceCombat(g, await model("moon_mischief"));
 }
-test("five independent aliens spawn in the arena, chase, and freeze on pause", async () => {
+test("ten larger independent aliens spawn in the arena, chase, and freeze on pause", async () => {
   const c = await setup();
-  assert.equal(c.aliens.length, 5);
+  assert.equal(c.aliens.length, 10);
   assert.ok(c.aliens.every((a) => insideBubbleArena(a.model.position, 2)));
+  assert.ok(c.aliens.every((a) => a.model.scale.x === ARENA_ALIEN_SCALE));
   assert.equal(
     new Set(c.aliens.map((a) => a.model.getObjectByName("Head"))).size,
-    5,
+    10,
   );
   const before = c.aliens.map((a) => a.model.position.clone());
   for (let i = 0; i < 180; i++) c.update(1 / 60);
@@ -88,7 +90,7 @@ test("bubbled aliens float upward and respawn within the square", async () => {
     assert.ok(insideBubbleArena(a.model.position, 1.5));
   }
   assert.equal(a.respawn, 0);
-  assert.equal(a.model.scale.x, 1);
+  assert.equal(a.model.scale.x, ARENA_ALIEN_SCALE);
   assert.equal(c.bubbles.has(a), false);
   const b = c.game.area.bounds,
     p = a.model.position;

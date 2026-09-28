@@ -11,9 +11,17 @@ import {
   CROWD_DISTANCE,
 } from "./bubble-arena.js";
 
-export const ALIEN_COUNT = 5;
+export const ALIEN_COUNT = 10;
+export const ARENA_ALIEN_SCALE = 1.25;
 export const RESPAWN_SECONDS = 2.5;
 const RANGE = 42;
+const BUBBLE_RADIUS = 1.95;
+const BUBBLE_BODY_OFFSET = 1.38;
+const EDGE_MARGIN = BUBBLE_RADIUS + 0.2;
+const STARTING_POSITIONS = [
+  [278, -226], [220, -262], [315, -300], [225, -330], [185, -380],
+  [314, -223], [170, -238], [340, -305], [265, -370], [200, -355],
+];
 
 // Distance along a ray to a collider; the same test clips shots and target selection.
 export function rayBoxDistance(origin, direction, box) {
@@ -126,6 +134,7 @@ export class SpaceCombat {
     this.shotRequested = false;
     this.spawnSerial = 0;
     this.arena = buildBubbleArena(game.areas.space);
+    this.arena.alienRadius = 0.48 * ARENA_ALIEN_SCALE;
     this.crowdTime = 0;
     this.grace = 0;
     this.wasInside = false;
@@ -140,7 +149,7 @@ export class SpaceCombat {
     this.gun = blaster();
     game.scene.add(this.gun);
     this.gun.visible = false;
-    this.bubbleGeometry = new THREE.SphereGeometry(1.55, 24, 16);
+    this.bubbleGeometry = new THREE.SphereGeometry(BUBBLE_RADIUS, 24, 16);
     this.bubbleMaterial = new THREE.MeshPhysicalMaterial({
       color: 0x9fe9ff,
       transparent: true,
@@ -196,20 +205,20 @@ export class SpaceCombat {
         ((index * 0.197 + this.spawnSerial * 0.137 + attempt * 0.091) % 0.76);
       let x =
         edge === 0
-          ? b.minX + 2
+          ? b.minX + EDGE_MARGIN
           : edge === 1
-            ? b.maxX - 2
-            : THREE.MathUtils.lerp(b.minX + 2, b.maxX - 2, t);
+            ? b.maxX - EDGE_MARGIN
+            : THREE.MathUtils.lerp(b.minX + EDGE_MARGIN, b.maxX - EDGE_MARGIN, t);
       let z =
         edge === 2
-          ? b.minZ + 2
+          ? b.minZ + EDGE_MARGIN
           : edge === 3
-            ? b.maxZ - 2
-            : THREE.MathUtils.lerp(b.minZ + 2, b.maxZ - 2, t);
+            ? b.maxZ - EDGE_MARGIN
+            : THREE.MathUtils.lerp(b.minZ + EDGE_MARGIN, b.maxZ - EDGE_MARGIN, t);
       // A few aliens begin near the first cover islands so the activity is
       // visible from the entrance. Later respawns use the contained perimeter.
       if (attempt === 0 && this.spawnSerial < ALIEN_COUNT) {
-        [x, z] = [[278, -226], [220, -262], [315, -300], [225, -330], [185, -380]][index];
+        [x, z] = STARTING_POSITIONS[index];
       }
       if (
         Math.hypot(x - BUBBLE_ARENA_START.x, z - BUBBLE_ARENA_START.z) < 28 ||
@@ -233,7 +242,7 @@ export class SpaceCombat {
         continue;
       alien.reset();
       alien.model.position.set(x, area.groundY, z);
-      alien.model.scale.setScalar(1);
+      alien.model.scale.setScalar(ARENA_ALIEN_SCALE);
       alien.model.rotation.x = 0;
       alien.delay = 1.2;
       alien.respawn = 0;
@@ -307,13 +316,13 @@ export class SpaceCombat {
       const bounds = this.arena.bounds;
       a.model.position.x = THREE.MathUtils.clamp(
         a.model.position.x,
-        bounds.minX + 1.6,
-        bounds.maxX - 1.6,
+        bounds.minX + EDGE_MARGIN,
+        bounds.maxX - EDGE_MARGIN,
       );
       a.model.position.z = THREE.MathUtils.clamp(
         a.model.position.z,
-        bounds.minZ + 1.6,
-        bounds.maxZ - 1.6,
+        bounds.minZ + EDGE_MARGIN,
+        bounds.maxZ - EDGE_MARGIN,
       );
       if (a.respawn > 0) {
         const bubble = this.bubbles.get(a);
@@ -321,17 +330,18 @@ export class SpaceCombat {
           bubble.position.addScaledVector(a.bubbleVelocity, dt);
           bubble.position.x = THREE.MathUtils.clamp(
             bubble.position.x,
-            bounds.minX + 1.6,
-            bounds.maxX - 1.6,
+            bounds.minX + EDGE_MARGIN,
+            bounds.maxX - EDGE_MARGIN,
           );
           bubble.position.z = THREE.MathUtils.clamp(
             bubble.position.z,
-            bounds.minZ + 1.6,
-            bounds.maxZ - 1.6,
+            bounds.minZ + EDGE_MARGIN,
+            bounds.maxZ - EDGE_MARGIN,
           );
           bubble.rotation.y += dt * 1.4;
           bubble.rotation.x += dt * 0.6;
           a.model.position.copy(bubble.position);
+          a.model.position.y -= BUBBLE_BODY_OFFSET;
           a.model.visible =
             a.model.position.distanceToSquared(g.player.position) <=
             ALIEN_RENDER_DISTANCE ** 2;
@@ -469,7 +479,7 @@ export class SpaceCombat {
       if (!alien.model || alien.respawn > 0) continue;
       const target = alien.model.position
         .clone()
-        .add(new THREE.Vector3(0, 1.1, 0));
+        .add(new THREE.Vector3(0, 1.35, 0));
       const offset = target.sub(origin),
         distance = offset.length(),
         direction = offset.normalize();
@@ -498,7 +508,7 @@ export class SpaceCombat {
       bubble.name = "alien-bubble";
       bubble.position
         .copy(chosen.model.position)
-        .add(new THREE.Vector3(0, 1.45, 0));
+        .add(new THREE.Vector3(0, BUBBLE_BODY_OFFSET, 0));
       this.game.scene.add(bubble);
       this.bubbles.set(chosen, bubble);
       chosen.respawn = 1;
@@ -506,6 +516,7 @@ export class SpaceCombat {
       chosen.bubbleVelocity = aim.clone().multiplyScalar(4.4);
       chosen.bubbleVelocity.y = 4.8;
       chosen.model.position.copy(bubble.position);
+      chosen.model.position.y -= BUBBLE_BODY_OFFSET;
       chosen.model.animator?.mixer.stopAllAction();
       this.defeated++;
     }

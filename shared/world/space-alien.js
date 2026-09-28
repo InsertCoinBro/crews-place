@@ -13,20 +13,21 @@ export function inAlienSafeZone(p) {
 // one-mile world. The old full-area breadth-first grid became over a million
 // cells after Space expanded and stalled the main thread during every replan.
 export function alienPath(from, to, area) {
-  const clearance = RADIUS + 0.72;
+  const radius = area.alienRadius ?? RADIUS;
+  const clearance = radius + 0.72;
   const safeZone = area.alienSafeZone ?? inAlienSafeZone;
   const clear = (p) =>
     !safeZone(p) &&
     (!area.bounds ||
-      (p.x >= area.bounds.minX + RADIUS &&
-        p.x <= area.bounds.maxX - RADIUS &&
-        p.z >= area.bounds.minZ + RADIUS &&
-        p.z <= area.bounds.maxZ - RADIUS)) &&
+      (p.x >= area.bounds.minX + radius &&
+        p.x <= area.bounds.maxX - radius &&
+        p.z >= area.bounds.minZ + radius &&
+        p.z <= area.bounds.maxZ - radius)) &&
     !area.colliders.some(
       (c) =>
         (c.minY ?? 0) < area.groundY + 1.9 &&
         c.maxY > area.groundY &&
-        overlapsCircle(p.x, p.z, RADIUS + 0.65, c),
+        overlapsCircle(p.x, p.z, radius + 0.65, c),
     );
   const hitTime = (a, b, box) => {
     if ((box.minY ?? 0) >= area.groundY + 1.9 || box.maxY <= area.groundY)
@@ -262,7 +263,7 @@ export class SpaceAlien {
           (dz / d) * distance,
           area.colliders,
           area.bounds,
-          RADIUS,
+          area.alienRadius ?? RADIUS,
         );
         if (safeZone(this.model.position)) this.model.position.copy(before);
         this.model.rotation.y = Math.atan2(dx, dz);
