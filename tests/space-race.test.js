@@ -12,27 +12,23 @@ import {
   RACE_BOOST_SPEED,
   RACE_LANE_LIMIT,
   RACE_ENTRY,
+  RACE_MAX_SPEED,
+  RACE_LAPS,
+  RACER_WIDTH,
+  RACER_LENGTH,
+  meteorState,
 } from "../shared/world/space-race-track.js";
 import { SPACE_BOUNDS, SPACE_ALTITUDE } from "../shared/world/space.js";
+import { racePilot } from "./space-race-driver.js";
 
 const track = createSpaceRaceTrack();
 function drive(run, { gentle = false, brake = false } = {}) {
-  const r = run.racers[0];
-  const obstacle = track.obstacles.find(
-    (o) => o.distance > r.distance - 5 && o.distance < r.distance + 85,
-  );
-  const pad = track.boosts.find(
-    (b) => b.distance > r.distance && b.distance < r.distance + 65,
-  );
-  const target = obstacle ? (obstacle.lane < 0 ? 5 : -5) : (pad?.lane ?? 0);
-  return {
-    steer: THREE.MathUtils.clamp((target - r.lane) * 2, -1, 1),
-    gentle,
-    brake,
-  };
+  return { ...racePilot(run), gentle, brake };
 }
 test("Moonbeam Rally occupies the vacant west moon, stays inside bounds, and cannot finish within a minute", () => {
-  assert.ok(track.length / RACE_BOOST_SPEED > 60);
+  assert.ok(track.raceDistance / RACE_BOOST_SPEED > 60);
+  assert.equal(track.raceDistance, track.length * RACE_LAPS);
+  assert.ok(RACE_MAX_SPEED >= 88);
   const points = Array.from(
     { length: 1000 },
     (_, i) => track.sample((i / 1000) * track.length).position,
@@ -55,15 +51,110 @@ test("all four jumps leave the ramp, visibly float above the road, and land cont
       peak = track.sample(j.start + j.ramp + j.flight / 2),
       end = track.sample(j.start + j.ramp + j.flight);
     assert.ok(start.roadY > 3);
-    assert.ok(peak.lift > 8);
-    assert.equal(end.lift, 0);
+    assert.ok(peak.lift > 33);
+    assert.ok(end.lift < 0.00001);
     let last = track.sample(j.start - 1);
     for (let d = j.start; d < j.start + j.ramp + j.flight + 1; d += 0.5) {
       const s = track.sample(d);
-      assert.ok(Math.abs(s.roadY + s.lift - last.roadY - last.lift) < 0.7);
+      assert.ok(Math.abs(s.roadY + s.lift - last.roadY - last.lift) < 1.1);
       last = s;
     }
   }
+});
+
+test("solid ship hulls prevent rear-end tunneling and sideways overlap", () => {
+  const run = new SpaceRaceRun(track);
+  run.state = "racing";
+  const [player, rival, third] = run.racers;
+  Object.assign(player, { distance: 100, lane: 0, speed: 118, boost: 3 });
+  Object.assign(rival, { distance: 108, lane: 0, speed: 20 });
+  third.distance = 500;
+  run.update(0.05);
+  assert.ok(rival.distance - player.distance >= RACER_LENGTH - 0.001);
+  Object.assign(player, { distance: 100, lane: 0, speed: 88 });
+  Object.assign(rival, { distance: 100, lane: 4.5, speed: 88 });
+  run.update(0.05, { steer: 1 });
+  assert.ok(Math.abs(rival.lane - player.lane) >= RACER_WIDTH - 0.001);
+  assert.ok(run.racers.every((r) => Math.abs(r.lane) <= RACE_LANE_LIMIT));
+  Object.assign(player, {
+    distance: track.length + 100,
+    lane: 0,
+    speed: 118,
+    boost: 3,
+  });
+  Object.assign(rival, { distance: 108, lane: 0, speed: 20 });
+  run.update(0.05);
+  assert.ok(
+    rival.distance + track.length - player.distance >= RACER_LENGTH - 0.001,
+    "lapped ship became intangible",
+  );
+});
+
+test("boost pads, magnetic stoppers and usable capsules affect actual race speeds", () => {
+  const run = new SpaceRaceRun(track);
+  run.state = "racing";
+  const r = run.racers[0];
+  run.racers[1].distance = run.racers[2].distance = 1000;
+  const cross = (f) => {
+    Object.assign(r, {
+      distance: f.distance - 1,
+      lane: f.lane,
+      speed: 88,
+      slow: 0,
+    });
+    run.update(0.02);
+  };
+  cross(track.boosts[0]);
+  assert.ok(r.boost > 2);
+  for (let i = 0; i < 30; i++) run.update(0.02);
+  assert.ok(r.speed > RACE_MAX_SPEED + 15);
+  cross(track.brakes[0]);
+  assert.ok(r.slow > 1);
+  cross(track.pickups[0]);
+  assert.equal(r.powerup, "turbo");
+  assert.ok(run.usePowerup());
+  assert.equal(r.powerup, null);
+  assert.ok(r.boost > 4);
+  r.powerup = "shield";
+  run.usePowerup();
+  assert.equal(r.slow, 0);
+  r.powerup = "pulse";
+  run.racers[1].distance = r.distance + 25;
+  run.usePowerup();
+  assert.ok(run.racers[1].slow > 0);
+  run.state = "ready";
+  r.powerup = "turbo";
+  assert.equal(run.usePowerup(), false);
+});
+
+test("meteor warnings precede impact; shields protect and tunnels clear jumps", () => {
+  const m = track.meteors[0];
+  assert.equal(meteorState(m, m.period * 0.2 - m.offset).warning, true);
+  const run = new SpaceRaceRun(track);
+  run.state = "racing";
+  run.elapsed = m.period * 0.7 - m.offset;
+  Object.assign(run.racers[0], {
+    distance: m.distance - 1,
+    lane: m.lane,
+    speed: 88,
+  });
+  run.update(0.01);
+  assert.ok(run.racers[0].slow > 2);
+  run.reset();
+  run.state = "racing";
+  run.elapsed = m.period * 0.7 - m.offset;
+  Object.assign(run.racers[0], {
+    distance: m.distance - 1,
+    lane: m.lane,
+    speed: 88,
+    shield: 5,
+  });
+  run.update(0.01);
+  assert.equal(run.racers[0].slow, 0);
+  assert.equal(track.tunnels.length, 3);
+  for (const tunnel of track.tunnels)
+    for (let d = tunnel.start; d < tunnel.start + tunnel.length; d += 5)
+      assert.equal(track.sample(d).lift, 0);
 });
 for (const fps of [30, 60, 120])
   test(`real steering can win a full race at ${fps} fps; reset repeats both aliens exactly`, () => {
@@ -79,7 +170,8 @@ for (const fps of [30, 60, 120])
       }
       assert.ok(budget > 0);
       assert.equal(run.place, 1);
-      assert.ok(run.elapsed > 60 && run.elapsed < 95);
+      assert.ok(run.elapsed > 60 && run.elapsed < 125);
+      assert.equal(run.racers[0].rings, 24);
       trips.push(run.racers.map((r) => [r.distance, r.lane, r.finish]));
     }
     assert.deepEqual(trips[0], trips[1]);
@@ -89,7 +181,7 @@ test("barriers contain sustained steering; brake produces a non-winning finish; 
     calm = new SpaceRaceRun(track),
     slow = new SpaceRaceRun(track);
   for (const r of [normal, calm, slow]) r.start();
-  for (let i = 0; i < 10000 && slow.state !== "finished"; i++) {
+  for (let i = 0; i < 14000 && slow.state !== "finished"; i++) {
     normal.update(0.05, drive(normal));
     calm.update(0.05, drive(calm, { gentle: true }));
     slow.update(0.05, { steer: 1, brake: true });
@@ -148,7 +240,18 @@ for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
       race.aliens[1].getObjectByProperty("isBone", true),
     );
     race.start();
-    for (let i = 0; i < 200; i++) race.update(0.05);
+    const pilot = () => {
+      const action = drive(race.run);
+      game.input.consume = (code) => code === "KeyF" && action.usePowerup;
+      game.input.down = (code) =>
+        code === "KeyD"
+          ? action.steer > 0
+          : code === "KeyA"
+            ? action.steer < 0
+            : false;
+      race.update(0.05);
+    };
+    for (let i = 0; i < 200; i++) pilot();
     const d = race.run.racers[0].distance;
     game.mode = "paused";
     race.update(1);
@@ -156,14 +259,7 @@ for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     game.mode = "playing";
     let budget = 3000;
     while (race.run.state !== "finished" && budget--) {
-      const action = drive(race.run);
-      game.input.down = (code) =>
-        code === "KeyD"
-          ? action.steer > 0.05
-          : code === "KeyA"
-            ? action.steer < -0.05
-            : false;
-      race.update(0.05);
+      pilot();
       race.updateCamera(0.05);
       assert.ok(game.camera.quaternion.toArray().every(Number.isFinite));
       assert.ok(model.visible);

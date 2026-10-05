@@ -72,6 +72,20 @@
   width: 100%;
   margin-top: 8px;
 }
+.race-power {
+  width: 100%;
+  margin-top: 6px;
+}
+.race-hud .race-power:not(:disabled) {
+  background: #99efff;
+  border-color: #46dfff;
+}
+.race-power:disabled {
+  opacity: 0.65;
+}
+.race-power[hidden] {
+  display: none;
+}
 .race-hud:not([data-race-state="racing"]) .race-options,
 .race-hud[data-race-state="racing"] .race-eyebrow,
 .race-hud[data-race-state="racing"] .race-help {

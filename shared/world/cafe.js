@@ -102,8 +102,8 @@ export function buildCafe(scene, interactions, origin = 190) {
 }
 
 export function buildSpaceCafePortal(cafe, space, interactions) {
-  // Stay at the spacecraft dock so the return route remains in a predictable place.
-  const x = SHIP_EXIT.x;
+  // Keep a fixed return site with a clear walking gap from the spacecraft dock.
+  const x = SHIP_EXIT.x - 18;
   const z = SHIP_EXIT.z + 5;
   const portal = cafe.group.getObjectByName("cafe-space-portal").clone();
   portal.material = portal.material.clone();

@@ -1,5 +1,6 @@
 import { SOURCES } from "./audio-sources.js";
 import { FARM_ANIMALS } from "./farm.js";
+import { RACE_BOOST_SPEED } from "./space-race-track.js";
 
 const unit = (v) => Math.max(0, Math.min(1, v));
 
@@ -14,7 +15,7 @@ export function mixWorldAudio(game, weather) {
   const outdoors =
     game.area.id === "town" && !game.area.interior && !game.spaceDive.occupied;
   const riding =
-    game.coaster.occupied || game.spaceDive.occupied || game.flying;
+    game.coaster.occupied || game.spaceDive.occupied || game.waterPark?.occupied || game.flying;
   const local = outdoors && !riding;
   a.proximity(
     "fountain",
@@ -23,6 +24,8 @@ export function mixWorldAudio(game, weather) {
     20,
     0.55,
   );
+  a.proximity("waterParkFlow", outdoors ? {x:-150,y:0,z:-80} : null, listener, 80, 0.32, SOURCES.fountain, 1.2);
+  a.setLoop("waterSlideRush", !!game.waterPark?.occupied && game.waterPark.ride.state === "riding", game.calm ? 0.14 : 0.3, SOURCES.fountain, 1.5);
   a.animal(
     "meadowHorse",
     "horse",
@@ -118,9 +121,9 @@ export function mixWorldAudio(game, weather) {
   a.setLoop(
     "hoverKart",
     !!race?.occupied && race.run.state === "racing",
-    0.12 + unit((race?.run.racers[0].speed ?? 0) / 54) * 0.12,
+    0.12 + unit((race?.run.racers[0].speed ?? 0) / RACE_BOOST_SPEED) * 0.12,
     SOURCES.spaceEngine,
-    0.8 + unit((race?.run.racers[0].speed ?? 0) / 54) * 0.4,
+    0.8 + unit((race?.run.racers[0].speed ?? 0) / RACE_BOOST_SPEED) * 0.4,
   );
   const airflow = unit((tube?.speed ?? 0) / 62);
   a.setLoop(

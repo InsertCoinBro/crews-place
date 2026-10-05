@@ -31,10 +31,14 @@ import { SpaceTube } from "./shared/world/space-tube.js";
 import { SpaceRace } from "./shared/world/space-race.js";
 import { RACE_ENTRY } from "./shared/world/space-race-track.js";
 import { TUBE_ENTRY } from "./shared/world/space-tube-track.js";
+import { WaterPark } from "./shared/world/water-park.js";
+import { WATER_PARK_EXIT, insideWaterPark } from "./shared/world/water-park-track.js";
 import { SpaceDive } from "./shared/world/space-dive.js";
 import { SPACE_DIVE_EXIT } from "./shared/world/space-dive-track.js";
 import { COASTER_EXIT } from "./shared/world/coaster-track.js";
 import { LibraryReader } from "./games/library.js";
+import { ColoringCorner } from "./games/coloring.js";
+import { BeachBall } from "./shared/world/park-ball.js";
 import { CornMaze, MAZE_START } from "./shared/world/corn-maze.js";
 import { Farm, FARM_SITE } from "./shared/world/farm.js";
 import { buildSpace } from "./shared/world/space.js";
@@ -136,6 +140,7 @@ class Game {
     this.area = town;
     this.player = new Player(this.scene, characters.get(initialCharacter));
     this.pickups = new Pickups(town.group);
+    this.parkBall = new BeachBall(town.group);
     this.follow = new FollowCamera(this.camera);
     this.follow.calm = this.calm;
     this.traffic = new Traffic(town.group);
@@ -216,8 +221,10 @@ class Game {
     this.interactionCooldown = 0;
     this.arcade = new ArcadeManager(this);
     this.library = new LibraryReader(this);
+    this.coloring = new ColoringCorner(this);
     this.coaster = new RollerCoaster(this);
     this.spaceDive = new SpaceDive(this);
+    this.waterPark = new WaterPark(this);
     this.spaceship = new Spaceship(this);
     this.spaceTube = new SpaceTube(this);
     this.spaceRace = new SpaceRace(this, characters.get("moon_mischief"));
@@ -411,6 +418,7 @@ class Game {
     this.spaceRace?.exit();
     if (this.coaster?.occupied) this.coaster.exit();
     if (this.spaceDive?.occupied) this.spaceDive.exit();
+    if (this.waterPark?.occupied) this.waterPark.exit();
     this.cornMaze?.exit();
     this.pickups.reset();
     this.player.setModel(this.characters.get(id));
@@ -636,22 +644,30 @@ class Game {
     if (!destination) return;
     this.setMode("activity");
     this.ui.showPrompt(null);
-    document.querySelector("#panel-tag").textContent =
-      destination.title.toUpperCase();
-    document.querySelector("#panel-title").textContent =
-      "Mini-game coming soon";
-    document.querySelector("#panel-copy").textContent = destination.description;
-    document.querySelector("#preferences").hidden = true;
-    this.ui.panel.showModal();
-    document.querySelector("#resume").focus();
-    if (destination.launch) {
-      try {
-        await destination.launch({ destination, close: () => this.resume() });
-      } catch (error) {
-        console.error(error);
-        document.querySelector("#panel-copy").textContent =
-          "This activity could not start. You can return to the town.";
-      }
+    if (!destination.launch) {
+      document.querySelector("#panel-tag").textContent =
+        destination.title.toUpperCase();
+      document.querySelector("#panel-title").textContent =
+        "Mini-game coming soon";
+      document.querySelector("#panel-copy").textContent =
+        destination.description;
+      document.querySelector("#preferences").hidden = true;
+      this.ui.panel.showModal();
+      document.querySelector("#resume").focus();
+      return;
+    }
+    try {
+      await destination.launch({
+        game: this,
+        destination,
+        close: () => this.resume(),
+      });
+    } catch (error) {
+      console.error(error);
+      this.resume();
+      this.ui.toast(
+        "This activity could not start. You can return to the town.",
+      );
     }
   }
   enterCafePortal() {
@@ -713,6 +729,7 @@ class Game {
       return;
     }
     if (this.mode === "playing") this.area.updatePortal?.(dt, this.calm);
+    this.waterPark.animateWater(this.mode === "playing" ? dt : 0);
     this.spaceship.update(this.mode === "playing" ? dt : 0);
     this.spaceTube.update(this.mode === "playing" ? dt : 0);
     this.spaceRace.update(this.mode === "playing" ? dt : 0);
@@ -736,6 +753,9 @@ class Game {
       } else if (this.spaceTube.occupied) {
         this.ui.showPrompt(null);
       } else if (this.spaceship.occupied) {
+        this.ui.showPrompt(null);
+      } else if (this.waterPark.occupied) {
+        this.waterPark.update(dt);
         this.ui.showPrompt(null);
       } else if (this.spaceDive.occupied) {
         this.spaceDive.update(dt);
@@ -843,6 +863,7 @@ class Game {
         if (this.area.containsPortal?.(this.player.position)) this.enterCafePortal();
         if (this.area.id === "town")
           this.pickups.update(dt, this.player, this.input, this.area);
+        if (this.area.id === "town") this.parkBall.update(dt, this.player);
         const pickupHint = document.querySelector("#pickup-hint");
         pickupHint.textContent = this.pickups.hint;
         pickupHint.hidden = !this.pickups.hint;
@@ -861,6 +882,7 @@ class Game {
       if (this.spaceRace.occupied) this.spaceRace.updateCamera(dt);
       else if (this.spaceTube.occupied) this.spaceTube.updateCamera(dt);
       else if (this.spaceship.occupied) this.spaceship.updateCamera(dt);
+      else if (this.waterPark.occupied) this.waterPark.updateCamera(dt);
       else if (this.spaceDive.occupied) this.spaceDive.updateCamera(dt);
       else if (this.coaster.occupied) this.coaster.updateCamera(dt);
       else
@@ -936,6 +958,7 @@ class Game {
     );
     this.sun.target.updateMatrixWorld();
     const inSpace = this.area.id === "space";
+    const inWaterPark = !inSpace && !this.area.interior && insideWaterPark(this.player.position);
     const inCoasterPark =
       !this.area.interior &&
       !inSpace &&
@@ -944,12 +967,12 @@ class Game {
       this.player.position.x > -42;
     this.renderer.toneMappingExposure = THREE.MathUtils.damp(
       this.renderer.toneMappingExposure,
-      inSpace ? 0.78 : inCoasterPark ? 0.86 : 1.25,
+      inSpace ? 0.78 : inWaterPark ? 0.95 : inCoasterPark ? 0.86 : 1.25,
       3,
       dt,
     );
-    this.scene.fog.near = inSpace ? 72 : inCoasterPark ? 165 : 105;
-    this.scene.fog.far = inSpace ? 210 : inCoasterPark ? 300 : 235;
+    this.scene.fog.near = inSpace ? 72 : inWaterPark ? 190 : inCoasterPark ? 165 : 105;
+    this.scene.fog.far = inSpace ? 210 : inWaterPark ? 310 : inCoasterPark ? 300 : 235;
     const outdoors = this.area.id === "town" && !this.spaceDive.occupied;
     const weather = this.weather.update(
       this.mode === "playing" ? dt : 0,
@@ -1035,6 +1058,15 @@ async function boot() {
     selected,
     horseResult.status === "fulfilled" ? horseResult.value : null,
   );
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("water-park-preview")) {
+    game.start();
+    game.player.teleport(WATER_PARK_EXIT.x, WATER_PARK_EXIT.z + 7);
+    game.follow.reset(0);
+  }
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("water-park-test")) {
+    const { addWaterParkChecks } = await import("./tests/water-park-browser-checks.js");
+    addWaterParkChecks(game);
+  }
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("cafe-test")) {
     const { runCafeChecks } = await import("./tests/cafe-browser-checks.js");
     runCafeChecks(game);

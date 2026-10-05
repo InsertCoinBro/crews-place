@@ -93,6 +93,10 @@ export function disposeScene(scene, extraTextures = []) {
   scene.traverse((o) => {
     o.animator?.dispose();
     if (o.geometry) geometries.add(o.geometry);
+    // Cloned player avatars are skinned: the renderer uploads one GPU bone
+    // texture per skeleton on first render. Release the clones' copies here so
+    // repeated mini-game launches don't leak them.
+    if (o.skeleton?.boneTexture) textures.add(o.skeleton.boneTexture);
     for (const m of Array.isArray(o.material) ? o.material : [o.material])
       if (m) {
         materials.add(m);

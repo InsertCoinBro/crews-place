@@ -11,3 +11,19 @@ body:has(.coaster-hud:not([hidden])) .controls { visibility:hidden; }
 .space-dive-hud .coaster-eyebrow { color:#83ecff; }
 .space-dive-hud .coaster-actions button { background:#203556; color:#e9f5ff; border-color:#6a92b2; }
 .space-dive-hud #space-dive-launch { background:#8fe9ff; color:#152743; border-color:#8fe9ff; }
+
+.water-park-hud { border-color:#e8b7ff; background:#fff9fff5; color:#482276; }
+.water-park-hud .coaster-eyebrow { color:#8b309d; }
+.water-slide-options { display:flex; gap:7px; margin-top:10px; }
+.water-slide-options button { flex:1; min-height:44px; padding:8px; border:2px solid #d8c7eb; border-radius:12px; color:#482276; background:#fff; font-weight:750; }
+.water-slide-options button[aria-pressed="true"] { background:#7137a3; border-color:#7137a3; color:white; }
+.water-slide-options button:disabled { opacity:.65; }
+.water-slide-options button:focus-visible { outline:3px solid #159bb8; outline-offset:2px; }
+.water-park-hud .coaster-stats { flex-wrap:wrap; gap:6px 14px; }
+.water-park-hud #water-park-launch { background:#7137a3; color:#fff; }
+body:has(.water-park-hud:not([hidden])) #mobile-controls { display:none; }
+@media (max-width:700px), (max-height:600px) {
+  .water-park-hud { bottom:8px; padding:10px 12px; max-height:65vh; overflow:auto; }
+  .water-park-hud strong { font-size:16px; }
+  .water-park-hud .coaster-actions button { flex:1; padding:8px; }
+}

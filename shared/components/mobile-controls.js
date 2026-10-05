@@ -214,6 +214,7 @@ export class MobileControls {
           ? "Exit"
           : "Use";
     jump.hidden =
+      this.game.waterPark?.occupied ||
       this.game.spaceRace?.occupied ||
       this.game.driving ||
       this.game.flying ||
@@ -225,6 +226,7 @@ export class MobileControls {
       this.game.spaceTube?.occupied ||
       this.game.spaceship?.occupied ||
       this.game.coaster?.occupied ||
+      this.game.waterPark?.occupied ||
       this.game.spaceDive?.occupied
     );
     restart.hidden = true;
@@ -239,6 +241,7 @@ export class MobileControls {
       this.game.flying ||
       this.game.cornMaze?.occupied ||
       this.game.coaster?.occupied ||
+      this.game.waterPark?.occupied ||
       this.game.spaceDive?.occupied
     );
     this.look.hidden = !!(
@@ -248,6 +251,7 @@ export class MobileControls {
       this.game.driving ||
       this.game.cornMaze?.occupied ||
       this.game.coaster?.occupied ||
+      this.game.waterPark?.occupied ||
       this.game.spaceDive?.occupied
     );
   }

@@ -2,6 +2,7 @@ import {
   RACE_ENTRY,
   RACE_LANE_LIMIT,
 } from "../shared/world/space-race-track.js";
+import { racePilot } from "./space-race-driver.js";
 
 export function runSpaceRaceChecks(game) {
   const race = game.spaceRace,
@@ -33,24 +34,23 @@ export function runSpaceRaceChecks(game) {
     game.input.release(key);
   };
   const steer = () => {
-    const r = race.run.racers[0];
-    const obstacle = race.track.obstacles.find(
-      (o) => o.distance > r.distance - 5 && o.distance < r.distance + 85,
-    );
-    const pad = race.track.boosts.find(
-      (b) => b.distance > r.distance && b.distance < r.distance + 65,
-    );
-    const target = obstacle ? (obstacle.lane < 0 ? 5 : -5) : (pad?.lane ?? 0);
+    const action = racePilot(race.run);
     game.input.release("KeyA");
     game.input.release("KeyD");
-    if (target - r.lane > 0.1) game.input.press("KeyD");
-    else if (target - r.lane < -0.1) game.input.press("KeyA");
+    if (action.steer > 0) game.input.press("KeyD");
+    else if (action.steer < 0) game.input.press("KeyA");
+    game.input.release("KeyF");
+    if (action.usePowerup) game.input.press("KeyF");
   };
   const board = () => {
     game.enter("space", [RACE_ENTRY.x, RACE_ENTRY.z]);
-    frames(15);
+    // Respect the short debounce from exiting any previous activity.
+    frames(30);
     press("KeyE");
-    assert(race.occupied && race.run.state === "ready", "cannot board");
+    assert(
+      race.occupied && race.run.state === "ready",
+      `cannot board (${game.mode}, state=${race.run.state}, vehicle=${game.player.inVehicle}, cooldown=${game.interactionCooldown})`,
+    );
   };
   game.start();
   game.calm = false;
@@ -70,7 +70,7 @@ export function runSpaceRaceChecks(game) {
   });
   for (const id of ["cowboy", "jolly_robot", "moon_mischief"])
     check(
-      `${id}: full race, four jumps, first place, trophy, repeat and safe exit`,
+      `${id}: two laps, eight jumps, fire rings, first place, trophy, repeat and safe exit`,
       () => {
         game.pause();
         game.setCharacter(id);
@@ -89,11 +89,13 @@ export function runSpaceRaceChecks(game) {
             s = race.track.sample(r.distance);
           if (s.lift > 1)
             jumped.add(
-              race.track.jumps.findIndex(
-                (j) =>
-                  r.distance > j.start &&
-                  r.distance < j.start + j.ramp + j.flight,
-              ),
+              Math.floor(r.distance / race.track.length) * 4 +
+                race.track.jumps.findIndex(
+                  (j) =>
+                    r.distance % race.track.length > j.start &&
+                    r.distance % race.track.length <
+                      j.start + j.ramp + j.flight,
+                ),
             );
           assert(Math.abs(r.lane) <= RACE_LANE_LIMIT, "escaped track");
           assert(
@@ -108,7 +110,10 @@ export function runSpaceRaceChecks(game) {
           if (budget % 300 === 0) game.renderer.render(game.scene, game.camera);
         }
         assert(budget > 0, "race stuck");
-        assert(jumped.size === 4, "missed jumps");
+        assert(
+          jumped.size === 8 && race.run.racers[0].rings === 24,
+          "missed jumps or rings",
+        );
         assert(
           race.run.elapsed >= 60 && race.run.place === 1,
           "race too short or wrong winner",
@@ -175,7 +180,7 @@ export function runSpaceRaceChecks(game) {
       race.start();
       game.input.press("KeyS");
       const wins = race.wins;
-      let budget = 8500;
+      let budget = 14000;
       while (race.run.state !== "finished" && budget--) game.tick(0.05);
       assert(budget > 0 && race.run.place === 3, "non-winning race failed");
       assert(race.wins === wins, "third place awarded trophy");

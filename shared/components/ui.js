@@ -1,3 +1,4 @@
+import { insideWaterPark } from "../world/water-park-track.js";
 import { MAZE_SITE, makeMaze } from "../world/corn-maze.js";
 const mapMaze = makeMaze();
 import { COASTER_STATION } from "../world/coaster-track.js";
@@ -59,6 +60,8 @@ export class UI {
             player.position.z > -710 && player.position.z < 680
           ? "Moonbeam Rally"
             : area.name
+        : !area.interior && insideWaterPark(player.position)
+          ? "Rainbow Rapids Water Park"
         : player.position.x < -90 && player.position.z > -50
           ? "Harvest Corn Maze"
           : area.interior
@@ -195,7 +198,7 @@ export class UI {
       !area.interior && player.position.z < -90 ? player.position.z : 0;
     const point = (x, z) => [
       90 + (x - (player.position.x < -90 ? -164 : 0)) * mapScale,
-      90 + (z - (player.position.x < -90 ? 24 : mapCenterZ)) * mapScale,
+      90 + (z - (player.position.x < -90 && player.position.z > -50 ? 24 : mapCenterZ)) * mapScale,
     ];
     if (mapCenterZ)
       document.querySelector("#map-title").textContent = "NORTHERN MEADOWS";
@@ -204,6 +207,10 @@ export class UI {
       const p = point(x - w / 2, z - d / 2);
       c.fillRect(p[0], p[1], w * mapScale, d * mapScale);
     };
+    rect(-169, -125, 138, 144, "#f4d2a3");
+    rect(-137, -80, 37, 30, "#23bde0");
+    for (let i=0; i<3; i++) rect(-211+i*12, -145, 8, 65, ["#ed4388", "#a273ed", "#ffce36"][i]);
+    if (insideWaterPark(player.position)) document.querySelector("#map-title").textContent = "RAINBOW RAPIDS";
     rect(-164, 24, 136, 136, "#739342");
     for (let row = 0; row < 17; row++)
       for (let col = 0; col < 17; col++)
@@ -215,7 +222,7 @@ export class UI {
             8,
             "#dec58d",
           );
-    if (player.position.x < -90)
+    if (player.position.x < -90 && player.position.z > -50)
       document.querySelector("#map-title").textContent = "CORN MAZE";
     for (const z of [-24, 24]) rect(0, z, 54, 6, "#819b98");
     for (const x of [-24, 24]) rect(x, 0, 6, 54, "#819b98");

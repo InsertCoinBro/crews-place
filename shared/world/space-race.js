@@ -2,11 +2,14 @@ import * as THREE from "three";
 import { clone } from "three/addons/utils/SkeletonUtils.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { label } from "./models.js";
+import { createRaceShip, RaceEffects } from "./space-race-effects.js";
 import {
   createSpaceRaceTrack,
   SpaceRaceRun,
   RACE_ENTRY,
   RACE_COLORS,
+  RACE_LAPS,
+  RACE_BOOST_SPEED,
 } from "./space-race-track.js";
 
 const v = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -39,47 +42,6 @@ function seated(model) {
     if (/DEF-shin[LR]$|^Shin[LR]$/.test(n.name)) n.rotation.x = Math.PI / 2;
   });
 }
-function kart(color) {
-  const g = new THREE.Group();
-  g.name = "hover-race-kart";
-  box(g, [0, 0.32, 0], [3.3, 0.65, 4.2], color);
-  box(g, [0, 0.76, -0.55], [1.5, 0.25, 1.55], 0x22334f);
-  box(g, [0, 1.3, -1.1], [1.7, 1, 0.25], 0x22334f);
-  box(g, [0, 0.93, 1.55], [2.7, 0.5, 0.65], color);
-  const steering = part(
-    g,
-    new THREE.TorusGeometry(0.36, 0.075, 8, 20),
-    0xeff5eb,
-    [0, 1.35, 0.7],
-  );
-  steering.rotation.x = -0.55;
-  const glow = part(
-    g,
-    new THREE.CylinderGeometry(1.7, 1.9, 0.09, 24),
-    0x8ffff0,
-    [0, -0.12, 0],
-  );
-  glow.scale.z = 1.24;
-  const flames = new THREE.Group();
-  g.add(flames);
-  g.userData.flames = flames;
-  for (const side of [-1, 1]) {
-    box(g, [side * 1.65, 0.28, -0.25], [0.65, 0.6, 3], 0x33496c);
-    const nozzle = part(g, new THREE.TorusGeometry(0.3, 0.1, 8, 16), 0xb5fff6, [
-      side * 1.35,
-      0.4,
-      -2.15,
-    ]);
-    const flame = part(
-      flames,
-      new THREE.ConeGeometry(0.28, 1.6, 12),
-      0x8efff3,
-      [side * 1.35, 0.4, -2.9],
-    );
-    flame.rotation.x = -Math.PI / 2;
-  }
-  return g;
-}
 
 export class SpaceRace {
   constructor(game, alienTemplate) {
@@ -102,17 +64,17 @@ export class SpaceRace {
       );
     } catch {}
     this.buildTrack();
+    this.effects = new RaceEffects(this.group, this.track);
     this.buildStation();
     this.buildHUD();
-    this.karts = [0x70dfd4, 0xbda2ef, 0xffce72].map((c) => {
-      const k = kart(c);
+    this.karts = [0x00cddd, 0x9555ee, 0xff8220].map((c) => {
+      const k = createRaceShip(c);
       this.group.add(k);
       return k;
     });
     this.aliens = [1, 2].map((id) => {
       const model = clone(alienTemplate);
-      model.name =
-        id === 1 ? "Nova · predictable racer" : "Pip · predictable racer";
+      model.name = id === 1 ? "Nova · tactical racer" : "Pip · tactical racer";
       model.position.set(0, 0.48, -0.55);
       model.rotation.set(0, 0, 0);
       model.visible = true;
@@ -144,7 +106,7 @@ export class SpaceRace {
       z: RACE_ENTRY.z,
       radius: 5,
       label: "Race at Moonbeam Rally",
-      hint: "E · Hover karts · Two alien racers · Win a trophy",
+      hint: "E · Plasma spacecraft · Fire rings · Two-lap race",
     });
     game.interactions.on("space-race", () => this.board());
   }
@@ -165,7 +127,10 @@ export class SpaceRace {
         const p = s.position.clone().addScaledVector(s.right, lanes[j]);
         p.y += j === 0 || j === 5 ? 1.7 : j === 1 || j === 4 ? 0.5 : 0;
         vertices.push(...p.toArray());
-        const c = j === 2 || j === 3 ? new THREE.Color(0x314361) : color;
+        const c =
+          j === 2 || j === 3
+            ? color.clone().multiplyScalar(0.16).addScalar(0.04)
+            : color;
         colors.push(c.r, c.g, c.b);
         if (i < count && j < lanes.length - 1) {
           const a = i * lanes.length + j,
@@ -185,8 +150,10 @@ export class SpaceRace {
       geo,
       new THREE.MeshStandardMaterial({
         vertexColors: true,
-        roughness: 0.82,
-        metalness: 0.05,
+        roughness: 0.46,
+        metalness: 0.38,
+        emissive: 0x224466,
+        emissiveIntensity: 0.12,
         side: THREE.DoubleSide,
         fog: false,
       }),
@@ -216,7 +183,17 @@ export class SpaceRace {
         bumper = new THREE.Group();
       bumper.position.copy(s.position);
       bumper.rotation.y = s.heading;
-      box(bumper, [0, 0.6, 0], [3.3, 1.15, 2.1], RACE_COLORS[i % 5]);
+      box(bumper, [0, 0.6, 0], [3.3, 1.15, 2.1], 0x24354a);
+      for (const side of [-1, 1]) {
+        const stripe = box(
+          bumper,
+          [side * 0.8, 1.2, 0],
+          [0.2, 0.1, 2],
+          0xff9b24,
+        );
+        stripe.material.emissive.set(0xff7419);
+        stripe.material.emissiveIntensity = 0.7;
+      }
       part(
         bumper,
         new THREE.SphereGeometry(0.48, 12, 8),
@@ -236,20 +213,6 @@ export class SpaceRace {
       }
       bumper.name = "soft-race-bumper";
       this.group.add(bumper);
-    });
-    this.track.boosts.forEach((b) => {
-      const s = this.track.sample(b.distance, b.lane),
-        pad = new THREE.Group();
-      pad.position.copy(s.position);
-      pad.rotation.y = s.heading;
-      for (let j = -3; j <= 3; j++)
-        box(pad, [0, 0.035, j * 1.2], [4.5, 0.07, 0.5], 0x88f2d6);
-      if (globalThis.document) {
-        const sign = label(pad, "BOOST ↑", 0, 1.2, -3, 4, "#143d48", "#baffdf");
-        sign.rotation.y = Math.PI;
-      }
-      pad.name = "star-boost-pad";
-      this.group.add(pad);
     });
     this.track.jumps.forEach((j, i) => {
       const s = this.track.sample(j.start - 12),
@@ -273,16 +236,6 @@ export class SpaceRace {
         sign.rotation.y = Math.PI;
       }
       this.group.add(gate);
-      for (let k = 0; k < 4; k++) {
-        const air = this.track.sample(j.start + j.ramp + 12 + k * 20);
-        const ring = part(
-          this.group,
-          new THREE.TorusGeometry(7, 0.14, 6, 32),
-          RACE_COLORS[i],
-          [air.position.x, air.roadY + air.lift + 2, air.position.z],
-        );
-        ring.rotation.y = air.heading;
-      }
     });
     const start = this.track.sample(0),
       gate = new THREE.Group();
@@ -402,7 +355,7 @@ export class SpaceRace {
     this.hud.hidden = true;
     this.hud.setAttribute("aria-label", "Moonbeam Rally race controls");
     this.hud.innerHTML =
-      '<span class="race-eyebrow">MOONBEAM RALLY</span><strong class="race-phase" role="status"></strong><p class="race-info"></p><progress class="race-progress" max="100" value="0" aria-label="Race progress"></progress><p class="race-help"><span class="race-help-keys">A/D or ←/→ steer · W accelerates · S brakes.</span><span class="race-help-touch">Thumbstick: left/right to steer, down to brake.</span> Jumps are automatic.</p><button class="race-options" aria-expanded="false" aria-controls="race-actions">Controls</button><div class="race-actions" id="race-actions"><button class="race-start">Start race · E</button><button class="race-auto" aria-pressed="true">Auto-accelerate</button><button class="race-gentle" aria-pressed="false">Gentler motion</button><button class="race-exit">Exit safely</button></div>';
+      '<span class="race-eyebrow">MOONBEAM RALLY / PLASMA GP</span><strong class="race-phase" role="status"></strong><p class="race-info"></p><progress class="race-progress" max="100" value="0" aria-label="Race progress"></progress><button class="race-power" disabled>Collect a power-up</button><p class="race-help"><span class="race-help-keys">A/D steer · W accelerate · S brake · F power-up.</span><span class="race-help-touch">Thumbstick steers; down brakes. Tap your power-up to use it.</span> Cyan arrows boost. Amber grids slow. Meteor circles warn before impact. Jumps are automatic.</p><button class="race-options" aria-expanded="false" aria-controls="race-actions">Controls</button><div class="race-actions" id="race-actions"><button class="race-start">Start race · E</button><button class="race-auto" aria-pressed="true">Auto-accelerate</button><button class="race-gentle" aria-pressed="false">Gentler motion</button><button class="race-exit">Exit safely</button></div>';
     document.querySelector("#game").append(this.hud);
     this.phaseText = this.hud.querySelector(".race-phase");
     this.info = this.hud.querySelector(".race-info");
@@ -416,6 +369,9 @@ export class SpaceRace {
         }
       });
     act(".race-start", () => this.start());
+    act(".race-power", () => {
+      if (this.run.usePowerup()) this.game.ui.toast(this.run.notice);
+    });
     act(".race-exit", () => this.exit());
     act(".race-auto", () => {
       this.autoThrottle = !this.autoThrottle;
@@ -469,7 +425,7 @@ export class SpaceRace {
       document.querySelector("#robot-gestures").hidden = true;
     }
     g.ui.toast(
-      "Ready when you are. Choose Start race. Steer around soft bumpers and through mint boost pads.",
+      "Two laps. Cyan boosts, amber stoppers, fire rings and meteor warnings. Collect a capsule, then press F or tap it.",
     );
     g.canvas?.focus();
     return true;
@@ -496,12 +452,15 @@ export class SpaceRace {
         finished ? [-0, -5, 5][i] : r.lane,
       );
       const k = this.karts[i];
+      // Retire finished rivals until the podium instead of leaving ghosts on the line.
+      k.visible = finished || r.finish === null;
       k.position.copy(s.position);
       k.position.y += 0.85 + (finished ? 0 : s.lift);
       k.rotation.set(-(finished ? 0 : s.pitch), s.heading, 0, "YXZ");
       k.userData.flames.visible =
         this.occupied && this.run.state === "racing" && r.speed > 2;
       k.userData.flames.scale.z = r.boost > 0 ? 1.7 : 1;
+      k.userData.shield.visible = this.occupied && r.shield > 0;
     });
     if (this.occupied) {
       this.game.player.position.copy(this.karts[0].position);
@@ -524,6 +483,14 @@ export class SpaceRace {
     const g = this.game;
     if (this.hud) this.hud.hidden = !this.occupied || g.mode !== "playing";
     this.updateRacerVisibility();
+    if (g.area.id === "space")
+      this.effects.update(
+        this.run,
+        g.player.position,
+        g.area.groundY,
+        this.gentle || g.calm,
+        this.occupied,
+      );
     if (!this.occupied || g.mode !== "playing") return;
     if (g.input.consume("KeyE")) {
       if (this.run.state === "ready" || this.run.state === "finished")
@@ -541,6 +508,7 @@ export class SpaceRace {
       throttle: this.autoThrottle || input.down("KeyW", "ArrowUp"),
       brake: input.down("KeyS", "ArrowDown"),
       gentle: this.gentle || g.calm,
+      usePowerup: input.consume("KeyF"),
     });
     if (this.run.notice) g.ui.toast(this.run.notice);
     if (this.run.state === "finished" && !this.resultShown) {
@@ -576,7 +544,10 @@ export class SpaceRace {
     const options = this.hud.querySelector(".race-options");
     const actions = this.hud.querySelector(".race-actions");
     options.hidden = !racing;
-    options.setAttribute("aria-expanded", String(racing && this.optionsExpanded));
+    options.setAttribute(
+      "aria-expanded",
+      String(racing && this.optionsExpanded),
+    );
     options.textContent = this.optionsExpanded ? "Hide controls" : "Controls";
     actions.hidden = racing && !this.optionsExpanded;
     const title =
@@ -593,9 +564,17 @@ export class SpaceRace {
       this.phaseText.textContent = title;
     this.info.textContent =
       state === "ready"
-        ? "3.9 km · 4 jumps · Race Nova & Pip · First place earns a trophy"
-        : `${Math.floor(this.run.elapsed / 60)}:${String(Math.floor(this.run.elapsed % 60)).padStart(2, "0")} · ${state === "finished" ? 0 : Math.round(r.speed * 3.6 * (this.gentle || this.game.calm ? 0.7 : 1))} km/h · ${Math.round((r.distance / this.track.length) * 100)}% · Trophies ${this.wins}`;
-    this.progress.value = (r.distance / this.track.length) * 100;
+        ? "2 laps · 7.8 km · 8 huge jumps · 24 fire rings · Win a trophy"
+        : `Lap ${Math.min(RACE_LAPS, 1 + Math.floor(r.distance / this.track.length))}/${RACE_LAPS} · ${Math.round(r.speed * 3.6 * (this.gentle || this.game.calm ? 0.7 : 1))} km/h · Rings ${r.rings}/24 · ${Math.floor(this.run.elapsed / 60)}:${String(Math.floor(this.run.elapsed % 60)).padStart(2, "0")}`;
+    this.progress.value = (r.distance / this.track.raceDistance) * 100;
+    const power = this.hud.querySelector(".race-power");
+    power.hidden = state !== "racing";
+    power.disabled = !r.powerup;
+    power.textContent = r.powerup
+      ? `Use ${r.powerup.toUpperCase()} · F`
+      : r.shield > 0
+        ? "Shield active"
+        : "Collect a power-up";
     const start = this.hud.querySelector(".race-start");
     start.hidden = state !== "ready" && state !== "finished";
     start.textContent =
@@ -614,10 +593,11 @@ export class SpaceRace {
         this.run.state === "finished" ? 0 : this.run.racers[0].distance,
       );
     const target = k.position.clone().add(v(0, g.areas.space.groundY + 1, 0));
+    const speedRatio = this.run.racers[0].speed / RACE_BOOST_SPEED;
     const desired = target
       .clone()
-      .addScaledVector(s.tangent, -12)
-      .add(v(0, 7.5, 0));
+      .addScaledVector(s.tangent, -(11.5 + speedRatio * 2))
+      .add(v(0, 5.8, 0));
     if (!this.cameraReady) g.camera.position.copy(desired);
     else
       g.camera.position.lerp(
@@ -625,8 +605,13 @@ export class SpaceRace {
         1 - Math.exp(-(this.gentle || g.calm ? 3 : 7) * dt),
       );
     g.camera.up.set(0, 1, 0);
-    g.camera.lookAt(target.clone().addScaledVector(s.tangent, 5));
-    g.camera.fov = 60;
+    g.camera.lookAt(target.clone().addScaledVector(s.tangent, 10));
+    g.camera.fov = THREE.MathUtils.damp(
+      g.camera.fov,
+      this.gentle || g.calm ? 62 : 64 + speedRatio * 10,
+      3,
+      dt,
+    );
     g.camera.far = Math.max(g.camera.far, 2200);
     g.camera.updateProjectionMatrix();
     this.cameraReady = true;

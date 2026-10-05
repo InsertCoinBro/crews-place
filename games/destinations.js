@@ -8,9 +8,22 @@ export const destinations = {
   rec: {
     title: "Recreation Club",
     description: "A space to make, imagine, and try something new.",
+    launch: ({ game, close }) =>
+      new Promise((resolve) => {
+        game.coloring.open(() => {
+          close();
+          resolve();
+        });
+      }),
   },
   park: {
     title: "Meadow Park",
-    description: "More ways to play outside are on the way.",
+    description: "Push the beach ball around the grass.",
+    launch: ({ game, close }) => {
+      game.parkBall.activate();
+      game.ui.toast("Wheee! Push the beach ball around the park.");
+      close();
+      return Promise.resolve();
+    },
   },
 };
