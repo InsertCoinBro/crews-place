@@ -8,6 +8,18 @@ Double-click `start.command`, then open the local address shown in its terminal 
 
 Keep the terminal open while playing. Press Ctrl+C there to stop the server. This version uses Vite; use the launcher instead of Live Server or opening the HTML file directly.
 
+## Rainbow Rapids water park
+
+The northwest park has three separate numbered lift stations. Follow the colored paths west of the splash pool, then north along the promenade. Press **E** or **Use** at a lift; it carries you to the top and waits for a separate **Start slide** press.
+
+- **1 · Cosmic Plunge**: a 300-metre tower with a long straight vertical drop. Lift entrance: `(-223, -135)`.
+- **2 · Rainbow Twister**: a 128-metre slide with four complete descending coils. Lift entrance: `(-204, -280)`.
+- **3 · Loop Lagoon**: two inversions, three turns around an open rainbow bowl, then a central drain tube. Lift entrance: `(-129, -314)`.
+
+Every slide ends above the lagoon: the raft drops into the water, then the character swims freely. Use **WASD**, **arrow keys**, or the **touch stick** to swim to the yellow steps on the southeast side. Reaching the steps climbs onto dry land. There is no drowning, timer, or automatic swim-to-exit. **Help me out** is always available in the pool. **C** changes the ride camera; Pause and gentler motion work throughout.
+
+Local development shortcuts: `/?water-park-preview` opens at the entrance; `/?water-park-test` offers the ride/swimming browser checks and inspection views. These shortcuts are disabled in production builds.
+
 ## Launch on another computer
 
 Install Node.js 22.12+ and npm or pnpm. In this project folder:

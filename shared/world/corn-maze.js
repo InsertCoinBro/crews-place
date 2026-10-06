@@ -473,6 +473,16 @@ export class CornMaze {
     p.position.copy(this.model.position);
     p.heading = this.model.rotation.y;
     p.sync();
+    // Seat the selected character visibly in the tractor cabin while driving.
+    // The seat offset (0, 0.9, 0.65) puts their feet just below the body top
+    // so legs are hidden inside and torso/head show above — looks like sitting.
+    if (this.occupied) {
+      const seat = new THREE.Vector3(0, 0.9, 0.65);
+      seat.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.model.rotation.y);
+      p.model.position.copy(this.model.position).add(seat);
+      p.model.rotation.y = this.model.rotation.y;
+      p.model.visible = true;
+    }
   }
   exit() {
     if (!this.occupied) return;

@@ -40,6 +40,7 @@ import { LibraryReader } from "./games/library.js";
 import { ColoringCorner } from "./games/coloring.js";
 import { BeachBall } from "./shared/world/park-ball.js";
 import { CornMaze, MAZE_START } from "./shared/world/corn-maze.js";
+import { TeddyBearWorld } from "./shared/world/teddy-bear-world.js";
 import { Farm, FARM_SITE } from "./shared/world/farm.js";
 import { buildSpace } from "./shared/world/space.js";
 import {
@@ -231,6 +232,7 @@ class Game {
     this.spaceAlien = new SpaceCombat(this, characters.get("moon_mischief"));
     this.farm = new Farm(this);
     this.cornMaze = new CornMaze(this);
+    this.teddyWorld = new TeddyBearWorld(this);
     this.interactions.on("minigame", (item) => {
       this.pickups.reset();
       this.arcade.launch(item);
@@ -685,6 +687,7 @@ class Game {
   enter(id, spawn) {
     const next = this.areas[id];
     if (!next) return;
+    this.waterPark?.exit();
     this.spaceRace?.exit();
     this.spaceTube?.exit();
     this.spaceship?.exit();
@@ -929,6 +932,7 @@ class Game {
         this.npcs.update(dt, this.area.interior ? null : this.player);
         this.wildlife.update(dt, this.area.interior ? null : this.player);
         this.farm.update(dt);
+        this.teddyWorld.update(dt);
         if (
           this.leaves.update(
             dt,
@@ -995,6 +999,7 @@ class Game {
       }
     }
     this.spaceDive.applyEnvironment();
+    this.waterPark.applyEnvironment();
     this.ui.update(
       dt,
       this.player,

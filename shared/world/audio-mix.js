@@ -24,7 +24,7 @@ export function mixWorldAudio(game, weather) {
     20,
     0.55,
   );
-  a.proximity("waterParkFlow", outdoors ? {x:-150,y:0,z:-80} : null, listener, 80, 0.32, SOURCES.fountain, 1.2);
+  a.proximity("waterParkFlow", outdoors ? {x:-166,y:2,z:-102} : null, listener, 80, 0.32, SOURCES.fountain, 1.2);
   a.setLoop("waterSlideRush", !!game.waterPark?.occupied && game.waterPark.ride.state === "riding", game.calm ? 0.14 : 0.3, SOURCES.fountain, 1.5);
   a.animal(
     "meadowHorse",

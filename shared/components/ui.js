@@ -1,4 +1,4 @@
-import { insideWaterPark } from "../world/water-park-track.js";
+import { insideWaterPark, WATER_SLIDES, WATER_POOL } from "../world/water-park-track.js";
 import { MAZE_SITE, makeMaze } from "../world/corn-maze.js";
 const mapMaze = makeMaze();
 import { COASTER_STATION } from "../world/coaster-track.js";
@@ -207,9 +207,13 @@ export class UI {
       const p = point(x - w / 2, z - d / 2);
       c.fillRect(p[0], p[1], w * mapScale, d * mapScale);
     };
-    rect(-169, -125, 138, 144, "#f4d2a3");
-    rect(-137, -80, 37, 30, "#23bde0");
-    for (let i=0; i<3; i++) rect(-211+i*12, -145, 8, 65, ["#ed4388", "#a273ed", "#ffce36"][i]);
+    rect(-168, -192, 148, 282, "#f4d2a3");
+    rect(-166.5, -102, 131, 38, "#23bde0");
+    for (const [i,slide] of WATER_SLIDES.entries()) {
+      rect(slide.entry.x, slide.entry.z, 10, 10, "#"+slide.color.toString(16));
+      const p=point(slide.entry.x,slide.entry.z);c.fillStyle="#452471";c.font="bold 10px sans-serif";c.fillText(String(i+1),p[0]-3,p[1]+3);
+    }
+    rect(WATER_POOL.exitX,WATER_POOL.exitZ,7,6,"#ffda39");
     if (insideWaterPark(player.position)) document.querySelector("#map-title").textContent = "RAINBOW RAPIDS";
     rect(-164, 24, 136, 136, "#739342");
     for (let row = 0; row < 17; row++)
@@ -319,7 +323,7 @@ export class UI {
     c.fillText("N", 86, 12);
     document.querySelector("#map-caption").textContent = area.interior
       ? "Inside " + area.name
-      : player.position.x < -90 ? "Golden finish at the west exit" : "North airfield: " +
+      : insideWaterPark(player.position) ? "1 Plunge · 2 Twister · 3 Loop & bowl" : player.position.x < -90 ? "Golden finish at the west exit" : "North airfield: " +
         Math.round(
           Math.hypot(
             player.position.x - NORTH_AIRFIELD_SITE.x,

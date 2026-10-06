@@ -104,6 +104,16 @@ export class ProceduralLayer {
     this.lastLeanX = 0;
     this.lastBounceY = 0;
     this.lastFloatY = 0;
+    // Rotation deltas (also no-accumulate).
+    this.lastChestRotX = 0;
+    this.lastHipsRotZ = 0;
+    this.lastHipsRotY = 0;
+    this.lastHeadRotY = 0;
+    this.lastHeadRotX = 0;
+    // Gesture head deltas (separate from head-look).
+    this.lastGestureHeadX = 0;
+    this.lastGestureHeadY = 0;
+    this.lastGestureHeadZ = 0;
     // Active procedural gesture: { name, time, duration } or null.
     this.gesture = null;
   }
@@ -132,6 +142,14 @@ export class ProceduralLayer {
       this.model.position.y -= this.lastBounceY;
       this.lastBounceY = 0;
     }
+    if (this.bones.head) {
+      this.bones.head.rotation.x -= this.lastGestureHeadX;
+      this.bones.head.rotation.y -= this.lastGestureHeadY;
+      this.bones.head.rotation.z -= this.lastGestureHeadZ;
+    }
+    this.lastGestureHeadX = 0;
+    this.lastGestureHeadY = 0;
+    this.lastGestureHeadZ = 0;
     this.gesture = null;
   }
 
@@ -146,7 +164,10 @@ export class ProceduralLayer {
     if (b.chest) {
       let breath = Math.sin(t * Math.PI * 2 * p.breatheRate) * p.breatheAmp;
       if (p.mechanical) breath = quantize(breath, 5);
-      b.chest.rotation.x += breath * 0.6;
+      b.chest.rotation.x -= this.lastChestRotX;
+      const chestRot = breath * 0.6;
+      b.chest.rotation.x += chestRot;
+      this.lastChestRotX = chestRot;
       // Chest rise: remove last frame's lift, apply this frame's (no accumulate).
       b.chest.position.y -= this.lastChestLift;
       const lift = Math.abs(breath) * 0.35;
@@ -179,23 +200,39 @@ export class ProceduralLayer {
     this.lastLeanX = this.leanX;
     // Hip swagger: side-to-side sway scaled by speed.
     if (b.hips && moving) {
-      const sway = Math.sin(t * Math.PI * 2 * 1.7) * p.swayAmp * Math.min(1, speed / 3);
-      b.hips.rotation.z += p.mechanical ? quantize(sway, 5) : sway;
-      b.hips.rotation.y += Math.sin(t * Math.PI * 2 * 0.85) * p.swayAmp * 0.5 * Math.min(1, speed / 3);
+      const swayRaw = Math.sin(t * Math.PI * 2 * 1.7) * p.swayAmp * Math.min(1, speed / 3);
+      const sway = p.mechanical ? quantize(swayRaw, 5) : swayRaw;
+      const twist = Math.sin(t * Math.PI * 2 * 0.85) * p.swayAmp * 0.5 * Math.min(1, speed / 3);
+      b.hips.rotation.z -= this.lastHipsRotZ;
+      b.hips.rotation.z += sway;
+      this.lastHipsRotZ = sway;
+      b.hips.rotation.y -= this.lastHipsRotY;
+      b.hips.rotation.y += twist;
+      this.lastHipsRotY = twist;
+    } else if (b.hips) {
+      b.hips.rotation.z -= this.lastHipsRotZ;
+      b.hips.rotation.y -= this.lastHipsRotY;
+      this.lastHipsRotZ = 0;
+      this.lastHipsRotY = 0;
     }
 
     // ---- Head look ----
     if (b.head) {
+      let headY = 0, headX = 0;
       if (moving) {
-        // Glance toward travel direction (subtle; the body already turns).
-        b.head.rotation.y += Math.sin(t * 2.1) * 0.06 * p.headLook;
+        headY = Math.sin(t * 2.1) * 0.06 * p.headLook;
       } else {
-        // Idle: curious look-arounds, per-character rhythm.
         const look = Math.sin(t * Math.PI * 2 * p.idleSwayRate * 0.5);
-        const gated = Math.max(0, look - 0.55) * 2.2; // only peek occasionally
-        b.head.rotation.y += (p.mechanical ? quantize(gated, 4) : gated) * 0.5 * p.headLook * Math.sign(Math.sin(t * 0.7));
-        b.head.rotation.x += Math.sin(t * Math.PI * 2 * p.breatheRate * 0.5) * 0.03;
+        const gated = Math.max(0, look - 0.55) * 2.2;
+        headY = (p.mechanical ? quantize(gated, 4) : gated) * 0.5 * p.headLook * Math.sign(Math.sin(t * 0.7));
+        headX = Math.sin(t * Math.PI * 2 * p.breatheRate * 0.5) * 0.03;
       }
+      b.head.rotation.y -= this.lastHeadRotY;
+      b.head.rotation.y += headY;
+      this.lastHeadRotY = headY;
+      b.head.rotation.x -= this.lastHeadRotX;
+      b.head.rotation.x += headX;
+      this.lastHeadRotX = headX;
     }
 
     // ---- Alien float ----
@@ -220,6 +257,14 @@ export class ProceduralLayer {
       if (g.time >= g.duration) {
         this.model.position.y -= this.lastBounceY;
         this.lastBounceY = 0;
+        if (this.bones.head) {
+          this.bones.head.rotation.x -= this.lastGestureHeadX;
+          this.bones.head.rotation.y -= this.lastGestureHeadY;
+          this.bones.head.rotation.z -= this.lastGestureHeadZ;
+        }
+        this.lastGestureHeadX = 0;
+        this.lastGestureHeadY = 0;
+        this.lastGestureHeadZ = 0;
         this.gesture = null;
       }
     } else if (this.lastBounceY !== 0) {
@@ -253,7 +298,12 @@ export class ProceduralLayer {
       const wave = Math.sin(k * TAU * 3) * 0.55;
       blend(b.upperArmR, -2.4, 0, -0.5);
       blend(b.forearmR, -0.3, 0, wave);
-      if (b.head) b.head.rotation.z += Math.sin(k * TAU * 3) * 0.06 * weight;
+      if (b.head) {
+        const tilt = Math.sin(k * TAU * 3) * 0.06 * weight;
+        b.head.rotation.z -= this.lastGestureHeadZ;
+        b.head.rotation.z += tilt;
+        this.lastGestureHeadZ = tilt;
+      }
     } else if (name === "Celebrate") {
       // Both arms up, joyful bounce.
       const bounce = Math.abs(Math.sin(k * TAU * 2.5));
@@ -265,11 +315,22 @@ export class ProceduralLayer {
       const bounceY = bounce * 0.22 * weight;
       this.model.position.y += bounceY;
       this.lastBounceY = bounceY;
-      if (b.head) b.head.rotation.x += -0.18 * weight;
+      if (b.head) {
+        const nodX = -0.18 * weight;
+        b.head.rotation.x -= this.lastGestureHeadX;
+        b.head.rotation.x += nodX;
+        this.lastGestureHeadX = nodX;
+      }
     } else if (name === "Nod" && b.head) {
-      b.head.rotation.x += Math.sin(k * TAU * 2) * 0.3 * weight;
+      const nod = Math.sin(k * TAU * 2) * 0.3 * weight;
+      b.head.rotation.x -= this.lastGestureHeadX;
+      b.head.rotation.x += nod;
+      this.lastGestureHeadX = nod;
     } else if (name === "ShakeHead" && b.head) {
-      b.head.rotation.y += Math.sin(k * TAU * 2.5) * 0.42 * weight;
+      const shake = Math.sin(k * TAU * 2.5) * 0.42 * weight;
+      b.head.rotation.y -= this.lastGestureHeadY;
+      b.head.rotation.y += shake;
+      this.lastGestureHeadY = shake;
     } else if (name === "LookAround" && b.head) {
       // Sweep left, hold, sweep right.
       const sweep = k < 0.45 ? (k / 0.45) * 0.7 : k < 0.55 ? 0.7 : 0.7 - ((k - 0.55) / 0.45) * 1.4;
@@ -279,11 +340,27 @@ export class ProceduralLayer {
 
   dispose() {
     this.cancelGesture();
-    if (this.bones.chest) this.bones.chest.position.y -= this.lastChestLift;
+    if (this.bones.chest) {
+      this.bones.chest.position.y -= this.lastChestLift;
+      this.bones.chest.rotation.x -= this.lastChestRotX;
+    }
     this.model.rotation.x -= this.lastLeanX;
-    if (this.bones.hips) this.bones.hips.position.y -= this.lastFloatY;
+    if (this.bones.hips) {
+      this.bones.hips.position.y -= this.lastFloatY;
+      this.bones.hips.rotation.z -= this.lastHipsRotZ;
+      this.bones.hips.rotation.y -= this.lastHipsRotY;
+    }
+    if (this.bones.head) {
+      this.bones.head.rotation.y -= this.lastHeadRotY;
+      this.bones.head.rotation.x -= this.lastHeadRotX;
+    }
     this.lastChestLift = 0;
     this.lastLeanX = 0;
     this.lastFloatY = 0;
+    this.lastChestRotX = 0;
+    this.lastHipsRotZ = 0;
+    this.lastHipsRotY = 0;
+    this.lastHeadRotY = 0;
+    this.lastHeadRotX = 0;
   }
 }

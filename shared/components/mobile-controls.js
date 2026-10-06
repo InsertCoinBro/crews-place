@@ -185,6 +185,7 @@ export class MobileControls {
     const gesture = this.root.querySelector(".mobile-gesture");
     const bubble = this.root.querySelector(".mobile-bubble");
     const arena = !!this.game.spaceAlien?.canPlay();
+    const swimming = this.game.waterPark?.swimming;
     bubble.hidden = !arena || arcade;
     bubble.disabled = !this.game.spaceAlien?.enabled;
     if (arcade) {
@@ -200,7 +201,7 @@ export class MobileControls {
       return;
     }
 
-    use.hidden = arena;
+    use.hidden = arena || swimming;
     use.textContent = this.game.spaceRace?.occupied
       ? ["ready", "finished"].includes(this.game.spaceRace.run.state)
         ? "Start"
@@ -229,6 +230,7 @@ export class MobileControls {
       this.game.waterPark?.occupied ||
       this.game.spaceDive?.occupied
     );
+    if (swimming) secondary.hidden = true;
     restart.hidden = true;
     enter.hidden = true;
     pickup.hidden = !document.querySelector("#pickup-hint:not([hidden])");
@@ -251,7 +253,7 @@ export class MobileControls {
       this.game.driving ||
       this.game.cornMaze?.occupied ||
       this.game.coaster?.occupied ||
-      this.game.waterPark?.occupied ||
+      (this.game.waterPark?.occupied && !swimming) ||
       this.game.spaceDive?.occupied
     );
   }
