@@ -99,6 +99,11 @@ export class ProceduralLayer {
     this.landPulse = 0;
     this.leanX = 0;
     this.leanZ = 0;
+    // Last-frame deltas for non-mixer-driven transforms (no accumulate).
+    this.lastChestLift = 0;
+    this.lastLeanX = 0;
+    this.lastBounceY = 0;
+    this.lastFloatY = 0;
     // Active procedural gesture: { name, time, duration } or null.
     this.gesture = null;
   }
@@ -123,6 +128,10 @@ export class ProceduralLayer {
   }
 
   cancelGesture() {
+    if (this.lastBounceY !== 0) {
+      this.model.position.y -= this.lastBounceY;
+      this.lastBounceY = 0;
+    }
     this.gesture = null;
   }
 
@@ -138,8 +147,11 @@ export class ProceduralLayer {
       let breath = Math.sin(t * Math.PI * 2 * p.breatheRate) * p.breatheAmp;
       if (p.mechanical) breath = quantize(breath, 5);
       b.chest.rotation.x += breath * 0.6;
-      // Chest rise: tiny positional lift.
-      b.chest.position.y += Math.abs(breath) * 0.35;
+      // Chest rise: remove last frame's lift, apply this frame's (no accumulate).
+      b.chest.position.y -= this.lastChestLift;
+      const lift = Math.abs(breath) * 0.35;
+      b.chest.position.y += lift;
+      this.lastChestLift = lift;
     }
 
     // ---- Squash & stretch ----
@@ -161,7 +173,10 @@ export class ProceduralLayer {
       ? THREE.MathUtils.clamp(speed * 0.012, 0, 0.09) * (p.leanFwd / 0.045)
       : 0;
     this.leanX += (targetLeanX - this.leanX) * Math.min(1, dt * 6);
+    // Remove last frame's lean, apply the new one (no accumulate).
+    this.model.rotation.x -= this.lastLeanX;
     this.model.rotation.x += this.leanX;
+    this.lastLeanX = this.leanX;
     // Hip swagger: side-to-side sway scaled by speed.
     if (b.hips && moving) {
       const sway = Math.sin(t * Math.PI * 2 * 1.7) * p.swayAmp * Math.min(1, speed / 3);
@@ -185,7 +200,13 @@ export class ProceduralLayer {
 
     // ---- Alien float ----
     if (p.floatAmp && b.hips) {
-      b.hips.position.y += Math.sin(t * Math.PI * 2 * 0.9) * p.floatAmp;
+      b.hips.position.y -= this.lastFloatY;
+      const floatY = Math.sin(t * Math.PI * 2 * 0.9) * p.floatAmp;
+      b.hips.position.y += floatY;
+      this.lastFloatY = floatY;
+    } else if (b.hips) {
+      b.hips.position.y -= this.lastFloatY;
+      this.lastFloatY = 0;
     }
 
     // ---- Procedural gesture (overrides clip pose for its bones) ----
@@ -196,7 +217,14 @@ export class ProceduralLayer {
       // Ease weight in/out so it blends with the clip.
       const weight = Math.min(1, g.time / 0.18) * Math.min(1, (g.duration - g.time) / 0.25);
       this.applyGesture(g.name, k, THREE.MathUtils.clamp(weight, 0, 1));
-      if (g.time >= g.duration) this.gesture = null;
+      if (g.time >= g.duration) {
+        this.model.position.y -= this.lastBounceY;
+        this.lastBounceY = 0;
+        this.gesture = null;
+      }
+    } else if (this.lastBounceY !== 0) {
+      this.model.position.y -= this.lastBounceY;
+      this.lastBounceY = 0;
     }
 
     // Keep the mixer-fed world matrices fresh for the next render.
@@ -233,7 +261,10 @@ export class ProceduralLayer {
       blend(b.upperArmR, -2.7, 0, -0.6);
       blend(b.forearmL, -0.4, 0, 0);
       blend(b.forearmR, -0.4, 0, 0);
-      this.model.position.y += bounce * 0.22 * weight;
+      this.model.position.y -= this.lastBounceY;
+      const bounceY = bounce * 0.22 * weight;
+      this.model.position.y += bounceY;
+      this.lastBounceY = bounceY;
       if (b.head) b.head.rotation.x += -0.18 * weight;
     } else if (name === "Nod" && b.head) {
       b.head.rotation.x += Math.sin(k * TAU * 2) * 0.3 * weight;
@@ -247,6 +278,12 @@ export class ProceduralLayer {
   }
 
   dispose() {
-    this.gesture = null;
+    this.cancelGesture();
+    if (this.bones.chest) this.bones.chest.position.y -= this.lastChestLift;
+    this.model.rotation.x -= this.lastLeanX;
+    if (this.bones.hips) this.bones.hips.position.y -= this.lastFloatY;
+    this.lastChestLift = 0;
+    this.lastLeanX = 0;
+    this.lastFloatY = 0;
   }
 }

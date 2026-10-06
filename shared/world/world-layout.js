@@ -1,7 +1,7 @@
 // North is negative Z. The west meadow accommodates the farm corn maze.
 export const NORTH_EXTENSION = 2400;
 export const WORLD_BOUNDS = Object.freeze({
-  minX: -244,
+  minX: -276,
   maxX: 90,
   minZ: -2490,
   maxZ: 104,

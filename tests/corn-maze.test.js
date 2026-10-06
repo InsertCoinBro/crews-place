@@ -17,9 +17,9 @@ const neighbors = (x, z) =>
     [x, z + 1],
     [x, z - 1],
   ].filter(([a, b]) => grid[b]?.[a] === 0);
-test("large maze has one solution, connected paths and multiple dead ends", () => {
+test("large maze has multiple paths, connected corridors and dead ends", () => {
   const seen = new Set(),
-    queue = [[16, 11]];
+    queue = [[20, 13]];
   let edges = 0,
     dead = 0;
   while (queue.length) {
@@ -34,13 +34,14 @@ test("large maze has one solution, connected paths and multiple dead ends", () =
   }
   assert.ok(seen.has("0,1"));
   assert.equal(seen.size, grid.flat().filter((v) => !v).length);
-  assert.equal(edges / 2, seen.size - 1);
+  assert.ok(edges / 2 > seen.size - 1);
   assert.ok(dead >= 5);
-  assert.ok(grid.length * 8 >= 130);
+  assert.ok(grid.length * 8 >= 160);
 });
 test("tractor can traverse every corridor connection with its full collision radius", () => {
-  for (let z = 0; z < 17; z++)
-    for (let x = 0; x < 17; x++)
+  const n = grid.length;
+  for (let z = 0; z < n; z++)
+    for (let x = 0; x < n; x++)
       if (!grid[z][x])
         for (const [a, b] of neighbors(x, z)) {
           const model = new THREE.Group();
@@ -63,7 +64,7 @@ test("tractor can traverse every corridor connection with its full collision rad
 });
 test("tractor stops at walls, reverses and turns in place", () => {
   const model = new THREE.Group();
-  const p = mazePoint(15, 11);
+  const p = mazePoint(19, 13);
   model.position.set(p.x, 0, p.z);
   const obstacle = [
     { minX: p.x - 8, maxX: p.x + 8, minZ: p.z + 4, maxZ: p.z + 12, maxY: 4.4 },
