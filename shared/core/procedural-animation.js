@@ -52,7 +52,7 @@ const PROFILES = {
   cowboy: {
     breatheAmp: 0.028,
     breatheRate: 0.32,
-    swayAmp: 0.055, // hip swagger when walking
+    swayAmp: 0.016, // subtle hip sway when walking
     leanFwd: 0.045, // confident forward lean at speed
     squash: 1.0, // full squash & stretch
     idleSwayRate: 0.4,
@@ -61,7 +61,7 @@ const PROFILES = {
   jolly_robot: {
     breatheAmp: 0.012,
     breatheRate: 0.5,
-    swayAmp: 0.02,
+    swayAmp: 0.007,
     leanFwd: 0.02,
     squash: 0.45, // robots are rigid; keep it subtle
     idleSwayRate: 0.9, // servo twitch
@@ -71,7 +71,7 @@ const PROFILES = {
   moon_mischief: {
     breatheAmp: 0.04,
     breatheRate: 0.25,
-    swayAmp: 0.08, // wobbly
+    swayAmp: 0.024, // gentle wobble
     leanFwd: 0.03,
     squash: 1.35, // extra bouncy
     idleSwayRate: 0.55,
