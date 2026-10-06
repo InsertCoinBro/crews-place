@@ -7,19 +7,21 @@ import { BOOKS, bookCoverTexture } from "../../games/library.js";
 function makeLibraryShelf(area, interactions, origin) {
   const g = area.group;
   const shelfZ = -5.45;
-  box(g, origin, 1.82, shelfZ, 7.9, 3.48, 0.42, 0x7b5739);
-  box(g, origin, 3.55, shelfZ + 0.03, 8.15, 0.18, 0.55, 0x5e422d);
-  box(g, origin, 0.18, shelfZ + 0.03, 8.15, 0.25, 0.65, 0x5e422d);
-  for (const x of [origin - 3.98, origin + 3.98])
-    box(g, x, 1.79, shelfZ + 0.04, 0.25, 3.45, 0.65, 0x5e422d);
-  for (const y of [1.72, 3.36])
-    box(g, origin, y, shelfZ + 0.08, 7.85, 0.18, 0.7, 0x66472f);
+  // One long shelf: a single reachable row of books (no more high shelf).
+  const shelfW = 12.6;
+  box(g, origin, 1.05, shelfZ, shelfW, 2.1, 0.42, 0x7b5739);
+  box(g, origin, 2.02, shelfZ + 0.03, shelfW + 0.25, 0.18, 0.55, 0x5e422d);
+  box(g, origin, 0.12, shelfZ + 0.03, shelfW + 0.25, 0.25, 0.65, 0x5e422d);
+  for (const x of [origin - shelfW / 2, origin + shelfW / 2])
+    box(g, x, 1.05, shelfZ + 0.04, 0.25, 2.0, 0.65, 0x5e422d);
+  // The single shelf board the books stand on.
+  box(g, origin, 0.42, shelfZ + 0.08, shelfW - 0.3, 0.14, 0.7, 0x66472f);
   collider(
     area,
-    box(g, origin, 1.7, shelfZ - 0.18, 8, 3.4, 0.24, 0x6b4a31),
+    box(g, origin, 1.0, shelfZ - 0.18, shelfW, 2.0, 0.24, 0x6b4a31),
     origin,
     shelfZ - 0.18,
-    8,
+    shelfW,
     0.24,
     4,
   );
@@ -27,7 +29,7 @@ function makeLibraryShelf(area, interactions, origin) {
     g,
     "READ-ALONG LIBRARY",
     origin,
-    3.85,
+    2.45,
     -5.78,
     7.2,
     "#fff1c7",
@@ -35,13 +37,15 @@ function makeLibraryShelf(area, interactions, origin) {
   );
 
   const slots = [];
-  for (let row = 0; row < 2; row++)
-    for (let col = 0; col < 6; col++)
-      slots.push({
-        x: origin - 2.95 + col * 1.18,
-        y: row === 0 ? 0.95 : 2.57,
-        z: -4.98,
-      });
+  const count = 12;
+  const spacing = 1.02;
+  const startX = origin - ((count - 1) * spacing) / 2;
+  for (let col = 0; col < count; col++)
+    slots.push({
+      x: startX + col * spacing,
+      y: 1.18,
+      z: -4.98,
+    });
   slots.forEach((slot, i) => {
     const book = BOOKS[i];
     if (book) {

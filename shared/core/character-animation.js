@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { ProceduralLayer } from "./procedural-animation.js";
 
 const once = new Set([
   "Jump",
@@ -79,6 +80,7 @@ export class CharacterAnimator {
     this.landTime = 0;
     this.carrying = false;
     this.reachTime = 0;
+    this.procedural = new ProceduralLayer(model);
     this.play("Idle", 0);
   }
   play(name, fade = 0.16) {
@@ -105,6 +107,20 @@ export class CharacterAnimator {
       this.current = null;
       this.play(current);
       return true;
+    }
+    // Procedural fallback: characters whose GLB lacks the authored clip
+    // (notably the cowboy) still get the gesture, synthesized live.
+    if (
+      !this.actions.has(name) &&
+      ROBOT_GESTURES.includes(name) &&
+      !this.carrying
+    ) {
+      const duration = this.procedural.startGesture(name);
+      if (duration > 0) {
+        this.gesture = name;
+        this.gestureTime = duration;
+        return true;
+      }
     }
     if (
       ![...ROBOT_GESTURES, "Dance"].includes(name) ||
@@ -142,6 +158,11 @@ export class CharacterAnimator {
     this.carrying = false;
     this.reachTime = 0;
     this.mixer.stopAllAction();
+    this.procedural.cancelGesture();
+    // Clear any procedural scale/tilt so the reset pose is clean.
+    this.model.scale.set(1, 1, 1);
+    this.model.rotation.x = 0;
+    this.model.rotation.z = 0;
     this.current = null;
     this.play("Idle", 0);
     this.mixer.update(0);
@@ -163,6 +184,7 @@ export class CharacterAnimator {
     if (!grounded || speed > 0.15) {
       this.gesture = null;
       this.gestureTime = 0;
+      this.procedural.cancelGesture();
     }
     let next;
     if (preparingJump) next = "JumpStart";
@@ -180,6 +202,9 @@ export class CharacterAnimator {
     }
     this.mixer.update(dt);
     this.gestureTime = Math.max(0, this.gestureTime - dt);
+    // Procedural life on top of the authored clip: breathing, squash &
+    // stretch, lean, head look, and any active procedural gesture.
+    this.procedural.update(dt, { speed, grounded, velocityY, event });
     if (this.reachTime > 0) {
       this.reachTime = Math.max(0, this.reachTime - dt);
       if (this.reachTime === 0 && !this.carrying) {
@@ -191,5 +216,7 @@ export class CharacterAnimator {
   dispose() {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
+    this.procedural.dispose();
+    this.model.scale.set(1, 1, 1);
   }
 }

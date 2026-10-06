@@ -15,19 +15,20 @@ export function runCafeChecks(game) {
     }
   };
   game.start();
-  check("Town café door enters the black room", () => {
+  check("Town café door enters the alien portal chamber", () => {
     const door = game.interactions.items.find(
       (item) => item.id === "cafe-door",
     );
     assert(door, "missing café door");
     game.interactions.handlers.get("door")(door);
     assert(game.area.id === "cafe", "wrong room");
-    assert(game.scene.background.getHex() === 0, "background is not black");
     assert(
-      game.skyLight.intensity === 0 &&
-        game.sun.intensity === 0 &&
-        game.scene.environmentIntensity === 0,
-      "room lighting is still on",
+      game.scene.background.getHex() === 0x0a0618,
+      "background is not alien indigo",
+    );
+    assert(
+      game.sun.intensity === 0 && game.scene.environmentIntensity === 0.25,
+      "room lighting is wrong",
     );
     assert(!game.areas.town.group.visible, "town still visible");
   });
@@ -107,8 +108,8 @@ export function runCafeChecks(game) {
       assert(game.area.id === "cafe", "arrival bounced back to Space");
       assert(game.player.position.y === 0, "café arrival altitude wrong");
       assert(
-        game.sun.intensity === 0 && game.skyLight.intensity === 0,
-        "café lighting not black",
+        game.sun.intensity === 0 && game.skyLight.intensity === 0.1,
+        "café lighting not alien",
       );
       assert(
         game.areas.space.group.getObjectByName("space-cafe-portal") === portal,

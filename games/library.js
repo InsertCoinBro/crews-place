@@ -12,23 +12,23 @@ export const BOOKS = [
     coverLine: "A quiet walk under a friendly sky",
     pages: [
       {
-        text: "Mira packed one soft scarf, one tiny snack, and one brave breath.",
+        text: "Mira packed one soft scarf that smelled like lavender, one tiny honey snack, and one brave breath that puffed out like a little cloud.",
         art: "moon",
       },
       {
-        text: "The moon made a silver path over every puddle in the lane.",
+        text: "The moon poured a silver path over every puddle in the lane, and each one winked back at her like a secret friend.",
         art: "puddle",
       },
       {
-        text: "When the path became dark, Mira counted five stars and took one more step.",
+        text: "When the path grew dark between the trees, Mira counted five brave stars — one, two, three, four, five — and her feet remembered how to be brave too.",
         art: "stars",
       },
       {
-        text: "A porch light blinked hello, and her backpack felt lighter than before.",
+        text: "A porch light blinked hello through the leaves, warm as a smile, and suddenly her backpack felt lighter than a feather.",
         art: "porch",
       },
       {
-        text: "Mira learned that a little light can travel with you anywhere.",
+        text: "Mira learned that a little light — moonlight, starlight, or the brave kind inside you — can travel with you anywhere you go.",
         art: "moon",
       },
     ],
@@ -43,23 +43,23 @@ export const BOOKS = [
     coverLine: "A patient train finds the best time to go",
     pages: [
       {
-        text: "Tiko was a small train with a bright bell and very round wheels.",
+        text: "Tiko was a small train with a bright brass bell that went ting-ting! and wheels so round they hummed a happy song on the rails.",
         art: "train",
       },
       {
-        text: "Big trains rushed by, but Tiko listened to the crossing guard.",
+        text: "Big express trains thundered past in a blur, but Tiko listened carefully to the crossing guard's whistle and waited, puffing soft white clouds.",
         art: "signal",
       },
       {
-        text: "He waited while ducks crossed, then waited while a kite string floated down.",
+        text: "He waited while seven ducks waddled across in a wiggly line, then waited while a red kite string floated down and tickled his chimney.",
         art: "ducks",
       },
       {
-        text: "At last the track was clear, and Tiko rolled smoothly through town.",
+        text: "At last the track was clear! Tiko's bell rang ting-ting-ting! and he rolled smoothly through town, waving to everyone he passed.",
         art: "track",
       },
       {
-        text: "Waiting did not make Tiko late. It helped everyone arrive safely.",
+        text: "Waiting did not make Tiko late at all. It helped every duck, every kite, and every friend arrive safely — and that felt better than hurrying.",
         art: "train",
       },
     ],
@@ -74,23 +74,23 @@ export const BOOKS = [
     coverLine: "A backyard song made from growing things",
     pages: [
       {
-        text: "Nia heard tap, tap, tap from seeds asleep under the soil.",
+        text: "Nia pressed her ear to the cool earth and heard it: tap, tap, tap — tiny seeds waking up and knocking softly to come out and play.",
         art: "garden",
       },
       {
-        text: "Rain played drums on leaves while worms wiggled the bass line.",
+        text: "Rain began to play drums on the broad leaves — pitter-patter-pit! — while the worms underground wiggled the wobbly bass line.",
         art: "rain",
       },
       {
-        text: "A sunflower lifted its face and hummed a warm yellow note.",
+        text: "A tall sunflower lifted its golden face to the sun and hummed one warm yellow note that buzzed like honey and felt like a hug.",
         art: "sunflower",
       },
       {
-        text: "Nia did not need to sing loudly. She hummed along in her own way.",
+        text: "Nia did not need to sing loudly or perfectly. She hummed along in her own quiet way, and the garden leaned in to listen.",
         art: "humming",
       },
       {
-        text: "The garden kept singing, and Nia knew she belonged in the song.",
+        text: "The garden kept singing its growing song, and Nia knew — deep in her roots — that she belonged in the music.",
         art: "garden",
       },
     ],
@@ -105,23 +105,23 @@ export const BOOKS = [
     coverLine: "A fluffy cloud discovers room for everyone",
     pages: [
       {
-        text: "Puff was a cloud who liked having the whole blue sky to himself.",
+        text: "Puff was a fluffy white cloud who loved having the whole wide blue sky all to himself, drifting wherever the breeze tickled him.",
         art: "cloud",
       },
       {
-        text: "A small bird asked for shade, and Puff made one soft corner.",
+        text: "A tiny tired bird asked, “Please, may I rest in your shade?” And Puff stretched out one soft, cool corner just for her.",
         art: "bird",
       },
       {
-        text: "A tired hill asked for rain, and Puff sprinkled silver drops.",
+        text: "A thirsty green hill whispered, “I’m so dry,” so Puff sprinkled silver raindrops that went plink-plink-plink on the leaves.",
         art: "rain",
       },
       {
-        text: "Soon Puff was not smaller. He was part of a bigger sky.",
+        text: "Puff didn’t feel smaller at all. He felt like part of something bigger — a sky full of friends.",
         art: "sky",
       },
       {
-        text: "Sharing gave Puff more places to float and more friends to see.",
+        text: "Sharing gave Puff more places to float, more songs to hear, and more friends waving up at him from below.",
         art: "cloud",
       },
     ],
@@ -136,23 +136,23 @@ export const BOOKS = [
     coverLine: "A gentle mystery with a cozy answer",
     pages: [
       {
-        text: "Under the stairs was a tiny green door with a brass button knob.",
+        text: "Under the stairs, half-hidden behind the winter coats, was a tiny green door with a brass knob shaped like a button.",
         art: "door",
       },
       {
-        text: "Sam knocked once. The door answered with a very polite creak.",
+        text: "Sam knocked once — knock-knock — and the door answered with the most polite little creak, as if it had been waiting to say hello.",
         art: "knob",
       },
       {
-        text: "Inside were pillows, picture books, and a lamp shaped like a pear.",
+        text: "Inside was the coziest nook: squishy pillows, a stack of picture books, and a lamp shaped like a glowing pear.",
         art: "nook",
       },
       {
-        text: "The secret place was not scary. It was quiet enough to think.",
+        text: "The secret place wasn’t scary at all. It was quiet enough to think big thoughts and soft enough to feel safe.",
         art: "lamp",
       },
       {
-        text: "Sam put a sign on the door: Come in softly, and stay as long as you need.",
+        text: "Sam hung a hand-drawn sign on the door: “Come in softly, and stay as long as you need. — Sam.”",
         art: "door",
       },
     ],
@@ -167,23 +167,23 @@ export const BOOKS = [
     coverLine: "A breakfast march with syrupy surprises",
     pages: [
       {
-        text: "On Saturday morning, Papa flipped one pancake too high.",
+        text: "On Saturday morning, Papa flipped one pancake a little too high — whoosh! — and everyone gasped.",
         art: "pancake",
       },
       {
-        text: "It landed on a plate, bounced twice, and rolled toward the door.",
+        text: "It landed on a plate with a plop, bounced twice like a trampoline, and rolled merrily toward the door.",
         art: "roll",
       },
       {
-        text: "Soon three pancakes, two berries, and a spoon were marching in a line.",
+        text: "Soon three fluffy pancakes, two giggling blueberries, and one brave spoon were marching in a wiggly line across the kitchen.",
         art: "parade",
       },
       {
-        text: "Milo followed with napkins, because parades can be sticky.",
+        text: "Milo marched behind with a stack of napkins, because everyone knows parades can be deliciously sticky.",
         art: "napkin",
       },
       {
-        text: "The pancake parade ended at the table, exactly where breakfast belonged.",
+        text: "The pancake parade marched right to the table and stopped — exactly where breakfast belonged, with syrup for everyone.",
         art: "pancake",
       },
     ],
@@ -198,23 +198,23 @@ export const BOOKS = [
     coverLine: "A small glow helps a big night feel kind",
     pages: [
       {
-        text: "Luma was a lantern who glowed softly beside the garden gate.",
+        text: "Luma was a small paper lantern who glowed softly beside the garden gate, humming a tiny warm light.",
         art: "lantern",
       },
       {
-        text: "The wind whooshed, and Luma's light shook like jelly.",
+        text: "The night wind whooshed through the trees — whooo! — and Luma’s light wobbled like jelly, but it did not go out.",
         art: "wind",
       },
       {
-        text: "A lost beetle saw the glow and buzzed closer.",
+        text: "A tiny lost beetle saw the warm glow and buzzed closer, his wings going bzz-bzz-bzz with relief.",
         art: "beetle",
       },
       {
-        text: "Luma stood steady while the beetle found the rose bush path.",
+        text: "Luma stood as steady as she could while the beetle followed her light all the way to the rose bush path home.",
         art: "path",
       },
       {
-        text: "Being brave did not mean shining the brightest. It meant shining enough.",
+        text: "Luma learned that being brave doesn’t mean shining the brightest. It means shining just enough, for just long enough, for someone who needs you.",
         art: "lantern",
       },
     ],
@@ -229,23 +229,23 @@ export const BOOKS = [
     coverLine: "Laundry day launches an outer-space idea",
     pages: [
       {
-        text: "One striped sock slipped from the basket and declared itself a rocket.",
+        text: "One stripy sock slipped from the laundry basket, pointed its toe at the ceiling, and declared: “I am a ROCKET!”",
         art: "rocket",
       },
       {
-        text: "It blasted past the couch planet and around the lamp moon.",
+        text: "It blasted past the big squashy couch planet — whoosh! — looped around the glowing lamp moon, and did a barrel roll over the rug.",
         art: "space",
       },
       {
-        text: "A button astronaut waved from the rug below.",
+        text: "A brave button astronaut waved from the rug below, shouting “Godspeed, Sock Rocket!” in a tiny button voice.",
         art: "button",
       },
       {
-        text: "The sock rocket found its twin hiding under a chair.",
+        text: "Behind the armchair, the sock rocket discovered its long-lost twin, who had been hiding there since Tuesday.",
         art: "chair",
       },
       {
-        text: "Together they landed in the drawer, ready for tomorrow's mission.",
+        text: "Together they zoomed back and landed softly in the drawer, side by side, already dreaming of tomorrow’s mission to the closet nebula.",
         art: "rocket",
       },
     ],
@@ -260,23 +260,23 @@ export const BOOKS = [
     coverLine: "A calm friend finds a calm way to play",
     pages: [
       {
-        text: "Dori the dragon liked quiet games and warm stones in the sun.",
+        text: "Dori the dragon loved quiet games, warm sun-toasted stones, and the soft shhhh of wind through the castle garden.",
         art: "dragon",
       },
       {
-        text: "When the castle yard got noisy, Dori took three slow breaths.",
+        text: "When the castle yard got too noisy and clangy, Dori closed her eyes and took three slow dragon breaths: in… out… in… out…",
         art: "breath",
       },
       {
-        text: "She invited one friend to sort shiny pebbles by color.",
+        text: "She invited one good friend to sit on the warm stones and sort shiny pebbles by color — reds here, blues there, sparkly ones in the middle.",
         art: "pebbles",
       },
       {
-        text: "More friends came, but everyone used soft voices near the stones.",
+        text: "More friends wandered over, but everyone used soft voices near the stones, because quiet games are best played gently.",
         art: "circle",
       },
       {
-        text: "Dori's day was not loud or lonely. It was just right.",
+        text: "Dori’s day wasn’t loud or lonely or too much. It was calm and cozy and exactly the right size — just like Dori liked it.",
         art: "dragon",
       },
     ],
@@ -291,23 +291,23 @@ export const BOOKS = [
     coverLine: "A winding river shows the way home",
     pages: [
       {
-        text: "A blue river curled through the meadow like a ribbon on a gift.",
+        text: "A blue river curled through the meadow like a satin ribbon on a birthday gift, sparkling where the sun kissed it.",
         art: "river",
       },
       {
-        text: "Leah followed it past stones, reeds, and one sleepy wooden bridge.",
+        text: "Leah followed it past smooth skipping stones, whispering reeds, and one sleepy old wooden bridge that snored softly in the sun.",
         art: "bridge",
       },
       {
-        text: "The river did not hurry. It bent around every hard place.",
+        text: "The river never hurried. When it met a hard place, it simply curved around it — gentle and patient, finding a new way.",
         art: "bend",
       },
       {
-        text: "When Leah felt unsure, she watched the water choose the next turn.",
+        text: "When Leah felt unsure about which way to go, she watched the water choose its next turn, and her feet felt braver too.",
         art: "water",
       },
       {
-        text: "By sunset, the river ribbon led her back to a porch and a wave.",
+        text: "By sunset, painted pink and gold, the river ribbon had led her all the way back to a porch, a warm wave, and home.",
         art: "porch",
       },
     ],
@@ -446,7 +446,7 @@ function makeCoverImage(book) {
   return canvas;
 }
 
-function drawFriendlyScene(c, book, page) {
+function drawFriendlyScene(c, book, page, time = 0) {
   const w = c.canvas.width;
   const h = c.canvas.height;
   c.fillStyle = "#fff8df";
@@ -682,6 +682,34 @@ function drawFriendlyScene(c, book, page) {
   c.lineWidth = 14;
   roundedRect(c, 28, 28, w - 56, h - 56, 34);
   c.stroke();
+
+  // ---- Living picture: gentle animated magic over every scene ----
+  for (let i = 0; i < 14; i++) {
+    const sx = 60 + ((i * 173 + time * 22 * (1 + (i % 3) * 0.4)) % (w - 120));
+    const sy = 70 + ((i * 211 + Math.sin(time * 0.9 + i) * 26) % (h - 160));
+    const tw = 0.35 + 0.65 * Math.abs(Math.sin(time * 1.7 + i * 2.1));
+    c.fillStyle = `rgba(255, 252, 230, ${0.55 * tw})`;
+    const r = 2.5 + (i % 3);
+    c.beginPath();
+    c.arc(sx, sy, r, 0, Math.PI * 2);
+    c.fill();
+    c.strokeStyle = `rgba(255, 252, 230, ${0.4 * tw})`;
+    c.lineWidth = 1.5;
+    c.beginPath();
+    c.moveTo(sx - r * 2.2, sy);
+    c.lineTo(sx + r * 2.2, sy);
+    c.moveTo(sx, sy - r * 2.2);
+    c.lineTo(sx, sy + r * 2.2);
+    c.stroke();
+  }
+  if (["moon", "stars", "puddle", "lantern", "wind", "beetle", "path"].includes(art)) {
+    for (let i = 0; i < 12; i++) {
+      const sx = 90 + ((i * 113) % 660);
+      const sy = 78 + ((i * 61) % 280);
+      const tw = 0.4 + 0.6 * Math.abs(Math.sin(time * 2.2 + i * 1.7));
+      circle(c, sx, sy, (3 + (i % 3)) * (0.7 + 0.5 * tw), `rgba(255, 248, 201, ${tw})`);
+    }
+  }
 }
 
 function makePicture(book, page) {
@@ -690,8 +718,47 @@ function makePicture(book, page) {
   picture.height = 650;
   picture.className = "book-picture";
   picture.dataset.art = page.art;
-  drawFriendlyScene(picture.getContext("2d"), book, page);
+  drawFriendlyScene(picture.getContext("2d"), book, page, 0);
   return picture;
+}
+
+// Pick the warmest available English storyteller voice. Browser TTS voices
+// vary wildly by platform; prefer natural/neural/premium voices, then known
+// good built-ins, then any English voice.
+let storyVoice = null;
+let storyVoiceReady = false;
+function pickStoryVoice() {
+  if (storyVoiceReady) return storyVoice;
+  const synth = window.speechSynthesis;
+  if (!synth) return null;
+  const voices = synth.getVoices();
+  if (!voices.length) return null;
+  storyVoiceReady = true;
+  const en = voices.filter((v) => /^en([-_]|$)/i.test(v.lang));
+  const pool = en.length ? en : voices;
+  const score = (v) => {
+    const n = (v.name + " " + (v.voiceURI || "")).toLowerCase();
+    let s = 0;
+    if (/natural|neural|premium|enhanced|high quality/.test(n)) s += 50;
+    if (/samantha|karen|moira|tessa|fiona/.test(n)) s += 40;
+    if (/google us english|google uk english female/.test(n)) s += 35;
+    if (/aria|jenny|guy|davis/.test(n)) s += 30;
+    if (/female|samantha|karen|zira|aria|jenny/.test(n)) s += 8;
+    if (/^en-us/i.test(v.lang)) s += 5;
+    if (v.localService) s += 3;
+    if (/whisper|robot|cellos|bubbles|bad|novelty/.test(n)) s -= 60;
+    return s;
+  };
+  pool.sort((a, b) => score(b) - score(a));
+  storyVoice = pool[0] || null;
+  return storyVoice;
+}
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  pickStoryVoice();
+  window.speechSynthesis.onvoiceschanged = () => {
+    storyVoiceReady = false;
+    pickStoryVoice();
+  };
 }
 
 export class LibraryReader {
@@ -702,6 +769,7 @@ export class LibraryReader {
     this.reading = false;
     this.timer = 0;
     this.snapshot = null;
+    this.pictureAnim = null;
     this.root = document.createElement("section");
     this.root.id = "library-reader";
     this.root.hidden = true;
@@ -736,7 +804,10 @@ export class LibraryReader {
       }
     });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) this.stopReading();
+      if (document.hidden) {
+        this.stopReading();
+        this.stopPictureAnimation();
+      }
     });
   }
 
@@ -766,6 +837,7 @@ export class LibraryReader {
   close() {
     if (!this.book) return;
     this.stopReading();
+    this.stopPictureAnimation();
     this.book = null;
     this.root.hidden = true;
     document.body.classList.remove("library-active");
@@ -777,6 +849,26 @@ export class LibraryReader {
     this.game.setMode("playing");
     this.game.canvas.focus({ preventScroll: true });
     this.game.ui.toast("Back in the Little Library.");
+  }
+
+  startPictureAnimation(canvas, book, page) {
+    this.stopPictureAnimation();
+    const ctx = canvas.getContext("2d");
+    const start = performance.now();
+    const tick = () => {
+      if (!this.book) return;
+      const time = (performance.now() - start) / 1000;
+      drawFriendlyScene(ctx, book, page, time);
+      this.pictureAnim = requestAnimationFrame(tick);
+    };
+    this.pictureAnim = requestAnimationFrame(tick);
+  }
+
+  stopPictureAnimation() {
+    if (this.pictureAnim) {
+      cancelAnimationFrame(this.pictureAnim);
+      this.pictureAnim = null;
+    }
   }
 
   next(auto = false) {
@@ -828,8 +920,11 @@ export class LibraryReader {
     };
     if ("speechSynthesis" in window && "SpeechSynthesisUtterance" in window) {
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.86;
-      utterance.pitch = 1.06;
+      const voice = pickStoryVoice();
+      if (voice) utterance.voice = voice;
+      utterance.rate = 0.94;
+      utterance.pitch = 1.02;
+      utterance.volume = 1;
       utterance.onend = done;
       utterance.onerror = () => {
         this.timer = setTimeout(done, pageReadSeconds(text) * 1000);
@@ -848,6 +943,7 @@ export class LibraryReader {
     author.textContent = this.book.author;
     bookNode.className = "reader-book page-" + direction;
     bookNode.replaceChildren();
+    this.stopPictureAnimation();
     if (this.page === 0) {
       bookNode.append(makeCoverImage(this.book));
       const coverText = document.createElement("div");
@@ -860,7 +956,9 @@ export class LibraryReader {
       bookNode.append(coverText);
     } else {
       const page = this.book.pages[this.page - 1];
-      bookNode.append(makePicture(this.book, page));
+      const picture = makePicture(this.book, page);
+      bookNode.append(picture);
+      this.startPictureAnimation(picture, this.book, page);
       const text = document.createElement("p");
       text.className = "reader-page-text";
       text.textContent = page.text;
