@@ -157,8 +157,8 @@ export class TeddyBearWorld {
     this.group.add(this.boat);
     box(this.group, LAKE.x, 0.35, LAKE.z - LAKE.rz - 4, 5, 0.25, 6, wood);
     for (const [dx, dz] of [[-2, -2], [2, -2], [-2, 2], [2, 2]]) cylinder(this.group, LAKE.x + dx, -0.4, LAKE.z - LAKE.rz - 4 + dz, 0.18, 0.18, 1.6, woodDark, 8);
-    this.boardItem = game.interactions.register({ id: "teddy-steamboat", area: "town", kind: "teddy-steamboat", x: this.dockPos.x, z: this.dockPos.z, radius: 5, label: "Board the Teddy Steamboat", hint: "E to board \u00B7 E to get off" });
-    game.interactions.on("teddy-steamboat", () => this.board());
+    this.boardItem = this.game.interactions.register({ id: "teddy-steamboat", area: "town", kind: "teddy-steamboat", x: this.dockPos.x, z: this.dockPos.z, radius: 5, label: "Board the Teddy Steamboat", hint: "E to board \u00B7 E to get off" });
+    this.game.interactions.on("teddy-steamboat", () => this.board());
     this.steam = [];
   }
   board() {
